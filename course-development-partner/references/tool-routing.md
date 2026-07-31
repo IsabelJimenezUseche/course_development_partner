@@ -36,6 +36,8 @@ Use this order:
 
 Use the narrowest read-only capability that completes the operation. Do not substitute a broad browser workflow for an available semantic connector.
 
+Choose the educational mechanism and evidence need before choosing a tool. Do not introduce a tool because it is available or visually impressive.
+
 Map tool names to portable capabilities defined in `mcp-capability-contracts.md`.
 
 ## 3. Capability profiles
@@ -65,6 +67,7 @@ Add scholarly search, DOI metadata, reference management, de-identified analytic
 - Do not store identifiable student data in portable state.
 - Confirm at action time before publishing, messaging, grading, changing permissions, overwriting live materials, or changing live settings.
 - Do not let AI alone determine grades, misconduct, accommodations, or other consequential student outcomes.
+- Do not analyze small or disaggregated groups when re-identification risk, authority, or educational purpose is unresolved.
 - Record material external writes in the design log.
 
 ## 5. Provenance
@@ -77,6 +80,7 @@ For external claims, contexts, data, visuals, or policies, preserve:
 - authority type: professor, institutional, scholarly, external, or illustrative;
 - supported claim or artifact;
 - license, attribution, or reuse restrictions.
+- ownership and permitted treatment of student-created work.
 
 Label professor-provided materials distinctly. State when a mapping or result is incomplete, inferred, or unverified.
 
@@ -95,6 +99,8 @@ Label professor-provided materials distinctly. State when a mapping or result is
 | Storage/versioning | Update portable design log and artifact manifest |
 
 Reduce automation, not rigor.
+
+For accessibility tools, also record the tool and ruleset version, exact standard/version/level supplied as the target, tested scope, manual checks completed, untested scope, and claim limitations. Automated scans do not establish ADA or Section 504 compliance and do not cover all WCAG success criteria. Read `references/accessibility-and-compliance.md` before selecting or interpreting an accessibility checker.
 
 ## 7. Reporting
 

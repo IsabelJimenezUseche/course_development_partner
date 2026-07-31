@@ -154,14 +154,34 @@ fallback: manual open/render checklist
 capability: check_accessibility
 input:
   artifact_reference
-  required_standard_or_policy: optional
+  artifact_type
+  required_standard:
+    name
+    exact_version
+    conformance_level
+    scope
+    authority
+    effective_date_if_available
+  inspection_methods_requested: [source, automated, keyboard, reflow, rendered, assistive_technology, human_content_review]
 output:
-  findings
+  findings:
+    - location
+    - severity
+    - evidence
+    - criterion_or_policy_mapping
+    - recommendation
+  tool_and_ruleset_versions
+  scope_tested
   automated_coverage
+  manual_checks_completed
   manual_checks_required
+  untested_scope
+  claim_limitations
 write_effect: none unless remediation is separately authorized
 fallback: manual accessibility checklist
 ```
+
+An accessibility tool reports bounded evidence, not ADA or Section 504 compliance. Do not silently map WCAG 2.2 results to a requirement that names WCAG 2.1, or vice versa. Require authoritative institutional review for legal applicability, exceptions, alternate versions, equivalent facilitation, fundamental alteration, undue burden, procurement acceptance, and release with unresolved barriers.
 
 ```yaml
 capability: analyze_learning_evidence
@@ -169,14 +189,19 @@ input:
   deidentified_data_reference
   analysis_question
   approved_variables
+  intended_use: course_improvement | program_evaluation | research_or_dissemination
+  governance_status
 output:
   reproducible_method
   results
   limitations
   privacy_notes
+  supported_and_unsupported_claims
 write_effect: local outputs only
 fallback: analysis plan and de-identification instructions
 ```
+
+Do not call this capability when intended use, authority, small-group re-identification risk, or required institutional review is unresolved. De-identification alone does not authorize research or dissemination.
 
 ## 8. Storage, versioning, and LMS
 

@@ -10,6 +10,10 @@
 6. Accessibility, inclusion, and clarity
 7. Assessment integrity and fairness
 8. Artifact integrity
+9. Evidence and source quality
+10. Engineering authenticity when applicable
+11. Implementation feasibility and sustainability
+12. Improvement evidence and research boundary
 
 ## 1. Severity and reporting
 
@@ -52,6 +56,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Remove or justify orphan activities and assessments.
 - Ensure engagement serves learning rather than replacing it.
 - Check that rubric criteria and weights reflect objective importance.
+- For course-level work, check prerequisite flow, outcome development, assessment timing, feedback opportunities, and workload across the sequence.
 
 ## 4. Scaffolding and readiness
 
@@ -59,7 +64,9 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Increase difficulty for a stated reason.
 - Keep challenge attainable with available support.
 - Surface and address likely misconceptions.
+- Elicit the current student model, use evidence to examine it, and re-test a revised model when conceptual change is intended.
 - Distinguish conceptual, procedural, computational, and communication needs.
+- Remove avoidable load from notation, directions, representations, interfaces, and simultaneous demands.
 - Remove supports when independent performance is expected.
 - Culminate in interpretation, justification, transfer, or decision-making when appropriate.
 
@@ -68,6 +75,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Ensure students can understand directions without excessive oral repair.
 - Ensure students perform the intended cognitive work.
 - Support equitable participation and useful group roles.
+- Preserve individual accountability and evidence of individual learning in collaborative work.
 - Include checkpoints, feedback, debrief, and closure.
 - Fit the stated time, class size, room, staffing, and technology.
 - Provide a fallback for time or technology failure.
@@ -75,16 +83,27 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 
 ## 6. Accessibility, inclusion, and clarity
 
+- Read `references/accessibility-and-compliance.md` and record the applicable institutional authority plus the exact required technical standard, version, level, scope, and effective date when relevant.
+- Keep ADA, Section 504, institutional policy, WCAG conformance, universal design, and individual accommodations distinct.
 - Use concise language and explain necessary jargon.
 - Chunk and order instructions.
-- Use semantic headings and meaningful link text.
+- Use semantic headings, landmarks, labels, instructions, and meaningful link text.
 - Ensure sufficient contrast and legible sizing.
 - Avoid color-only meaning.
 - Provide alternative text, transcripts, captions, or textual equivalents.
-- Check table structure and reading order.
+- Check table structure, document language, accessible equations, reading order, and metadata.
+- Check keyboard-only operation, logical focus order, visible and unobscured focus, zoom, reflow, time limits, input errors, and accessible authentication when applicable.
+- Inspect PDF tags and reading order rather than assuming a visually correct PDF is accessible.
+- Verify generated captions, transcripts, descriptions, and alternative text for disciplinary accuracy.
+- Include embedded and third-party learning tools in the reviewed scope.
 - Avoid irrelevant stereotypes and exclusionary assumptions.
 - Match workload, reading level, and background to the audience.
 - Respect required accommodations and institutional policy.
+- Verify that learner variability, access, participation, and belonging barriers were considered during intake and design rather than only remediated at the end.
+- Offer multiple means of engagement, representation, or expression only when they preserve the target construct.
+- Combine automated, keyboard, rendered, assistive-technology, and human-content checks in proportion to the artifact and stakes; record untested scope.
+- Do not claim WCAG conformance from an automated scan alone or make an ADA/Section 504 compliance or exception determination.
+- Record unresolved barriers, responsible owners, interim access, remediation dates, and required institutional approvals in `assets/accessibility-review.md`.
 
 ## 7. Assessment integrity and fairness
 
@@ -92,11 +111,15 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Check time burden and point balance.
 - Remove accidental answer cues and information leakage.
 - Ensure the rubric measures intended learning.
+- State the intended interpretation or decision and check outcome coverage, under-sampling, and alternative explanations for performance.
 - Apply consistent rules across valid approaches.
 - Define error propagation and carry-forward credit.
 - Detect double penalties.
 - Protect identifiable student data.
 - Never make consequential grading or academic-integrity decisions solely from AI output.
+- Match scorer preparation, moderation, and consistency evidence to the stakes and judgment required.
+- State the permitted-AI context without claiming an assessment is AI-proof.
+- Do not call an assessment or rubric validated unless the claimed interpretation and use have proportionate supporting evidence.
 
 ## 8. Artifact integrity
 
@@ -110,3 +133,36 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Record the last-reviewed date and unresolved issues.
 
 Run the deterministic state, alignment, and manifest validators when applicable. If tools cannot run, perform their documented checks manually.
+
+## 9. Evidence and source quality
+
+- Identify the source or professor-approved rationale for consequential pedagogical recommendations.
+- Represent applicability, strength, uncertainty, and context limits accurately.
+- Distinguish institutional requirements, disciplinary sources, learning research, practice guidance, illustrative contexts, and generated content.
+- Verify licenses, attribution, adaptation rights, and reuse restrictions.
+- Do not let a general recommendation override an authoritative course requirement without an instructor decision.
+
+## 10. Engineering authenticity when applicable
+
+- Require engineering formulation, analysis, design, experimentation, interpretation, or judgment rather than a themed calculation alone.
+- Verify applicable standards, multiple constraints, uncertainty, risk, and tradeoffs.
+- Include safety, welfare, ethical, lifecycle, environmental, social, or stakeholder consequences when they materially affect the decision.
+- Allow multiple defensible alternatives when evidence and reasoning support them.
+- Require qualified instructor review of consequential technical, safety, ethical, or standards claims.
+
+## 11. Implementation feasibility and sustainability
+
+- Estimate professor, TA, grader, student, technology-support, and accessibility-support workload.
+- Check preparation, facilitation, grading, feedback, training, maintenance, and versioning—not only class time.
+- Verify room, laboratory, software, data, equipment, and support availability.
+- Provide a realistic fallback and minimum viable implementation.
+- Make workload tradeoffs visible and obtain instructor approval when resources constrain the preferred design.
+
+## 12. Improvement evidence and research boundary
+
+- Map each collected variable or observation to an improvement decision.
+- Use more than satisfaction, participation, grades, or anecdote alone to claim learning.
+- State alternative explanations and prohibit unsupported causal claims.
+- Use disaggregated evidence only when lawful, ethical, privacy-preserving, sufficiently aggregated, and actionable.
+- Distinguish ordinary course improvement, program evaluation, and research or dissemination.
+- Pause research-like collection or dissemination for applicable institutional review, privacy, and data-governance guidance; de-identification alone is insufficient authorization.

@@ -1,3 +1,7 @@
 # Local design and implementation planning
 /design.md
 /TODO.md
+
+# Generated Python caches
+__pycache__/
+*.py[cod]

@@ -43,9 +43,15 @@ Ask no more than three questions at a time. Prefer questions that change the des
 - What evidence would demonstrate that learning?
 - What do students already know?
 - Where do they usually struggle?
+- What prediction, explanation, or decision would reveal their current model?
 - Which source requirements are fixed?
 - Is the target fluency, understanding, model selection, interpretation, transfer, design, or judgment?
 - What time, staffing, room, technology, grading, or accessibility constraints apply?
+- Which institutional accessibility policy or process applies, and is an exact WCAG version, conformance level, scope, or review date required?
+- Which access, participation, or belonging barriers should shape the design from the start?
+- What professor, TA, grader, and student workload is sustainable?
+- What collaboration, resources, and AI use are permitted for the assessment?
+- Is proposed evidence collection ordinary course improvement, program evaluation, or research/dissemination?
 
 Do not ask for facts already available in supplied materials. Extract them and ask only about ambiguity.
 

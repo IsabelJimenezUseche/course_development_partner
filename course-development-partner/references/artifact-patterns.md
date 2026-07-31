@@ -20,7 +20,10 @@ For every artifact, identify:
 - audience and teaching use;
 - mapped learning outcome and intended cognitive demand;
 - prerequisites and likely misconceptions;
+- learning mechanism and evidence-informed rationale when consequential;
 - delivery constraints;
+- learner variability, access, participation, and implementation-load constraints;
+- applicable accessibility authority, exact technical target, and review evidence when relevant;
 - progressive preview;
 - student-facing and instructor-facing components;
 - required validation passes;
@@ -28,6 +31,8 @@ For every artifact, identify:
 - editable and rendered output requirements.
 
 Keep related artifacts synchronized. Never allow the solution, rubric, or instructor guide to introduce an unstated requirement or assumption.
+
+When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and use `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
 
 ## 2. Lesson plans
 
@@ -40,6 +45,7 @@ Include:
 - time blocks;
 - instructor and student actions;
 - checks for understanding;
+- feedback use, scaffold fading, and transfer when appropriate;
 - transition language;
 - debrief and closure prompts;
 - materials and technology;
@@ -52,7 +58,7 @@ Validate that the plan is feasible for the stated class size, room, time, staffi
 
 Preview: ordered reasoning/task sequence with the purpose of each step.
 
-Design a progression toward meaningful challenge. Include visible progress markers, adequate workspace, group roles when useful, checkpoints, synthesis, and debrief. Avoid busywork and disconnected question sets.
+Design a progression toward meaningful challenge. Include visible progress markers, adequate workspace, checkpoints, synthesis, and debrief. Design access and participation before production. When work is collaborative, define meaningful roles, equitable participation, individual accountability, interdependence, and evidence of individual understanding. Avoid busywork and disconnected question sets.
 
 Create:
 
@@ -77,12 +83,15 @@ When appropriate, ask students to:
 - interpret a result;
 - examine limitations or sensitivity;
 - recommend an action.
+- reason about uncertainty, risk, or tradeoffs.
 
 Remove irrelevant detail unless distinguishing signal from noise is an explicit objective. Independently verify facts, data, equations, and solvability.
 
+For engineering tasks, apply `references/engineering-authenticity.md`. Make relevant standards, multiple constraints, safety, welfare, ethics, stakeholder perspectives, uncertainty, and lifecycle effects part of the decision rather than decorative context.
+
 ## 5. Assessments
 
-Preview: assessment blueprint with outcome, cognitive demand, item type, points, and time.
+Preview: `assets/assessment-blueprint.md` with outcome, intended interpretation/use, evidence claim, cognitive demand, item type, dependency, points, time, and construct-irrelevant barriers.
 
 Map every item to an outcome. Check:
 
@@ -94,8 +103,12 @@ Map every item to an outcome. Check:
 - independence or intentional dependency among items;
 - fairness across valid methods;
 - technical correctness.
+- outcome coverage and under-sampling;
+- alternative explanations for performance;
+- scorer preparation and moderation;
+- permitted collaboration, resources, and AI use.
 
-Independently solve quantitative items before use. Distinguish diagnostic, formative, and summative purposes.
+Independently solve quantitative items before use. Distinguish diagnostic, formative, and summative purposes. Apply `references/assessment-quality.md` for consequential use and state the evidence level accurately; do not call an assessment validated based only on classroom review.
 
 ## 6. Rubrics and calibration
 
@@ -157,6 +170,7 @@ Request removal of names, identifiers, existing grades, accommodation informatio
 7. Ask the instructor to approve consequential changes.
 8. Re-score every example after revision.
 9. Check whether another grader could apply the interpretation consistently.
+10. For consequential use, ask at least two qualified graders to score independently when feasible, compare criterion-level disagreements, revise guidance or moderation rules, and re-score.
 
 Create an instructor/grader calibration guide containing de-identified boundary examples, approved interpretations, dependency rules, valid alternatives, and common misconceptions. Keep it separate from the student-facing rubric.
 
@@ -172,6 +186,7 @@ Confirm:
 - later correct reasoning receives carry-forward credit where appropriate;
 - alternative correct methods can receive full credit;
 - examples produce defensible scores and feedback;
+- scorer-consistency evidence and unresolved disagreements are represented accurately;
 - student expectations are clear without revealing answers or constraining valid approaches.
 
 ## 7. Solution keys
@@ -225,7 +240,7 @@ Make purpose, required action, deadline, criteria, and help pathway easy to find
 
 ### Surveys and reflections
 
-Map each item to a decision or research question. Avoid collecting unnecessary identifying data. Distinguish course improvement from human-subjects research and follow institutional requirements.
+Map each item to a decision or research question. Avoid collecting unnecessary identifying data. Use `assets/implementation-evidence-plan.md` when collecting new evidence. Distinguish course improvement, program evaluation, and research or dissemination. De-identification alone does not authorize research; pause research-like collection or dissemination for applicable institutional review and data-governance guidance.
 
 ### Audio and video
 

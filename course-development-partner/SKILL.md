@@ -1,6 +1,6 @@
 ---
 name: course-development-partner
-description: Collaboratively create, redesign, produce, and validate higher-education course materials using backward design, authentic disciplinary contexts, active learning, progressive scaffolding, aligned assessment, professor-led quality control, and available MCP or native tools. Use when a professor or instructional designer needs to plan or review a course, module, lesson, worksheet, contextualized problem, assessment, rubric, solution key, slide storyboard, visual explanation, study guide, or related teaching artifact; analyze legacy course materials; convert lectures to active learning; calibrate rubrics with de-identified student responses; research and verify content; or produce editable teaching files.
+description: Collaboratively create, redesign, produce, and validate higher-education course materials using backward design, evidence-informed learning mechanisms, authentic disciplinary contexts, inclusive and accessible participation, ADA and WCAG awareness, progressive scaffolding, aligned assessment, professor-led quality control, and available MCP or native tools. Use when a professor or instructional designer needs to plan or review a course, curriculum sequence, module, lesson, worksheet, contextualized or engineering problem, assessment, rubric, solution key, slide storyboard, visual explanation, study guide, or related teaching artifact; analyze legacy course materials; convert lectures to active learning; calibrate rubrics with de-identified student responses; research and verify content; review accessibility requirements; or produce editable teaching files.
 ---
 
 # Course Development Partner
@@ -27,7 +27,7 @@ Separate generation from validation. A polished draft is not evidence that an ar
    - **Rapid:** proceed with visible assumptions and request review of a nearly complete draft.
    Use Studio unless the instructor explicitly selects another mode. Do not silently choose Guided or Rapid because the request appears complete.
 4. Ask no more than three questions at once. Prefer one pivotal question when it unlocks the next useful preview.
-5. Create or update `course-design-brief.md` from `assets/course-design-brief.md`.
+5. Create or update `course-design-brief.md` from `assets/course-design-brief.md`, including learner variability, access, participation, applicable institutional accessibility requirements, permitted-AI, and implementation constraints relevant to the task.
 6. Maintain **Confirmed**, **Assumed**, and **Open** lists.
 7. Read [references/interaction-protocol.md](references/interaction-protocol.md) when beginning a new collaboration, changing modes, or presenting a consequential decision.
 
@@ -49,16 +49,24 @@ Stop for instructor direction in every mode when a decision changes authoritativ
 Route the task to the necessary phases; do not force irrelevant phases for a focused artifact request.
 
 1. **Establish:** confirm collaboration mode, purpose, and portable state.
-2. **Inspect:** inventory course context, authoritative requirements, legacy material, gaps, and conflicts.
+2. **Inspect:** inventory course context, authoritative requirements, learner variability, access and participation barriers, implementation capacity, legacy material, gaps, and conflicts.
 3. **Align:** connect observable outcomes to evidence, activities, feedback, and assessment.
-4. **Diagnose:** identify prerequisites, misconceptions, bottlenecks, and the intended cognitive demand.
-5. **Sequence:** design progressive challenge, checks for understanding, debrief, timing, and instructor/TA moves.
+4. **Diagnose:** identify prerequisites, student models or misconceptions, bottlenecks, intended cognitive demand, and avoidable cognitive load.
+5. **Sequence:** design an explicit learning mechanism, progressive challenge, feedback use, scaffold fading, transfer, equitable participation, debrief, timing, and instructor/TA moves.
 6. **Contextualize:** add a credible disciplinary situation and decision only when it improves learning.
 7. **Produce:** create the required student, instructor, solution, rubric, accessibility, and source artifacts.
-8. **Validate:** run separate technical, alignment, scaffolding, feasibility, accessibility, assessment, and file-integrity passes.
+8. **Validate:** run separate technical, alignment, evidence-rationale, scaffolding, feasibility, accessibility, assessment, engineering-authenticity when applicable, and file-integrity passes.
 9. **Package and iterate:** label versions, verify rendering, record open issues, and capture implementation evidence for revision.
 
 Read [references/design-workflow.md](references/design-workflow.md) for phase inputs, outputs, and decision points.
+
+Read [references/evidence-informed-design.md](references/evidence-informed-design.md) when selecting a teaching strategy, diagnosing misconceptions or cognitive load, designing for learner variability, or explaining why an activity should produce learning.
+
+Read [references/accessibility-and-compliance.md](references/accessibility-and-compliance.md) when digital content, documents, media, assessments, accommodations, ADA, Section 504, WCAG, third-party learning technology, or an institutional accessibility policy is relevant. Record the exact required standard, version, level, scope, and authority. Do not claim ADA or Section 504 compliance, or infer a legal exception, from an automated scan or AI review.
+
+Read [references/course-coherence-and-implementation.md](references/course-coherence-and-implementation.md) for full-course or multi-week work, workload and sustainability decisions, implementation evidence, or course-improvement/research boundaries.
+
+Read [references/engineering-authenticity.md](references/engineering-authenticity.md) only when an engineering or engineering-technology task requires professional judgment, design, experimentation, standards, risk, safety, ethics, or sociotechnical tradeoffs.
 
 ## Preview before producing
 
@@ -80,6 +88,8 @@ Keep learning outcomes, terminology, notation, assumptions, difficulty, examples
 
 Read [references/artifact-patterns.md](references/artifact-patterns.md) before creating or materially revising a lesson plan, active-learning worksheet, context-rich problem, assessment, rubric, solution key, slide/visual, study guide, communication, survey, or media script.
 
+Read [references/assessment-quality.md](references/assessment-quality.md) before designing or validating a consequential assessment, claiming an assessment or rubric is validated, calibrating multiple graders, or adapting assessment to a permitted-AI context.
+
 For rubrics:
 
 1. Clarify rubric structure, formative/summative use, scale, weights, and scoring orientation before producing a final rubric.
@@ -89,6 +99,7 @@ For rubrics:
 5. Before scoring calibration examples, obtain the response content or confirmation that summaries are sufficient and ask what each example demonstrates about the objective. Do not score examples first and solicit instructor judgment afterward.
 6. Compare rubric results with instructor judgments, revise focused criteria or rules, re-score examples, and obtain approval for consequential scoring decisions.
 7. Keep calibration examples in an instructor/grader guide, separate from the student-facing rubric.
+8. For consequential use, have qualified graders score a purposeful sample independently when feasible; diagnose criterion-level disagreement, re-score after revision, and state when consistency evidence is unavailable.
 
 ## Validate independently
 
@@ -105,8 +116,12 @@ Read [references/validation-checklists.md](references/validation-checklists.md) 
 - `scripts/validate_design_state.py`
 - `scripts/validate_alignment_map.py`
 - `scripts/validate_artifact_manifest.py`
+- `scripts/validate_assessment_blueprint.py`
+- `scripts/validate_course_curriculum_map.py`
 
 Perform the documented manual checks when scripts cannot run. Independently solve quantitative assessment items and verify equations, units, assumptions, models, boundary conditions, and visuals as applicable.
+
+For an accessibility review, create `accessibility-review.md` from `assets/accessibility-review.md`. Use automated, manual, rendered, keyboard, and assistive-technology evidence in proportion to the artifact and stakes; never treat one method as complete coverage.
 
 ## Preserve portability and provenance
 
@@ -120,4 +135,6 @@ Preserve source title, owner/publisher, stable reference, retrieval date when ti
 2. Update `artifact-manifest.md` from `assets/artifact-manifest.md`.
 3. Report tools used, validation completed, unresolved blockers or assumptions, and required instructor review.
 4. Provide concise implementation notes, timing, materials, and contingencies when relevant.
-5. Invite post-use reflection without claiming improved learning absent evidence.
+5. Use `assets/implementation-plan.md` when preparation, staffing, grading, technology, or maintenance load is consequential.
+6. Use `assets/implementation-evidence-plan.md` before collecting new learning evidence; distinguish course improvement from program evaluation or research and pause for applicable institutional guidance.
+7. Invite post-use reflection without claiming improved learning absent evidence.

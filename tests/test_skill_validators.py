@@ -94,5 +94,102 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertIn("unresolved blockers/open issues", result.stdout)
 
 
+class AssessmentBlueprintValidatorTests(unittest.TestCase):
+    def test_complete_blueprint_passes(self) -> None:
+        content = """# Assessment Blueprint
+| Item ID | Outcome(s) | Intended interpretation/use | Evidence claim | Cognitive demand | Item type | Dependency | Expected time (min) | Points | Construct-irrelevant barriers | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A-1 | LO-1 | Formative feedback | Select and justify a model | Evaluate | Constructed response | independent | 12 | 10 | none identified | approved |
+- Evidence level claimed: classroom-reviewed
+"""
+        result = run_script(
+            "validate_assessment_blueprint.py",
+            content,
+            ".md",
+            "--required-outcome",
+            "LO-1",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_blueprint_detects_missing_coverage_and_overclaim(self) -> None:
+        content = """# Assessment Blueprint
+| Item ID | Outcome(s) | Intended interpretation/use | Evidence claim | Cognitive demand | Item type | Dependency | Expected time (min) | Points | Construct-irrelevant barriers | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A-1 | LO-1 | Final grade | Correct answer | Apply | Problem | independent | 10 | 10 | none identified | review |
+- Evidence level claimed: formally validated
+"""
+        result = run_script(
+            "validate_assessment_blueprint.py",
+            content,
+            ".md",
+            "--required-outcome",
+            "LO-2",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("Required outcome is not sampled: LO-2", result.stdout)
+        self.assertIn("Formal-validation claim requires", result.stdout)
+
+
+class CourseCurriculumMapValidatorTests(unittest.TestCase):
+    def test_coherent_course_map_passes(self) -> None:
+        content = """# Course Curriculum Map
+| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|
+| 1 | LO-1 | introduce | external: prerequisite course | Prediction and model sketch | Diagnostic feedback | 2 | approved |
+| 2 | LO-1 | practice | none | Contrasting cases | Peer and instructor feedback | 3 | approved |
+| 3 | LO-1 | assess | none | Novel transfer problem | Scored rubric | 2 | approved |
+"""
+        result = run_script(
+            "validate_course_curriculum_map.py",
+            content,
+            ".md",
+            "--max-hours-per-module",
+            "8",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_course_map_detects_sequence_cycle_and_overload(self) -> None:
+        content = """# Course Curriculum Map
+| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|
+| 1 | LO-1 | assess | LO-2 | Final design | Scored rubric | 6 | review |
+| 1 | LO-2 | introduce | LO-1 | Initial model | Diagnostic feedback | 5 | review |
+"""
+        result = run_script(
+            "validate_course_curriculum_map.py",
+            content,
+            ".md",
+            "--max-hours-per-module",
+            "8",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("mastery/assessment appears before introduction or practice", result.stdout)
+        self.assertIn("Circular outcome prerequisites", result.stdout)
+        self.assertIn("exceeds limit 8", result.stdout)
+
+
+class PackageContentTests(unittest.TestCase):
+    def test_every_reference_is_routed_from_skill(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        for reference in sorted((skill_root / "references").glob("*.md")):
+            self.assertIn(f"references/{reference.name}", skill_text, reference.name)
+
+    def test_development_docs_are_outside_runtime_package(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        self.assertFalse((skill_root / "README.md").exists())
+        self.assertFalse((skill_root / "design.md").exists())
+        self.assertFalse((skill_root / "TODO.md").exists())
+
+    def test_accessibility_profile_is_operational_and_bounded(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        reference_text = (skill_root / "references" / "accessibility-and-compliance.md").read_text(encoding="utf-8")
+        self.assertIn("assets/accessibility-review.md", skill_text)
+        self.assertIn("WCAG 2.1 Level AA", reference_text)
+        self.assertIn("Purdue University", reference_text)
+        self.assertIn("must not make a legal or institutional compliance determination", (skill_root / "assets" / "accessibility-review.md").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

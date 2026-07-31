@@ -6,8 +6,13 @@ Store consequential context in ordinary Markdown:
 
 - `course-design-brief.md`
 - `alignment-map.md`
+- `assessment-blueprint.md`
+- `course-curriculum-map.md`
 - `context-brief.md`
 - `lesson-storyboard.md`
+- `implementation-plan.md`
+- `implementation-evidence-plan.md`
+- `accessibility-review.md`
 - `design-log.md`
 - `artifact-manifest.md`
 - `capability-manifest.md`
@@ -40,6 +45,7 @@ Include:
 4. source and provenance notes;
 5. validation reports;
 6. unresolved blockers, assumptions, and next decision.
+7. current curriculum, assessment, implementation, and evidence plans when they exist.
 
 Exclude:
 
@@ -56,5 +62,8 @@ Exclude:
 4. Discover local capabilities and update the capability manifest.
 5. State any mapping differences that change deliverables or privacy.
 6. Continue from the recorded next decision.
+7. Verify that outcome IDs, artifact relationships, privacy classifications, and evidence limitations remain intact.
 
 Do not ask the instructor to restate confirmed information unless it is missing, contradictory, or unsafe to infer.
+
+Do not claim cross-client support from file readability alone. Run the same educational scenario in each claimed client and compare decisions, safeguards, artifact relationships, and fallbacks.

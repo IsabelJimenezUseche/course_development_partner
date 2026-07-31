@@ -1,4 +1,4 @@
 interface:
   display_name: "Course Development Partner"
-  short_description: "Co-design rigorous higher-education materials"
-  default_prompt: "Use $course-development-partner to collaboratively design an aligned, scaffolded teaching artifact."
+  short_description: "Co-design evidence-informed course materials"
+  default_prompt: "Use $course-development-partner to co-design an aligned, accessible, evidence-informed higher-education artifact."
