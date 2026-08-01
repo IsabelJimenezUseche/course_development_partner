@@ -24,11 +24,18 @@ REQUIRED = (
     "feedback or assessment",
     "status",
 )
+VALID_STATUSES = {"draft", "review", "approved", "blocked", "retired"}
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate required columns and outcome alignment in a Markdown or CSV map."
+        description="Validate required columns and outcome alignment in a Markdown or CSV map.",
+        epilog=(
+            "Examples:\n"
+            "  validate_alignment_map.py alignment-map.md\n"
+            "  validate_alignment_map.py alignment-map.csv"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to alignment-map.md or a CSV equivalent")
     return parser.parse_args()
@@ -89,6 +96,9 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
         activity = row["learning activity/support"]
         assessment = row["feedback or assessment"]
         status = row["status"]
+
+        if status and normalize(status) not in VALID_STATUSES:
+            issues.append(f"Row {row_number} ({outcome_id or 'no outcome ID'}): unknown status {status}")
 
         if not outcome_id and any((outcome, evidence, activity, assessment)):
             issues.append(f"Row {row_number}: activity or assessment has no outcome ID")

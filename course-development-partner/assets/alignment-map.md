@@ -12,3 +12,5 @@
 - Construct-irrelevant barriers:
 - Course-sequence dependencies:
 - Instructor decisions needed:
+
+Status values: `draft`, `review`, `approved`, `blocked`, `retired`.

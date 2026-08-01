@@ -157,12 +157,13 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 ## Validation
 
-The current package passes the official skill structure validator and fourteen deterministic unit tests covering design state, alignment, artifact manifests, assessment blueprints, course-curriculum coherence, accessibility and rich-artifact routing, and package boundaries.
+The current package passes the official skill structure validator and 31 deterministic unit tests covering design state, alignment, artifact manifests and paired variants, assessment blueprints, course-curriculum coherence, all validator rules and exit-code classes, CLI help, accessibility and rich-artifact routing, local Markdown links, and package inventory boundaries.
 
 Run the repository tests with:
 
 ```bash
 python3 -m unittest discover -s tests -v
+python3 tests/check_repository.py
 ```
 
 The portable core has also been forward-tested on STEM, non-STEM, and rubric-calibration scenarios. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts have been produced, rendered, structurally inspected, corrected, and reopened; see `tests/rich-artifact-production-report.md` for the bounded evidence and limitations. Live MCP/LMS integrations, a faithful mock institutional authorization flow, and clean bidirectional OpenAI/ChatGPT/Codex–Claude installation and handoff still require testing before a formal production release.

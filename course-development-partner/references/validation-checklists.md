@@ -14,6 +14,7 @@
 10. Engineering authenticity when applicable
 11. Implementation feasibility and sustainability
 12. Improvement evidence and research boundary
+13. Manual equivalents for deterministic checks
 
 ## 1. Severity and reporting
 
@@ -168,3 +169,16 @@ Run the deterministic state, alignment, and manifest validators when applicable.
 - Use disaggregated evidence only when lawful, ethical, privacy-preserving, sufficiently aggregated, and actionable.
 - Distinguish ordinary course improvement, program evaluation, and research or dissemination.
 - Pause research-like collection or dissemination for applicable institutional review, privacy, and data-governance guidance; de-identification alone is insufficient authorization.
+
+## 13. Manual equivalents for deterministic checks
+
+When code execution is unavailable, record the reviewer, date, file version, and result for each applicable check.
+
+- **Course design brief:** confirm every required heading exists; locate TODO/TBD or bracketed placeholders; identify empty list fields; verify Current phase and Next decision contain actionable text.
+- **Alignment map:** confirm every required column; require at least one data row; check unique outcome IDs; verify each outcome has an observable outcome, evidence, activity/support, feedback/assessment, and one allowed status (`draft`, `review`, `approved`, `blocked`, or `retired`); flag empty or unknown statuses and orphan activity/assessment rows.
+- **Artifact manifest:** confirm required columns and unique artifact IDs; verify file/reference, audience, outcomes, allowed status, validation evidence for validated/teaching-ready items, no unresolved blocker for teaching-ready items, and a last-reviewed date; when a family declares required student and instructor variants, confirm both are explicitly labeled; open each local reference when path checking is required.
+- **Assessment blueprint:** confirm required columns and unique item IDs; verify outcome coverage, evidence claim, cognitive demand, type, dependency, positive time and points, construct-irrelevant barriers, and status; reject unsupported formal-validation claims; compare required outcomes with represented outcomes.
+- **Course/curriculum map:** confirm required columns; inspect outcome stages in sequence; reject unknown stages, unknown prerequisites, circular prerequisites, nonpositive workload, mastery/assessment before development, and workload above the instructor-approved limit.
+- **Repository integrity:** open every relative Markdown link; compare the runtime package against the approved inventory; confirm every reference is routed from `SKILL.md`, every asset is mentioned by `SKILL.md` or a direct reference, and every validator is named in `SKILL.md`.
+
+Use the same outcome vocabulary as the scripts: structural or parsing failures are errors; educational incompleteness, readiness gaps, or inconsistencies are findings. A manual pass does not authorize a stronger claim than the automated check would.

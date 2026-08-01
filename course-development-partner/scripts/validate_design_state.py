@@ -31,7 +31,12 @@ REQUIRED_HEADINGS = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate required sections and completion state in course-design-brief.md."
+        description="Validate required sections and completion state in course-design-brief.md.",
+        epilog=(
+            "Example:\n"
+            "  validate_design_state.py course-design-brief.md"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to a Markdown course-design brief")
     return parser.parse_args()

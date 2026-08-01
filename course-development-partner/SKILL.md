@@ -82,6 +82,8 @@ Show the smallest representation that permits useful instructor review:
 - a visual specification before an image or diagram;
 - an analysis plan before processing student or survey data.
 
+Create or update `lesson-storyboard.md` from `assets/lesson-storyboard.md` when sequencing a lesson, activity, or slide narrative requires an approved preview.
+
 Record consequential choices and rationale in `design-log.md` from `assets/design-log.md`.
 
 ## Build connected artifact families

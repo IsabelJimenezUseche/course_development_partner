@@ -32,7 +32,13 @@ ALLOWED_STAGES = {"introduce", "practice", "master", "assess"}
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate prerequisite flow, outcome development, and workload in a course map."
+        description="Validate prerequisite flow, outcome development, and workload in a course map.",
+        epilog=(
+            "Examples:\n"
+            "  validate_course_curriculum_map.py course-curriculum-map.md\n"
+            "  validate_course_curriculum_map.py map.csv --max-hours-per-module 8"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to course-curriculum-map.md or CSV")
     parser.add_argument(

@@ -29,11 +29,18 @@ REQUIRED = (
 )
 VALID_STATUSES = {"draft", "review", "validated", "teaching-ready", "retired"}
 EMPTY_ISSUES = {"", "-", "none", "n/a", "na"}
+PAIR_VARIANTS = {"student", "instructor"}
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate required fields and teaching-readiness claims in an artifact manifest."
+        description="Validate required fields and teaching-readiness claims in an artifact manifest.",
+        epilog=(
+            "Examples:\n"
+            "  validate_artifact_manifest.py artifact-manifest.md\n"
+            "  validate_artifact_manifest.py artifact-manifest.csv --check-paths"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to artifact-manifest.md or a CSV equivalent")
     parser.add_argument(
@@ -98,6 +105,8 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
 
     issues: list[str] = []
     seen_ids: set[str] = set()
+    family_variants: dict[str, set[str]] = {}
+    family_requirements: dict[str, set[str]] = {}
     for row_number, raw in enumerate(raw_rows, start=1):
         row = {key: (raw.get(original) or "").strip() for key, original in mapping.items()}
         artifact_id = row["artifact id"]
@@ -131,6 +140,31 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
             target = (path.parent / reference).resolve()
             if not target.exists():
                 issues.append(f"{label}: local reference does not exist: {reference}")
+
+        family = normalize(row.get("artifact family", ""))
+        variant = normalize(row.get("variant", ""))
+        requirements = {
+            normalize(token)
+            for token in re.split(r"[;,/]", row.get("required variants", ""))
+            if token.strip()
+        }
+        if family:
+            family_variants.setdefault(family, set())
+            family_requirements.setdefault(family, set()).update(requirements)
+            if not variant:
+                issues.append(f"{label}: artifact family {family} is missing a variant label")
+            else:
+                family_variants[family].add(variant)
+        elif variant or requirements:
+            issues.append(f"{label}: variant or required variants declared without an artifact family")
+
+    for family, requirements in sorted(family_requirements.items()):
+        if PAIR_VARIANTS <= requirements:
+            missing_variants = PAIR_VARIANTS - family_variants.get(family, set())
+            for variant in sorted(missing_variants):
+                issues.append(
+                    f"Artifact family {family}: required {variant} variant is not represented"
+                )
 
     return [], issues
 

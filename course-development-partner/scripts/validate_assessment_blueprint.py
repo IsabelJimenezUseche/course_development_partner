@@ -33,7 +33,14 @@ REQUIRED = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate completeness, coverage, and claims in an assessment blueprint."
+        description="Validate completeness, coverage, and claims in an assessment blueprint.",
+        epilog=(
+            "Examples:\n"
+            "  validate_assessment_blueprint.py assessment-blueprint.md\n"
+            "  validate_assessment_blueprint.py blueprint.csv --required-outcome LO-1\n"
+            "  validate_assessment_blueprint.py blueprint.md --allow-formal-validation"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to assessment-blueprint.md or CSV")
     parser.add_argument(
