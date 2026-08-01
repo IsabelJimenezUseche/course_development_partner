@@ -1,8 +1,8 @@
 # Course Development Partner
 
-Course Development Partner is an interactive, client-agnostic Agent Skill for professors and instructional designers creating higher-education materials. It helps an instructor move from course goals and source materials to aligned, authentic, scaffolded, accessible, and validated teaching artifacts.
+Course Development Partner is an interactive, client-neutral Agent Skill for responsible educators, course owners, and instructional designers creating higher-education materials. It helps a teaching team move from course goals and source materials to aligned, authentic, scaffolded, accessible, and boundedly validated teaching artifacts.
 
-The skill is designed to work with skills-compatible agents such as ChatGPT, Codex, and Claude. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool.
+The skill is designed for skills-compatible agents and portable Markdown handoffs. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool. Compatibility claims remain conditional until the same scenarios pass in each named client.
 
 ## What the skill supports
 
@@ -20,7 +20,7 @@ The skill is designed to work with skills-compatible agents such as ChatGPT, Cod
 
 ## Design principles
 
-The skill treats the instructor as the disciplinary and pedagogical authority. AI assists with analysis, alternatives, drafting, production, and validation, but does not independently determine technical correctness, academic policy, grades, misconduct, accommodations, or student readiness.
+The skill treats the responsible educator or course owner as the disciplinary and pedagogical authority. AI assists with analysis, alternatives, drafting, production, and validation, but does not independently determine technical correctness, academic policy, grades, misconduct, accommodations, or student readiness.
 
 The core design chain is:
 
@@ -36,15 +36,22 @@ The skill also:
 - separates content generation from independent validation;
 - preserves editable, portable project state in ordinary Markdown files.
 
-## Interaction modes
+## Engagement tiers and interaction modes
+
+| Tier | How it works |
+|---|---|
+| **Focused** | Handles one low-risk artifact or bounded review with minimal inline state. |
+| **Project** | Coordinates consequential or connected artifacts with a brief and project index. |
+| **Course** | Uses full portable state for multi-week, curriculum, and implementation work. |
 
 | Mode | How it works |
 |---|---|
 | **Studio — default** | Uses frequent, focused co-design checkpoints for consequential decisions. |
 | **Guided** | Requests instructor review at major phase boundaries. |
-| **Rapid** | Produces a near-complete draft with assumptions made visible for review. |
+| **Rapid** | Produces the complete provisional draft in one pass without intermediate checkpoints, then requests one consolidated faculty review. |
+| **Auto** | Works without faculty checkpoints, selects the strongest recommended option, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
 
-The instructor may change modes at any time. Every mode pauses for authoritative requirements, high-stakes scoring decisions, identifiable student data, or external actions that require permission.
+Studio is a non-blocking default rather than a required mode-selection exchange. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
 
 ## Educational-design workflow
 
@@ -74,7 +81,9 @@ The supported orientations are:
 
 - **Objective-achievement-based:** awards credit for evidence that the objective was achieved.
 - **Error/deduction-based:** subtracts defined errors from full credit while preventing distorted or repeated penalties.
-- **Balanced — recommended:** anchors criteria and weights in the educational objectives, then treats errors according to how much they undermine the targeted learning.
+- **Balanced:** anchors criteria and weights in the educational objectives, then treats errors according to how much they undermine the targeted learning.
+
+The skill selects a recommendation from the construct and stakes rather than using a universal default. Objective-achievement or balanced logic usually fits partial, multidimensional, reasoned, or legitimately diverse evidence; checklist/mastery or explicit error rules fit verified discrete, threshold, or safety-critical requirements.
 
 After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies the rubric, diagnoses disagreements, proposes focused revisions, re-scores the examples, and records approved boundary interpretations in a separate grader guide.
 
@@ -98,11 +107,15 @@ External systems are read-only by default. Publishing, messaging students, chang
 
 ## ADA and WCAG awareness
 
-The skill treats accessibility as a design requirement from intake through production and validation. It asks for the applicable institutional authority and records the exact technical standard, version, conformance level, scope, and effective date. Automated scanning is only one source of evidence; the workflow also covers keyboard use, focus, zoom and reflow, reading order, captions and transcripts, content alternatives, rendered artifacts, assistive technology, third-party tools, and unresolved remediation ownership.
+The skill treats accessibility as a design requirement from intake through production and validation. It asks for the applicable authority and separately records the exact standard/version/level/scope, source-verification date, policy date, compliance deadline, and local release/remediation date. Automated scanning is only one source of evidence; the workflow also covers keyboard use, version-specific focus and input criteria, zoom and reflow, reading order, captions and transcripts, content alternatives, rendered artifacts, assistive technology, third-party tools, and unresolved remediation ownership.
 
 ADA, Section 504, institutional policy, WCAG conformance, universal design, and individual accommodations remain distinct. The skill can document evidence and findings, but it does not independently declare legal compliance or exceptions.
 
-For a confirmed Purdue University project, the skill prefills **WCAG 2.1 Level AA** as the required technical target, verifies the current [ADA Title II web and mobile accessibility rule](https://www.ada.gov/resources/2024-03-08-web-rule/), and routes policy or exception questions to Purdue's authoritative process. It records the applicable campus, unit, scope, effective date, and review date.
+The skill never prefills an institution-specific accessibility rule. It records the governing requirement from current authoritative sources, keeps WCAG 2.1 and 2.2 criterion sets distinct, and treats current WCAG2ICT material as informative guidance for applying a selected WCAG version to non-web documents and software.
+
+## Visual design
+
+When no authoritative template or visual system is supplied, the skill suggests an optional Purdue-inspired teaching palette: Boilermaker Gold (`#CFB991`), black (`#000000`), Steel (`#555960`), Rush (`#DAAA00`), and light neutrals. It recommends verified high-contrast pairs such as black on gold and white on Steel, uses color only as a supplementary cue, and never adds protected marks or proprietary assets without authorization.
 
 ## Privacy and responsible use
 
@@ -157,7 +170,7 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 ## Validation
 
-The current package passes the official skill structure validator and 31 deterministic unit tests covering design state, alignment, artifact manifests and paired variants, assessment blueprints, course-curriculum coherence, all validator rules and exit-code classes, CLI help, accessibility and rich-artifact routing, local Markdown links, and package inventory boundaries.
+The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, and package inventory boundaries.
 
 Run the repository tests with:
 
@@ -166,4 +179,4 @@ python3 -m unittest discover -s tests -v
 python3 tests/check_repository.py
 ```
 
-The portable core has also been forward-tested on STEM, non-STEM, and rubric-calibration scenarios. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts have been produced, rendered, structurally inspected, corrected, and reopened; see `tests/rich-artifact-production-report.md` for the bounded evidence and limitations. Live MCP/LMS integrations, a faithful mock institutional authorization flow, and clean bidirectional OpenAI/ChatGPT/Codex–Claude installation and handoff still require testing before a formal production release.
+The portable core has also been forward-tested on focused review, accessibility-authority, visual-design, STEM, non-STEM, and rubric-calibration scenarios. See [the current test index](tests/test-index.md) for current, historical, and pending evidence. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts were produced and inspected, but those temporary files were not retained; [the historical report](tests/rich-artifact-production-report.md) therefore remains bounded and non-reproducible. Live integrations, a faithful mock institutional authorization flow, a retained rich-artifact rerun, and clean bidirectional named-client installation and handoff still require testing before broader production or compatibility claims.

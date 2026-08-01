@@ -1,5 +1,8 @@
 # Rich-Artifact Production Plan
 
+- Schema version: 2.0
+- Last updated:
+
 ## Artifact and teaching use
 
 - Artifact ID and working title:
@@ -31,6 +34,8 @@
 ## Design and accessibility
 
 - Document/deck/workbook/visual archetype or style authority:
+- Selected palette and contrast evidence:
+- Optional Purdue-inspired palette proposed: yes | no | not applicable
 - Required technical accessibility target: [standard, exact version, level, scope, effective date]
 - Institutional review or accommodation process:
 - Reading, navigation, keyboard, media, alternative, and assistive-technology needs:

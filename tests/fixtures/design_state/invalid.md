@@ -2,19 +2,28 @@
 
 ## Course context
 
-- Course: TBD
+- Course or module: TBD
 
 ## Intended learning
 
-- [describe outcome]
+- Learning outcomes: [describe outcome]
+
+## Access, participation, and belonging
+
+- Known access constraints without sensitive student details:
 
 ## Constraints
 
 -
 
+## Implementation load
+
+- Minimum viable fallback:
+
 ## Collaboration
 
-- Mode:
+- Interaction level:
+- Requested artifacts:
 
 ## Status
 

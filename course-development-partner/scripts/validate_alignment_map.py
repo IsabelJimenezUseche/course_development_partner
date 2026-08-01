@@ -10,10 +10,16 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import csv
-import re
 import sys
 from pathlib import Path
+
+from _tabular import (
+    load_table,
+    normalize,
+    normalized_mapping,
+    normalized_row,
+    parse_identifier_list,
+)
 
 
 REQUIRED = (
@@ -41,55 +47,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def normalize(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
-
-
-def markdown_rows(text: str) -> tuple[list[str], list[dict[str, str]]]:
-    lines = [line.strip() for line in text.splitlines() if line.strip().startswith("|")]
-    for index in range(len(lines) - 1):
-        header = [cell.strip() for cell in lines[index].strip("|").split("|")]
-        separator = [cell.strip() for cell in lines[index + 1].strip("|").split("|")]
-        if len(header) == len(separator) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator):
-            rows: list[dict[str, str]] = []
-            for line in lines[index + 2 :]:
-                cells = [cell.strip() for cell in line.strip("|").split("|")]
-                if len(cells) != len(header):
-                    break
-                rows.append(dict(zip(header, cells)))
-            return header, rows
-    raise ValueError("No Markdown table found")
-
-
-def load_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    if not path.is_file():
-        raise ValueError(f"File does not exist: {path}")
-    if path.suffix.lower() == ".csv":
-        with path.open(newline="", encoding="utf-8-sig") as handle:
-            reader = csv.DictReader(handle)
-            if reader.fieldnames is None:
-                raise ValueError("CSV has no header")
-            return reader.fieldnames, [dict(row) for row in reader]
-    return markdown_rows(path.read_text(encoding="utf-8"))
-
-
 def validate(path: Path) -> tuple[list[str], list[str]]:
     try:
-        headers, raw_rows = load_rows(path)
+        _, headers, raw_rows = load_table(path, REQUIRED)
+        mapping = normalized_mapping(headers, REQUIRED)
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
-
-    mapping = {normalize(header): header for header in headers}
-    missing = [column for column in REQUIRED if column not in mapping]
-    if missing:
-        return [f"Missing required column: {column}" for column in missing], []
     if not raw_rows:
         return [], ["Alignment map contains no data rows"]
 
     issues: list[str] = []
     seen_ids: set[str] = set()
     for row_number, raw in enumerate(raw_rows, start=1):
-        row = {key: (raw.get(original) or "").strip() for key, original in mapping.items()}
+        row = normalized_row(raw, mapping)
         outcome_id = row["outcome id"]
         outcome = row["observable learning outcome"]
         evidence = row["evidence of learning"]
@@ -103,7 +73,14 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
         if not outcome_id and any((outcome, evidence, activity, assessment)):
             issues.append(f"Row {row_number}: activity or assessment has no outcome ID")
         if outcome_id:
-            normalized_id = normalize(outcome_id)
+            try:
+                normalized_ids = parse_identifier_list(outcome_id, field_name="outcome")
+            except ValueError as exc:
+                issues.append(f"Row {row_number}: {exc}")
+                normalized_ids = {normalize(outcome_id)}
+            if len(normalized_ids) != 1:
+                issues.append(f"Row {row_number}: outcome ID must contain exactly one identifier")
+            normalized_id = next(iter(normalized_ids))
             if normalized_id in seen_ids:
                 issues.append(f"Row {row_number}: duplicate outcome ID {outcome_id}")
             seen_ids.add(normalized_id)
@@ -133,7 +110,7 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: {args.path}")
+    print(f"OK: structurally complete alignment map; manual alignment review still required: {args.path}")
     return 0
 
 

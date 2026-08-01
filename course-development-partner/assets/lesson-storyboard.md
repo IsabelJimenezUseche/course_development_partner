@@ -1,5 +1,8 @@
 # Lesson Storyboard
 
+- Schema version: 2.0
+- Last updated:
+
 ## Lesson information
 
 - Outcome(s):

@@ -1,5 +1,8 @@
 # Context Brief
 
+- Schema version: 2.0
+- Last updated:
+
 - Setting:
 - Student role, stakeholder, or client:
 - Professional or disciplinary decision:

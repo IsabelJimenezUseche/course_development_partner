@@ -1,5 +1,7 @@
 # Initial Forward-Test Report
 
+> Historical and superseded as a current inventory/status record. Retained to document the initial failures and revisions. See `test-index.md` for current status and `rich-artifact-production-report.md` for the later bounded production exercise.
+
 Date: 2026-07-31
 
 Skill: `course-development-partner`

@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def markdown_files() -> list[Path]:
-    paths = [ROOT / "README.md"]
+    paths = list(ROOT.glob("*.md"))
     paths.extend(SKILL_ROOT.rglob("*.md"))
     paths.extend((ROOT / "tests").rglob("*.md"))
     return sorted({path for path in paths if path.is_file()})
@@ -121,7 +121,7 @@ def check_inventory(inventory_path: Path) -> tuple[list[str], list[str]]:
         token = f"assets/{path.name}"
         if token not in routed_text:
             issues.append(f"Asset is not routed from SKILL.md or a direct reference: {token}")
-    for path in sorted((SKILL_ROOT / "scripts").glob("*.py")):
+    for path in sorted((SKILL_ROOT / "scripts").glob("validate_*.py")):
         token = f"scripts/{path.name}"
         if token not in skill_text:
             issues.append(f"Validator is not named in SKILL.md: {token}")

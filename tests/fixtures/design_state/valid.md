@@ -1,20 +1,31 @@
 # Course Design Brief
 
+- Schema version: 2.0
+
 ## Course context
 
-- Course: BIO 101
+- Course or module: BIO 101
 
 ## Intended learning
 
-- Explain a mechanism.
+- Learning outcomes: Explain a mechanism.
+
+## Access, participation, and belonging
+
+- Known access constraints without sensitive student details: None identified.
 
 ## Constraints
 
-- Fifty minutes.
+- Fixed requirements: Fifty minutes.
+
+## Implementation load
+
+- Minimum viable fallback: Printable activity.
 
 ## Collaboration
 
-- Studio.
+- Interaction level: Studio
+- Requested artifacts: Student worksheet.
 
 ## Status
 

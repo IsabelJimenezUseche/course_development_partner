@@ -1,5 +1,9 @@
 # Implementation Plan
 
+- Schema version: 2.0
+- Last updated:
+- Status: draft | review | approved | blocked | retired
+
 ## Teaching use
 
 - Artifact, lesson, module, or course:
@@ -30,3 +34,5 @@
 - Tradeoff relative to the preferred design:
 - Reuse and maintenance plan:
 - Instructor approval:
+- Affected artifact IDs:
+- Approval date:

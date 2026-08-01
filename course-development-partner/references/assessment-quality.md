@@ -97,6 +97,8 @@ For consequential rubric use:
 
 Do not let AI serve as the second qualified grader for consequential use. AI may organize discrepancies or apply provisional rules, but a responsible human must approve interpretations and decisions.
 
+Choose scoring logic from the construct and consequences rather than a universal default. Use objective-achievement or balanced logic when evidence can be partial, multidimensional, reasoned, or legitimately diverse. Use checklist/mastery or explicit error rules when verified discrete requirements, safety steps, or thresholds govern. Document any combined logic and prevent double penalties.
+
 ## 6. Design for the permitted-AI context
 
 Ask the instructor which AI uses are permitted, restricted, or required by institutional or course policy. Do not invent policy.

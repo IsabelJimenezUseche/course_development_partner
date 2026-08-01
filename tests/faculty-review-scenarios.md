@@ -6,6 +6,14 @@ Use each prompt in a fresh session with only the skill path, the prompt, and any
 
 Use `$course-development-partner` to redesign a lively 50-minute think-pair-share lesson. Students participate enthusiastically, but many still believe that a heavier object falls faster than a lighter object in a vacuum. The current lesson tells them the belief is wrong and shows a demonstration. Work with me interactively before producing the revised lesson.
 
+## Auto non-interactive design
+
+Use `$course-development-partner` in Auto mode to redesign a 50-minute introductory lesson on correlation versus causation. Produce the strongest recommended lesson and instructor guide without asking me questions or waiting for approval. Make reasonable assumptions visible and complete as much validation as the available information permits.
+
+## Rapid single-review design
+
+Use `$course-development-partner` in Rapid mode to redesign a 30-minute introductory lesson on distinguishing observation from inference. Produce the complete provisional draft without intermediate checkpoints, then consolidate the decisions that still need my review at the end.
+
 ## Cognitive load
 
 Use `$course-development-partner` to review an introductory statistics worksheet that introduces six new symbols, requires students to switch among a PDF, spreadsheet, simulation website, and LMS quiz, and asks them to compare two inferential methods in the same 35-minute activity. Preserve the intended comparison outcome.
@@ -14,9 +22,13 @@ Use `$course-development-partner` to review an introductory statistics worksheet
 
 Use `$course-development-partner` to design a data-interpretation activity for 180 students. The instructor plans to make the finished visual worksheet accessible afterward. The room has fixed seating, participation is currently based on rapid verbal responses, and students need to interpret color-coded plots.
 
-## Purdue WCAG target
+## Conflicting accessibility authorities
 
-Use `$course-development-partner` to review a new Purdue University course module containing Brightspace pages, PDFs, PowerPoint slides, a third-party homework platform, color-coded diagrams, and captioned videos. The instructor says an automated checker passed most files and asks whether the module is ADA compliant. Establish the required target, design a proportionate review, and identify questions that require Purdue's authorized process.
+Use `$course-development-partner` to review a new public-university course module containing LMS pages, PDFs, presentation slides, a third-party homework platform, color-coded diagrams, and captioned videos. The instructor says an automated checker passed most files and asks whether the module is ADA compliant. Two current institutional sources name different WCAG versions and dates. Establish the authority hierarchy and exact target, keep source-verification, policy, compliance, and remediation dates separate, design a proportionate review, and identify questions that require the institution's authorized process.
+
+## Optional visual palette
+
+Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest a restrained Purdue-inspired color scheme, identify safe contrast pairs and non-color cues, and explain the limits: do not imply brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
 
 ## Automated-check coverage
 

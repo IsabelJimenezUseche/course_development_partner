@@ -1,16 +1,25 @@
 # Compact Brief
 
+- Schema version: 2.0
+
 ## COURSE CONTEXT
-- Course: Seminar
+- Course or module: Seminar
 
 ## INTENDED LEARNING
-- Evaluate one claim.
+- Learning outcomes: Evaluate one claim.
+
+## ACCESS, PARTICIPATION, AND BELONGING
+- Known access constraints without sensitive student details: None identified.
 
 ## CONSTRAINTS
-- One meeting.
+- Fixed requirements: One meeting.
+
+## IMPLEMENTATION LOAD
+- Minimum viable fallback: Text-only prompt.
 
 ## COLLABORATION
-- Rapid, explicitly selected.
+- Interaction level: Guided, explicitly selected.
+- Requested artifacts: One discussion prompt.
 
 ## STATUS
 ### CONFIRMED

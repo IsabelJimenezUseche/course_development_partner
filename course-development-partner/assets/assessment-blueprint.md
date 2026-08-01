@@ -1,5 +1,8 @@
 # Assessment Blueprint
 
+- Schema version: 2.0
+- Last updated:
+
 ## Assessment context
 
 - Purpose: diagnostic | formative | summative | combined
@@ -22,6 +25,10 @@
 - Accessibility and accommodation review:
 - Security and information-leakage review:
 - Scorer preparation and moderation:
-- Evidence level claimed: classroom-reviewed | expert-reviewed | piloted | reliability examined | formally validated
+- Evidence level claimed: classroom-reviewed | expert-reviewed | piloted | reliability-examined | formally-validated
 - Known limitations:
 - Instructor approval:
+
+Status values: `draft`, `review`, `approved`, `blocked`, `retired`.
+
+For CSV, add an `Evidence level claimed` column and repeat the same assessment-level value on every row.

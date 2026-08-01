@@ -10,15 +10,24 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import csv
 import re
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
+
+from _tabular import (
+    load_table,
+    local_reference_path,
+    normalize,
+    normalized_mapping,
+    normalized_row,
+    parse_identifier_list,
+    parse_iso_date,
+)
 
 
 REQUIRED = (
     "artifact id",
+    "artifact type",
     "file or reference",
     "audience",
     "outcome(s)",
@@ -26,10 +35,37 @@ REQUIRED = (
     "validation completed",
     "blockers/open issues",
     "last reviewed",
+    "production plan",
+    "accessibility review",
 )
 VALID_STATUSES = {"draft", "review", "validated", "teaching-ready", "retired"}
 EMPTY_ISSUES = {"", "-", "none", "n/a", "na"}
-PAIR_VARIANTS = {"student", "instructor"}
+REFERENCE_STATES = {"pending", "not required", "not-required"}
+VALID_ARTIFACT_TYPES = {
+    "markdown", "document", "presentation", "spreadsheet", "pdf", "visual", "audio", "video", "other"
+}
+RICH_TYPES = {"document", "presentation", "spreadsheet", "pdf", "visual", "audio", "video"}
+VALID_VARIANTS = {
+    "student", "instructor", "solution", "grader", "accessible-alternative", "source", "distribution"
+}
+VALIDATION_TOKENS = {
+    "technical", "alignment", "source/reuse", "structural", "rendered/playback",
+    "accessibility", "privacy/metadata", "reopen", "manual"
+}
+BASE_READY_TOKENS = {"technical", "alignment", "accessibility", "reopen"}
+RICH_READY_TOKENS = BASE_READY_TOKENS | {
+    "source/reuse", "structural", "rendered/playback", "privacy/metadata"
+}
+
+
+def is_reference_state(value: str) -> bool:
+    normalized = normalize(value)
+    return (
+        normalized in REFERENCE_STATES
+        or normalized.startswith("not applicable")
+        or normalized.startswith("n/a —")
+        or normalized.startswith("n/a -")
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -51,55 +87,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def normalize(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
-
-
-def markdown_rows(text: str) -> tuple[list[str], list[dict[str, str]]]:
-    lines = [line.strip() for line in text.splitlines() if line.strip().startswith("|")]
-    for index in range(len(lines) - 1):
-        header = [cell.strip() for cell in lines[index].strip("|").split("|")]
-        separator = [cell.strip() for cell in lines[index + 1].strip("|").split("|")]
-        if len(header) == len(separator) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator):
-            rows: list[dict[str, str]] = []
-            for line in lines[index + 2 :]:
-                cells = [cell.strip() for cell in line.strip("|").split("|")]
-                if len(cells) != len(header):
-                    break
-                rows.append(dict(zip(header, cells)))
-            return header, rows
-    raise ValueError("No Markdown table found")
-
-
-def load_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    if not path.is_file():
-        raise ValueError(f"File does not exist: {path}")
-    if path.suffix.lower() == ".csv":
-        with path.open(newline="", encoding="utf-8-sig") as handle:
-            reader = csv.DictReader(handle)
-            if reader.fieldnames is None:
-                raise ValueError("CSV has no header")
-            return reader.fieldnames, [dict(row) for row in reader]
-    return markdown_rows(path.read_text(encoding="utf-8"))
-
-
-def is_local_reference(value: str) -> bool:
-    if not value or value.startswith(("#", "[")):
-        return False
-    parsed = urlparse(value)
-    return not parsed.scheme and not parsed.netloc
-
-
 def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str]]:
     try:
-        headers, raw_rows = load_rows(path)
+        _, headers, raw_rows = load_table(path, REQUIRED)
+        mapping = normalized_mapping(headers, REQUIRED)
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
-
-    mapping = {normalize(header): header for header in headers}
-    missing = [column for column in REQUIRED if column not in mapping]
-    if missing:
-        return [f"Missing required column: {column}" for column in missing], []
     if not raw_rows:
         return [], ["Artifact manifest contains no data rows"]
 
@@ -108,7 +101,7 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
     family_variants: dict[str, set[str]] = {}
     family_requirements: dict[str, set[str]] = {}
     for row_number, raw in enumerate(raw_rows, start=1):
-        row = {key: (raw.get(original) or "").strip() for key, original in mapping.items()}
+        row = normalized_row(raw, mapping)
         artifact_id = row["artifact id"]
         label = artifact_id or f"row {row_number}"
 
@@ -120,26 +113,61 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                 issues.append(f"Row {row_number}: duplicate artifact ID {artifact_id}")
             seen_ids.add(normalized_id)
 
-        for field in ("file or reference", "audience", "outcome(s)", "status"):
+        for field in ("artifact type", "file or reference", "audience", "outcome(s)", "status"):
             if not row[field]:
                 issues.append(f"{label}: missing {field}")
+
+        artifact_type = normalize(row["artifact type"])
+        if artifact_type and artifact_type not in VALID_ARTIFACT_TYPES:
+            issues.append(f"{label}: unknown artifact type {row['artifact type']}")
+
+        if row["outcome(s)"]:
+            try:
+                parse_identifier_list(row["outcome(s)"], field_name="outcome")
+            except ValueError as exc:
+                issues.append(f"{label}: {exc}")
 
         status = normalize(row["status"])
         if status and status not in VALID_STATUSES:
             issues.append(f"{label}: unknown status {row['status']}")
-        if status in {"validated", "teaching-ready"} and not row["validation completed"]:
-            issues.append(f"{label}: {status} without validation evidence")
+        validation_tokens = {
+            normalize(token)
+            for token in re.split(r"[;,]", row["validation completed"])
+            if token.strip()
+        }
+        invalid_validation = validation_tokens - VALIDATION_TOKENS
+        for token in sorted(invalid_validation):
+            issues.append(f"{label}: unknown validation token {token}")
+        if status in {"validated", "teaching-ready"}:
+            if not validation_tokens or normalize(row["validation completed"]) in EMPTY_ISSUES:
+                issues.append(f"{label}: {status} without validation evidence")
+            if not row["last reviewed"]:
+                issues.append(f"{label}: {status} without last-reviewed date")
+            elif not parse_iso_date(row["last reviewed"]):
+                issues.append(f"{label}: last reviewed must use YYYY-MM-DD")
+            for token in sorted({"technical", "alignment"} - validation_tokens):
+                issues.append(f"{label}: {status} missing validation token {token}")
         if status == "teaching-ready":
             if normalize(row["blockers/open issues"]) not in EMPTY_ISSUES:
                 issues.append(f"{label}: teaching-ready with unresolved blockers/open issues")
-            if not row["last reviewed"]:
-                issues.append(f"{label}: teaching-ready without last-reviewed date")
+            required_tokens = RICH_READY_TOKENS if artifact_type in RICH_TYPES else BASE_READY_TOKENS
+            for token in sorted(required_tokens - validation_tokens):
+                issues.append(f"{label}: teaching-ready missing validation token {token}")
+            if artifact_type in RICH_TYPES and (
+                not row["production plan"] or is_reference_state(row["production plan"])
+            ):
+                issues.append(f"{label}: teaching-ready rich artifact is missing production plan")
+            if not row["accessibility review"] or is_reference_state(row["accessibility review"]):
+                issues.append(f"{label}: teaching-ready artifact is missing accessibility review")
 
-        reference = row["file or reference"]
-        if check_paths and is_local_reference(reference):
-            target = (path.parent / reference).resolve()
-            if not target.exists():
-                issues.append(f"{label}: local reference does not exist: {reference}")
+        if check_paths:
+            for field in ("file or reference", "production plan", "accessibility review"):
+                reference = row[field]
+                if field != "file or reference" and is_reference_state(reference):
+                    continue
+                target = local_reference_path(reference, path.parent)
+                if target is not None and not target.exists():
+                    issues.append(f"{label}: local {field} does not exist: {reference}")
 
         family = normalize(row.get("artifact family", ""))
         variant = normalize(row.get("variant", ""))
@@ -155,16 +183,23 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                 issues.append(f"{label}: artifact family {family} is missing a variant label")
             else:
                 family_variants[family].add(variant)
+                if variant not in VALID_VARIANTS:
+                    issues.append(f"{label}: unknown variant {row.get('variant', '')}")
+                audiences = {
+                    normalize(token) for token in re.split(r"[;,]", row["audience"]) if token.strip()
+                }
+                if variant in {"student", "instructor", "grader"} and variant not in audiences:
+                    issues.append(f"{label}: variant {variant} conflicts with audience {row['audience']}")
         elif variant or requirements:
             issues.append(f"{label}: variant or required variants declared without an artifact family")
 
     for family, requirements in sorted(family_requirements.items()):
-        if PAIR_VARIANTS <= requirements:
-            missing_variants = PAIR_VARIANTS - family_variants.get(family, set())
-            for variant in sorted(missing_variants):
-                issues.append(
-                    f"Artifact family {family}: required {variant} variant is not represented"
-                )
+        for requirement in sorted(requirements):
+            if requirement not in VALID_VARIANTS:
+                issues.append(f"Artifact family {family}: unknown required variant {requirement}")
+        missing_variants = requirements - family_variants.get(family, set())
+        for variant in sorted(missing_variants):
+            issues.append(f"Artifact family {family}: required {variant} variant is not represented")
 
     return [], issues
 
@@ -180,7 +215,7 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: {args.path}")
+    print(f"OK: manifest readiness rules passed; manual release review still required: {args.path}")
     return 0
 
 

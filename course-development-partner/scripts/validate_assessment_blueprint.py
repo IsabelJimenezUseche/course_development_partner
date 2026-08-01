@@ -10,10 +10,19 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import csv
 import re
 import sys
 from pathlib import Path
+
+from _tabular import (
+    find_cycles,
+    load_table,
+    normalize,
+    normalized_mapping,
+    normalized_row,
+    parse_identifier_list,
+    parse_positive_finite,
+)
 
 
 REQUIRED = (
@@ -29,6 +38,10 @@ REQUIRED = (
     "construct-irrelevant barriers",
     "status",
 )
+VALID_STATUSES = {"draft", "review", "approved", "blocked", "retired"}
+VALID_EVIDENCE_LEVELS = {
+    "classroom-reviewed", "expert-reviewed", "piloted", "reliability-examined", "formally-validated"
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -54,82 +67,74 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Allow a formal-validation claim after external evidence has been verified",
     )
+    parser.add_argument(
+        "--alignment-map",
+        type=Path,
+        help="Optional alignment map whose outcome IDs define required coverage",
+    )
     return parser.parse_args()
 
 
-def normalize(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
-
-
-def markdown_rows(text: str) -> tuple[list[str], list[dict[str, str]]]:
-    lines = [line.strip() for line in text.splitlines() if line.strip().startswith("|")]
-    for index in range(len(lines) - 1):
-        header = [cell.strip() for cell in lines[index].strip("|").split("|")]
-        separator = [cell.strip() for cell in lines[index + 1].strip("|").split("|")]
-        if len(header) == len(separator) and all(
-            re.fullmatch(r":?-{3,}:?", cell) for cell in separator
-        ):
-            rows: list[dict[str, str]] = []
-            for line in lines[index + 2 :]:
-                cells = [cell.strip() for cell in line.strip("|").split("|")]
-                if len(cells) != len(header):
-                    break
-                rows.append(dict(zip(header, cells)))
-            return header, rows
-    raise ValueError("No Markdown table found")
-
-
 def load(path: Path) -> tuple[str, list[str], list[dict[str, str]]]:
-    if not path.is_file():
-        raise ValueError(f"File does not exist: {path}")
-    text = path.read_text(encoding="utf-8-sig")
-    if path.suffix.lower() == ".csv":
-        with path.open(newline="", encoding="utf-8-sig") as handle:
-            reader = csv.DictReader(handle)
-            if reader.fieldnames is None:
-                raise ValueError("CSV has no header")
-            return text, reader.fieldnames, [dict(row) for row in reader]
-    headers, rows = markdown_rows(text)
-    return text, headers, rows
+    return load_table(path, REQUIRED)
 
 
-def positive_number(value: str) -> bool:
-    try:
-        return float(value) > 0
-    except ValueError:
-        return False
-
-
-def outcome_tokens(value: str) -> set[str]:
-    return {normalize(token) for token in re.findall(r"[A-Za-z]+-[A-Za-z0-9_-]+", value)}
-
-
-def evidence_level(text: str) -> str:
+def evidence_level(text: str, rows: list[dict[str, str]], mapping: dict[str, str]) -> str:
     match = re.search(r"^\s*-\s*Evidence level claimed:\s*(.+?)\s*$", text, re.MULTILINE | re.I)
-    return normalize(match.group(1)) if match else ""
+    markdown_value = normalize(match.group(1)).replace(" ", "-") if match else ""
+    column_value = ""
+    if "evidence level claimed" in mapping:
+        values = {
+            normalize(row.get(mapping["evidence level claimed"], "")).replace(" ", "-")
+            for row in rows
+            if row.get(mapping["evidence level claimed"], "").strip()
+        }
+        if len(values) > 1:
+            raise ValueError("CSV contains conflicting evidence-level claims")
+        column_value = next(iter(values), "")
+    if markdown_value and column_value and markdown_value != column_value:
+        raise ValueError("Markdown and table evidence-level claims conflict")
+    return markdown_value or column_value
+
+
+def alignment_outcomes(path: Path) -> set[str]:
+    required = (
+        "outcome id", "observable learning outcome", "evidence of learning",
+        "learning activity/support", "feedback or assessment", "status"
+    )
+    _, headers, rows = load_table(path, required)
+    mapping = normalized_mapping(headers, required)
+    outcomes: set[str] = set()
+    for raw in rows:
+        value = normalized_row(raw, mapping)["outcome id"]
+        if value:
+            outcomes.update(parse_identifier_list(value, field_name="outcome"))
+    return outcomes
 
 
 def validate(
-    path: Path, required_outcomes: list[str], allow_formal_validation: bool
+    path: Path,
+    required_outcomes: list[str],
+    allow_formal_validation: bool,
+    alignment_map: Path | None = None,
 ) -> tuple[list[str], list[str]]:
     try:
         text, headers, raw_rows = load(path)
+        mapping = normalized_mapping(headers, REQUIRED)
+        claimed_level = evidence_level(text, raw_rows, mapping)
+        derived_outcomes = alignment_outcomes(alignment_map) if alignment_map else set()
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
-
-    mapping = {normalize(header): header for header in headers}
-    missing = [column for column in REQUIRED if column not in mapping]
-    if missing:
-        return [f"Missing required column: {column}" for column in missing], []
     if not raw_rows:
         return [], ["Assessment blueprint contains no data rows"]
 
     issues: list[str] = []
     seen_items: set[str] = set()
     represented_outcomes: set[str] = set()
+    dependency_values: dict[str, str] = {}
 
     for row_number, raw in enumerate(raw_rows, start=1):
-        row = {key: (raw.get(original) or "").strip() for key, original in mapping.items()}
+        row = normalized_row(raw, mapping)
         item_id = row["item id"]
         if not item_id and any(row.values()):
             issues.append(f"Row {row_number}: assessment content has no item ID")
@@ -139,6 +144,13 @@ def validate(
             continue
 
         normalized_id = normalize(item_id)
+        try:
+            ids = parse_identifier_list(item_id, field_name="item")
+            if len(ids) != 1:
+                issues.append(f"Row {row_number}: item ID must contain exactly one identifier")
+            normalized_id = next(iter(ids))
+        except ValueError as exc:
+            issues.append(f"Row {row_number}: {exc}")
         if normalized_id in seen_items:
             issues.append(f"Row {row_number}: duplicate item ID {item_id}")
         seen_items.add(normalized_id)
@@ -147,17 +159,47 @@ def validate(
             if not row[field_name]:
                 issues.append(f"Row {row_number} ({item_id}): missing {field_name}")
 
-        represented_outcomes.update(outcome_tokens(row["outcome(s)"]))
-        if row["expected time (min)"] and not positive_number(row["expected time (min)"]):
+        if row["outcome(s)"]:
+            try:
+                represented_outcomes.update(parse_identifier_list(row["outcome(s)"], field_name="outcome"))
+            except ValueError as exc:
+                issues.append(f"Row {row_number} ({item_id}): {exc}")
+        status = normalize(row["status"])
+        if status and status not in VALID_STATUSES:
+            issues.append(f"Row {row_number} ({item_id}): unknown status {row['status']}")
+        if row["expected time (min)"] and parse_positive_finite(row["expected time (min)"]) is None:
             issues.append(f"Row {row_number} ({item_id}): expected time must be a positive number")
-        if row["points"] and not positive_number(row["points"]):
+        if row["points"] and parse_positive_finite(row["points"]) is None:
             issues.append(f"Row {row_number} ({item_id}): points must be a positive number")
+        dependency_values[normalized_id] = row["dependency"]
 
-    for outcome in required_outcomes:
-        if normalize(outcome) not in represented_outcomes:
-            issues.append(f"Required outcome is not sampled: {outcome}")
+    graph: dict[str, set[str]] = {}
+    for item_id, value in dependency_values.items():
+        if normalize(value) == "independent":
+            graph[item_id] = set()
+            continue
+        try:
+            dependencies = parse_identifier_list(value, field_name="dependency")
+        except ValueError as exc:
+            issues.append(f"{item_id}: {exc}")
+            continue
+        graph[item_id] = dependencies
+        for dependency in dependencies:
+            if dependency not in seen_items:
+                issues.append(f"{item_id}: unknown dependency item {dependency}")
+    for cycle in find_cycles(graph):
+        issues.append(f"Circular item dependencies: {cycle}")
 
-    if evidence_level(text) == "formally validated" and not allow_formal_validation:
+    all_required = {normalize(outcome) for outcome in required_outcomes} | derived_outcomes
+    for outcome in sorted(all_required):
+        if outcome not in represented_outcomes:
+            issues.append(f"Required outcome is not sampled: {outcome.upper()}")
+
+    if not claimed_level:
+        issues.append("Missing evidence level claimed")
+    elif claimed_level not in VALID_EVIDENCE_LEVELS:
+        issues.append(f"Unknown evidence level claimed: {claimed_level}")
+    if claimed_level == "formally-validated" and not allow_formal_validation:
         issues.append(
             "Formal-validation claim requires verified external evidence and "
             "--allow-formal-validation"
@@ -169,7 +211,7 @@ def validate(
 def main() -> int:
     args = parse_args()
     errors, issues = validate(
-        args.path, args.required_outcome, args.allow_formal_validation
+        args.path, args.required_outcome, args.allow_formal_validation, args.alignment_map
     )
     for item in errors:
         print(f"ERROR: {item}")
@@ -179,7 +221,7 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: {args.path}")
+    print(f"OK: blueprint structural and declared-coverage checks passed; manual validity review still required: {args.path}")
     return 0
 
 

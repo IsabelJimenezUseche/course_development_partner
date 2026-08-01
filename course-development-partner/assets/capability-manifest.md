@@ -1,5 +1,8 @@
 # Capability Manifest
 
+- Schema version: 2.0
+- Last updated:
+
 | Capability | Available provider or tool | Access level | Intended use | Approval required | Fallback | Verification date |
 |---|---|---|---|---|---|---|
 | read_course_sources |  | read | inspect supplied materials | no | upload or paste |  |

@@ -1,5 +1,7 @@
 # Representative Rich-Artifact Production Report
 
+> Historical bounded evidence. The temporary binaries, builders, and renderings from this run were not retained, so this report is not a current reproducible regression result. See `test-index.md` and `rich-artifact-fixture-spec.md` for current status and the reproducibility contract for a future rerun.
+
 Date: 2026-07-31
 
 Skill: `course-development-partner`
@@ -18,7 +20,7 @@ The generated binaries, builders, renderings, and inspection records were kept i
 | Teaching use | Active-learning activity, mini-deck, assessment-planning workbook, and explanatory diagram |
 | Mapped outcome | Use observed evidence to evaluate and revise a causal model |
 | Approved preview | Two-page activity specification, three-slide storyboard, workbook schema, and four-step visual specification |
-| Accessibility target | WCAG 2.1 Level AA awareness for a Purdue-context fixture; no conformance or legal-compliance claim |
+| Accessibility target | WCAG 2.1 Level AA awareness for a public-university fixture; no conformance or legal-compliance claim |
 | Source/privacy | Synthetic content; no student records or identifiable information |
 | External effect | Local temporary files only; no publish, message, grade, permission, or live-course change |
 | Fallback | Markdown content and specifications; CSV for flat workbook data; SVG source and text alternative for the diagram |

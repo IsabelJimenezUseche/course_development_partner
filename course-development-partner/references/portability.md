@@ -4,6 +4,7 @@
 
 Store consequential context in ordinary Markdown:
 
+- `project-index.md`
 - `course-design-brief.md`
 - `alignment-map.md`
 - `assessment-blueprint.md`
@@ -17,6 +18,9 @@ Store consequential context in ordinary Markdown:
 - `design-log.md`
 - `artifact-manifest.md`
 - `capability-manifest.md`
+- `source-register.md`
+
+Apply `references/state-contract.md`. Preserve schema versions, ISO dates, controlled statuses, identifiers, authority owners, and explicit not-applicable rationales.
 
 Do not rely on hidden memory, conversation history, client-specific project fields, or tool-call identifiers.
 
@@ -63,13 +67,14 @@ At handoff, record who may access each sensitive or restricted artifact, where t
 
 ## Resume in another client
 
-1. Read the course-design brief, design log, and artifact manifest.
-2. Inspect source artifacts.
-3. Rebuild Confirmed/Assumed/Open state.
-4. Discover local capabilities and update the capability manifest.
-5. State any mapping differences that change deliverables or privacy.
-6. Continue from the recorded next decision.
-7. Verify that outcome IDs, artifact relationships, privacy classifications, and evidence limitations remain intact.
+1. Read the project index, course-design brief, design log, source register, and artifact manifest.
+2. Identify active, superseded, blocked, and intentionally absent state.
+3. Inspect source artifacts.
+4. Rebuild Confirmed/Assumed/Open state.
+5. Discover local capabilities and update the capability manifest.
+6. State any mapping differences that change deliverables or privacy.
+7. Continue from the recorded next decision.
+8. Verify that outcome IDs, artifact relationships, privacy classifications, and evidence limitations remain intact.
 
 Do not ask the instructor to restate confirmed information unless it is missing, contradictory, or unsafe to infer.
 

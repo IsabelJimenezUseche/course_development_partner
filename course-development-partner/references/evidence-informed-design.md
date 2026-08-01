@@ -24,7 +24,7 @@ Use this authority order:
 5. credible practice guidance with a clear context;
 6. illustrative or generated ideas, labeled as provisional.
 
-For each consequential recommendation, record:
+Apply `references/evidence-source-protocol.md` and use `assets/source-register.md` for consequential recommendations. Record:
 
 - the design claim;
 - the source or professor-approved rationale;

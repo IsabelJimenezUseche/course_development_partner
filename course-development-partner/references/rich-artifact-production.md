@@ -29,6 +29,8 @@ Before production, create `production-plan.md` from `assets/production-plan.md` 
 - student/instructor version relationship;
 - Markdown or neutral-data fallback.
 
+Read `references/visual-design.md` when layout, typography, color, hierarchy, diagrams, or visual identity materially affects the artifact. Follow supplied authoritative templates first; otherwise offer the optional Purdue-inspired palette and record contrast evidence.
+
 Treat the plan as a production gate, not a substitute for the course-design brief or artifact specification. Keep one source of truth for content and generate related versions from it when practical.
 
 ## 2. Route to host capabilities

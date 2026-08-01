@@ -26,7 +26,7 @@ For every important outcome, identify where students:
 - integrate or transfer learning;
 - demonstrate **mastery** or are **assessed** consequentially.
 
-Record module or week, prerequisite outcomes, learning experience and evidence, feedback or assessment, expected workload, and status.
+Record a positive numeric sequence, display module or week, prerequisite outcomes, learning experience and evidence, feedback or assessment, expected workload, and controlled status. Use sequence—not row order or a text label—to establish chronology.
 
 Inspect for:
 

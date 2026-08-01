@@ -1,5 +1,8 @@
 # Implementation Evidence Plan
 
+- Schema version: 2.0
+- Last updated:
+
 ## Purpose and boundary
 
 - Improvement question:
@@ -22,6 +25,8 @@
 - De-identification or aggregation method:
 - Small-group re-identification risk:
 - Access and approved storage:
+- Data owner and authorized system:
+- Retention authority and review checkpoint:
 - Retention and deletion rule:
 - Conditions for disaggregated analysis:
 - Consent, notice, or institutional-review question:

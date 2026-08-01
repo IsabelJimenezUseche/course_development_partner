@@ -1,5 +1,10 @@
 # Course Design Brief
 
+- Schema version: 2.0
+- Last updated:
+- Engagement tier: Focused | Project | Course
+- Responsible course owner:
+
 ## Course context
 
 - Course or module:
@@ -32,7 +37,11 @@
 - Institution type and jurisdiction, if relevant:
 - Applicable ADA, Section 504, state/local, contractual, or institutional authority identified by an authorized source:
 - Required technical accessibility target: [standard, exact version, level, scope, effective date]
-- Recommended design target, if different:
+- Recommended accessibility design target, if different:
+- Source last verified:
+- Policy effective or revision date:
+- Applicable compliance deadline:
+- Local release or remediation date:
 - Accessibility contact, review, procurement, or exception process:
 - Help pathways:
 
@@ -56,7 +65,7 @@
 
 ## Collaboration
 
-- Interaction level: Studio | Guided | Rapid
+- Interaction level: Studio | Guided | Rapid | Auto
 - Instructor preferences:
 - Requested artifacts:
 - Evidence-informed rationale needed: yes | no | undecided

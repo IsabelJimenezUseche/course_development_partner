@@ -15,18 +15,27 @@ import sys
 from pathlib import Path
 
 
-REQUIRED_HEADINGS = (
+REQUIRED_H2 = (
     "course context",
     "intended learning",
+    "access, participation, and belonging",
     "constraints",
+    "implementation load",
     "collaboration",
     "status",
-    "confirmed",
-    "assumed",
-    "open",
-    "current phase",
-    "next decision",
 )
+REQUIRED_H3 = ("confirmed", "assumed", "open", "current phase", "next decision")
+PROFILE_REQUIRED_FIELDS = {
+    "establish": ("course or module", "learning outcomes", "interaction level", "requested artifacts"),
+    "produce": (
+        "course or module", "learning outcomes", "technology and format", "interaction level",
+        "requested artifacts", "minimum viable fallback"
+    ),
+    "handoff": (
+        "course or module", "learning outcomes", "technology and format", "interaction level",
+        "requested artifacts", "minimum viable fallback", "accessibility contact, review, procurement, or exception process"
+    ),
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,6 +48,12 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to a Markdown course-design brief")
+    parser.add_argument(
+        "--profile",
+        choices=tuple(PROFILE_REQUIRED_FIELDS),
+        default="establish",
+        help="Completion profile to apply (default: establish)",
+    )
     return parser.parse_args()
 
 
@@ -46,7 +61,21 @@ def normalize_heading(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
 
 
-def validate(path: Path) -> tuple[list[str], list[str]]:
+def section_body(text: str, heading: str, level: int) -> str:
+    hashes = "#" * level
+    pattern = rf"^{hashes}\s+{re.escape(heading)}\s*$\n(?P<body>.*?)(?=^#{{1,{level}}}\s+|\Z)"
+    match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    return match.group("body").strip() if match else ""
+
+
+def field_values(text: str) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for match in re.finditer(r"^\s*-\s+([^:\n]+):\s*(.*?)\s*$", text, flags=re.MULTILINE):
+        values[normalize_heading(match.group(1))] = match.group(2).strip()
+    return values
+
+
+def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[str]]:
     if not path.is_file():
         return [f"File does not exist: {path}"], []
 
@@ -55,20 +84,38 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
     except (OSError, UnicodeError) as exc:
         return [f"Cannot read {path}: {exc}"], []
 
-    headings = {
-        normalize_heading(match.group(1))
-        for match in re.finditer(r"^#{1,6}\s+(.+?)\s*$", text, flags=re.MULTILINE)
-    }
-    errors = [
-        f"Missing required heading: {heading}"
-        for heading in REQUIRED_HEADINGS
-        if heading not in headings
+    heading_records = [
+        (len(match.group(1)), normalize_heading(match.group(2)))
+        for match in re.finditer(r"^(#{1,6})\s+(.+?)\s*$", text, flags=re.MULTILINE)
     ]
+    counts: dict[tuple[int, str], int] = {}
+    for record in heading_records:
+        counts[record] = counts.get(record, 0) + 1
+    errors: list[str] = []
+    for heading in REQUIRED_H2:
+        if (2, heading) not in counts:
+            errors.append(f"Missing required level-2 heading: {heading}")
+        elif counts[(2, heading)] > 1:
+            errors.append(f"Duplicate required heading: {heading}")
+    for heading in REQUIRED_H3:
+        if (3, heading) not in counts:
+            errors.append(f"Missing required level-3 heading: {heading}")
+        elif counts[(3, heading)] > 1:
+            errors.append(f"Duplicate required heading: {heading}")
+
+    status_start = re.search(r"^##\s+Status\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
+    if status_start:
+        trailing = text[status_start.end() :]
+        next_h2 = re.search(r"^##\s+", trailing, flags=re.MULTILINE)
+        status_text = trailing[: next_h2.start()] if next_h2 else trailing
+        for heading in REQUIRED_H3:
+            if not re.search(rf"^###\s+{re.escape(heading)}\s*$", status_text, flags=re.I | re.M):
+                errors.append(f"Status subsection is outside Status: {heading}")
 
     incomplete: list[str] = []
     placeholder_patterns = (
         (r"\b(?:TODO|TBD)\b", "Contains TODO/TBD marker"),
-        (r"\[(?:insert|replace|describe)[^\]]*\]", "Contains bracketed placeholder"),
+        (r"\[[^\]\n]+\](?!\()", "Contains bracketed placeholder"),
         (r"^\s*-\s*$", "Contains an empty list item"),
         (r"^\s*-\s+[^:\n]+:\s*$", "Contains an unanswered field"),
     )
@@ -76,18 +123,25 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
         if re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE):
             incomplete.append(message)
 
-    for heading in ("current phase", "next decision"):
-        pattern = rf"^###\s+{re.escape(heading)}\s*$\n(?P<body>.*?)(?=^###\s+|\Z)"
-        match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
-        if match and not re.search(r"\w", re.sub(r"^[\s-]+$", "", match.group("body"))):
+    for heading in REQUIRED_H3:
+        body = section_body(text, heading, 3)
+        if (3, heading) in counts and not re.search(r"\w", re.sub(r"^[\s-]+$", "", body)):
             incomplete.append(f"Section is empty: {heading}")
+
+    values = field_values(text)
+    for field in PROFILE_REQUIRED_FIELDS[profile]:
+        value = values.get(field, "")
+        if not value:
+            incomplete.append(f"Required field is unanswered for {profile}: {field}")
+        elif normalize_heading(value) in {"n/a", "na", "not applicable"}:
+            incomplete.append(f"Not-applicable field requires a rationale: {field}")
 
     return errors, sorted(set(incomplete))
 
 
 def main() -> int:
     args = parse_args()
-    errors, incomplete = validate(args.path)
+    errors, incomplete = validate(args.path, args.profile)
     for item in errors:
         print(f"ERROR: {item}")
     for item in incomplete:
@@ -96,7 +150,10 @@ def main() -> int:
         return 1
     if incomplete:
         return 2
-    print(f"OK: {args.path}")
+    print(
+        f"OK: structurally complete course-design brief for profile {args.profile}; "
+        f"manual design review still required: {args.path}"
+    )
     return 0
 
 

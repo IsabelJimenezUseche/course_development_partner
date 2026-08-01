@@ -84,7 +84,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 
 ## 6. Accessibility, inclusion, and clarity
 
-- Read `references/accessibility-and-compliance.md` and record the applicable institutional authority plus the exact required technical standard, version, level, scope, and effective date when relevant.
+- Read `references/accessibility-and-compliance.md` and record authority, exact required standard/version/level/scope, source-verification date, policy date, applicable compliance deadline, and local release/remediation date separately.
 - Keep ADA, Section 504, institutional policy, WCAG conformance, universal design, and individual accommodations distinct.
 - Use concise language and explain necessary jargon.
 - Chunk and order instructions.
@@ -93,7 +93,8 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Avoid color-only meaning.
 - Provide alternative text, transcripts, captions, or textual equivalents.
 - Check table structure, document language, accessible equations, reading order, and metadata.
-- Check keyboard-only operation, logical focus order, visible and unobscured focus, zoom, reflow, time limits, input errors, and accessible authentication when applicable.
+- Apply the exact criterion set named by the required target. For WCAG 2.1, keep Parsing 4.1.1 where required. Record WCAG 2.2 additions—including Focus Not Obscured 2.4.11, Dragging Movements 2.5.7, Target Size 2.5.8, Consistent Help 3.2.6, Redundant Entry 3.3.7, and Accessible Authentication 3.3.8—as additional checks unless 2.2 governs.
+- Check keyboard-only operation, logical focus order, focus visibility, zoom, reflow, time limits, input errors, and authentication according to the selected version.
 - Inspect PDF tags and reading order rather than assuming a visually correct PDF is accessible.
 - Verify generated captions, transcripts, descriptions, and alternative text for disciplinary accuracy.
 - Include embedded and third-party learning tools in the reviewed scope.
@@ -135,7 +136,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Record the last-reviewed date and unresolved issues.
 - Verify the editable source, final distribution artifact, renderer/playback evidence, accessibility review, and regeneration method agree with the artifact manifest.
 
-Run the deterministic state, alignment, and manifest validators when applicable. If tools cannot run, perform their documented checks manually.
+Run the applicable deterministic state, alignment, assessment, curriculum, manifest, and project validators. If tools cannot run, perform their documented checks manually.
 
 ## 9. Evidence and source quality
 
@@ -174,11 +175,12 @@ Run the deterministic state, alignment, and manifest validators when applicable.
 
 When code execution is unavailable, record the reviewer, date, file version, and result for each applicable check.
 
-- **Course design brief:** confirm every required heading exists; locate TODO/TBD or bracketed placeholders; identify empty list fields; verify Current phase and Next decision contain actionable text.
-- **Alignment map:** confirm every required column; require at least one data row; check unique outcome IDs; verify each outcome has an observable outcome, evidence, activity/support, feedback/assessment, and one allowed status (`draft`, `review`, `approved`, `blocked`, or `retired`); flag empty or unknown statuses and orphan activity/assessment rows.
-- **Artifact manifest:** confirm required columns and unique artifact IDs; verify file/reference, audience, outcomes, allowed status, validation evidence for validated/teaching-ready items, no unresolved blocker for teaching-ready items, and a last-reviewed date; when a family declares required student and instructor variants, confirm both are explicitly labeled; open each local reference when path checking is required.
-- **Assessment blueprint:** confirm required columns and unique item IDs; verify outcome coverage, evidence claim, cognitive demand, type, dependency, positive time and points, construct-irrelevant barriers, and status; reject unsupported formal-validation claims; compare required outcomes with represented outcomes.
-- **Course/curriculum map:** confirm required columns; inspect outcome stages in sequence; reject unknown stages, unknown prerequisites, circular prerequisites, nonpositive workload, mastery/assessment before development, and workload above the instructor-approved limit.
+- **Course design brief:** enforce the documented heading hierarchy and selected completion profile; locate TODO/TBD, bracketed placeholders, empty fields, and bare not-applicable values; verify status subsections, Current phase, and Next decision.
+- **Alignment map:** select the table by required headers; reject malformed rows and duplicate headers; require one valid outcome ID per row; verify outcome, evidence, activity/support, feedback/assessment, and controlled status.
+- **Artifact manifest:** verify artifact type, identifiers, audiences, controlled statuses and validation tokens, ISO dates, every declared variant, variant/audience agreement, readiness evidence, production/accessibility references, blockers, and local paths including Markdown links.
+- **Assessment blueprint:** verify controlled status/evidence level, valid outcome/item IDs, required outcome coverage, finite positive time/points, dependency targets/cycles, barriers, and bounded formal-validation authorization.
+- **Course/curriculum map:** sort by positive numeric Sequence rather than row order; validate stages, controlled status, tokenized external/internal prerequisites, cycles, finite positive workload, prior development, and the approved workload limit.
+- **Project:** verify the project index, active file paths, schema versions, ISO dates, cross-file outcome references, and applicable component validators.
 - **Repository integrity:** open every relative Markdown link; compare the runtime package against the approved inventory; confirm every reference is routed from `SKILL.md`, every asset is mentioned by `SKILL.md` or a direct reference, and every validator is named in `SKILL.md`.
 
 Use the same outcome vocabulary as the scripts: structural or parsing failures are errors; educational incompleteness, readiness gaps, or inconsistencies are findings. A manual pass does not authorize a stronger claim than the automated check would.

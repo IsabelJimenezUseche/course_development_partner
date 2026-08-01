@@ -1,5 +1,8 @@
 # Course Curriculum Map
 
+- Schema version: 2.0
+- Last updated:
+
 ## Course-level context
 
 - Course or sequence:
@@ -9,11 +12,11 @@
 
 ## Outcome development map
 
-Use developmental stages `introduce`, `practice`, `master`, or `assess`. Separate multiple stages with semicolons. Use `external: [source]` for a prerequisite intentionally developed before this mapped course or sequence.
+Use developmental stages `introduce`, `practice`, `master`, or `assess`. Separate multiple stages with semicolons. Use `external: [source]` as one semicolon-separated prerequisite token for learning intentionally developed before this mapped course or sequence. Use a positive numeric `Sequence` value to define chronological order independently of row order or the displayed module label.
 
-| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
-|---|---|---|---|---|---|---|---|
-| 1 | LO-1 | introduce | external: prerequisite course |  |  |  | draft |
+| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | introduce | external: prerequisite course |  |  |  | draft |
 
 ## Coherence review
 
@@ -24,3 +27,5 @@ Use developmental stages `introduce`, `practice`, `master`, or `assess`. Separat
 - Breadth/depth concerns:
 - Bottleneck or deadline clusters:
 - Instructor decisions needed:
+
+Status values: `draft`, `review`, `approved`, `blocked`, `retired`.

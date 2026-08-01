@@ -42,17 +42,37 @@ def run_help(name: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def run_project(files: dict[str, str], *args: str) -> subprocess.CompletedProcess[str]:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        project = Path(temp_dir)
+        for name, content in files.items():
+            path = project / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+        return subprocess.run(
+            [sys.executable, str(SCRIPTS / "validate_project.py"), str(project), *args],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+
 class DesignStateValidatorTests(unittest.TestCase):
     def test_complete_design_state_passes(self) -> None:
         content = """# Course Design Brief
 ## Course context
-- Course: BIO 101
+- Course or module: BIO 101
 ## Intended learning
-- Explain a mechanism
+- Learning outcomes: Explain a mechanism
+## Access, participation, and belonging
+- Provide equivalent text and visual representations
 ## Constraints
 - Fifty minutes
+## Implementation load
+- One class period; no new platform
 ## Collaboration
-- Studio
+- Interaction level: Studio
+- Requested artifacts: Alignment map and activity draft
 ## Status
 ### Confirmed
 - Outcome approved
@@ -72,6 +92,13 @@ class DesignStateValidatorTests(unittest.TestCase):
         template = (ROOT / "course-development-partner" / "assets" / "course-design-brief.md").read_text()
         result = run_script("validate_design_state.py", template)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+
+    def test_required_heading_at_wrong_level_is_structural_error(self) -> None:
+        content = (FIXTURES / "design_state" / "valid.md").read_text(encoding="utf-8")
+        content = content.replace("## Constraints", "### Constraints")
+        result = run_script("validate_design_state.py", content)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Missing required level-2 heading: constraints", result.stdout)
 
 
 class AlignmentValidatorTests(unittest.TestCase):
@@ -119,20 +146,52 @@ class AlignmentValidatorTests(unittest.TestCase):
         ):
             self.assertIn(expected, result.stdout)
 
+    def test_parser_selects_schema_table_and_preserves_escaped_pipe(self) -> None:
+        content = """| Note | Value |
+|---|---|
+| Owner | Faculty |
+
+| Outcome ID | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
+|---|---|---|---|---|---|
+| LO-1 | Compare A \\| B | Explanation | Contrast cases | Feedback | approved |
+"""
+        result = run_script("validate_alignment_map.py", content)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_malformed_middle_row_is_structural_error(self) -> None:
+        content = """| Outcome ID | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
+|---|---|---|---|---|---|
+| LO-1 | Explain | Evidence | Activity | Feedback | approved |
+| LO-2 | This row is short | Evidence |
+| LO-3 | Apply | Evidence | Activity | Feedback | approved |
+"""
+        result = run_script("validate_alignment_map.py", content)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Malformed Markdown table row", result.stdout)
+
+    def test_duplicate_normalized_header_is_structural_error(self) -> None:
+        content = """| Outcome ID | outcome   id | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
+|---|---|---|---|---|---|---|
+| LO-1 | LO-1 | Explain | Evidence | Activity | Feedback | approved |
+"""
+        result = run_script("validate_alignment_map.py", content)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Duplicate normalized header", result.stdout)
+
 
 class ArtifactManifestValidatorTests(unittest.TestCase):
     def test_teaching_ready_manifest_passes(self) -> None:
-        content = """| Artifact ID | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed |
-|---|---|---|---|---|---|---|---|
-| WS-1 | https://example.edu/ws-1 | student | LO-1 | teaching-ready | technical; accessibility; rendering | none | 2026-07-31 |
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws-1 | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | none | 2026-07-31 | not required | https://example.edu/ws-1-accessibility |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_teaching_ready_with_blocker_returns_two(self) -> None:
-        content = """| Artifact ID | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed |
-|---|---|---|---|---|---|---|---|
-| WS-1 | worksheet.md | student | LO-1 | teaching-ready | technical | solution not verified | 2026-07-31 |
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | worksheet.md | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | solution not verified | 2026-07-31 | not required | accessibility-review.md |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -155,19 +214,19 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_check_paths_detects_missing_local_reference(self) -> None:
-        content = """| Artifact ID | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed |
-|---|---|---|---|---|---|---|---|
-| WS-1 | missing.md | student | LO-1 | draft | none | none | 2026-07-31 |
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | missing.md | student | LO-1 | draft | manual | none | 2026-07-31 | https://example.edu/not-required | https://example.edu/pending |
 """
         result = run_script("validate_artifact_manifest.py", content, ".md", "--check-paths")
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertIn("local reference does not exist", result.stdout)
+        self.assertIn("local file or reference does not exist", result.stdout)
 
     def test_missing_fields_validation_evidence_and_family_context_are_reported(self) -> None:
-        content = """| Artifact ID | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed |
-|---|---|---|---|---|---|---|---|---|---|---|
-|  |  | student | student; instructor |  |  |  |  |  | none |  |
-| A-2 |  |  |  | https://example.edu/a-2 | instructor | LO-1 | validated |  | none | 2026-07-31 |
+        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|  |  | student | student; instructor | markdown |  |  |  |  |  | none |  | not required | pending |
+| A-2 |  |  |  | markdown | https://example.edu/a-2 | instructor | LO-1 | validated |  | none | 2026-07-31 | not required | pending |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -181,6 +240,43 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
             "variant or required variants declared without an artifact family",
         ):
             self.assertIn(expected, result.stdout)
+
+    def test_ready_manifest_rejects_none_evidence_and_invalid_date(self) -> None:
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws | student | LO-1 | validated | none | none | 2026-13-40 | not required | pending |
+"""
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown validation token none", result.stdout)
+        self.assertIn("last reviewed must use YYYY-MM-DD", result.stdout)
+
+    def test_calendar_invalid_iso_date_is_rejected(self) -> None:
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws | student | LO-1 | validated | technical; alignment | none | 2026-02-31 | not required | pending |
+"""
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("last reviewed must use YYYY-MM-DD", result.stdout)
+
+    def test_pending_non_file_evidence_is_not_treated_as_a_path_for_drafts(self) -> None:
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not applicable — plain Markdown | pending |
+"""
+        result = run_script("validate_artifact_manifest.py", content, ".md", "--check-paths")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_every_declared_variant_is_required(self) -> None:
+        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | family-1 | student | student; instructor; solution | markdown | https://example.edu/student | student | LO-1 | draft | manual | none | 2026-07-31 | not required | pending |
+| WS-2 | family-1 | instructor | student; instructor; solution | markdown | https://example.edu/instructor | instructor | LO-1 | draft | manual | none | 2026-07-31 | not required | pending |
+"""
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("required solution variant is not represented", result.stdout)
 
 
 class AssessmentBlueprintValidatorTests(unittest.TestCase):
@@ -218,15 +314,32 @@ class AssessmentBlueprintValidatorTests(unittest.TestCase):
         self.assertIn("Required outcome is not sampled: LO-2", result.stdout)
         self.assertIn("Formal-validation claim requires", result.stdout)
 
+    def test_unknown_status_evidence_dependency_cycle_and_infinity_are_rejected(self) -> None:
+        content = """| Item ID | Outcome(s) | Intended interpretation/use | Evidence claim | Cognitive demand | Item type | Dependency | Expected time (min) | Points | Construct-irrelevant barriers | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A-1 | LO-1 | Feedback | Claim | Apply | Response | A-2 | inf | 2 | none | done |
+| A-2 | LO-1 | Feedback | Claim | Apply | Response | A-1 | 2 | 2 | none | review |
+- Evidence level claimed: unquestionably-valid
+"""
+        result = run_script("validate_assessment_blueprint.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        for expected in (
+            "unknown status done",
+            "expected time must be a positive number",
+            "Circular item dependencies",
+            "Unknown evidence level claimed",
+        ):
+            self.assertIn(expected, result.stdout)
+
 
 class CourseCurriculumMapValidatorTests(unittest.TestCase):
     def test_coherent_course_map_passes(self) -> None:
         content = """# Course Curriculum Map
-| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
-|---|---|---|---|---|---|---|---|
-| 1 | LO-1 | introduce | external: prerequisite course | Prediction and model sketch | Diagnostic feedback | 2 | approved |
-| 2 | LO-1 | practice | none | Contrasting cases | Peer and instructor feedback | 3 | approved |
-| 3 | LO-1 | assess | none | Novel transfer problem | Scored rubric | 2 | approved |
+| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | introduce | external: prerequisite course | Prediction and model sketch | Diagnostic feedback | 2 | approved |
+| 2 | 2 | LO-1 | practice | none | Contrasting cases | Peer and instructor feedback | 3 | approved |
+| 3 | 3 | LO-1 | assess | none | Novel transfer problem | Scored rubric | 2 | approved |
 """
         result = run_script(
             "validate_course_curriculum_map.py",
@@ -239,10 +352,10 @@ class CourseCurriculumMapValidatorTests(unittest.TestCase):
 
     def test_course_map_detects_sequence_cycle_and_overload(self) -> None:
         content = """# Course Curriculum Map
-| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
-|---|---|---|---|---|---|---|---|
-| 1 | LO-1 | assess | LO-2 | Final design | Scored rubric | 6 | review |
-| 1 | LO-2 | introduce | LO-1 | Initial model | Diagnostic feedback | 5 | review |
+| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | assess | LO-2 | Final design | Scored rubric | 6 | review |
+| 1 | 1 | LO-2 | introduce | LO-1 | Initial model | Diagnostic feedback | 5 | review |
 """
         result = run_script(
             "validate_course_curriculum_map.py",
@@ -255,6 +368,35 @@ class CourseCurriculumMapValidatorTests(unittest.TestCase):
         self.assertIn("mastery/assessment appears before introduction or practice", result.stdout)
         self.assertIn("Circular outcome prerequisites", result.stdout)
         self.assertIn("exceeds limit 8", result.stdout)
+
+    def test_sequence_is_evaluated_independently_of_physical_row_order(self) -> None:
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 3 | 3 | LO-1 | assess | none | Transfer task | Rubric | 2 | approved |
+| 1 | 1 | LO-1 | introduce | none | Initial model | Feedback | 2 | approved |
+| 2 | 2 | LO-1 | practice | none | Cases | Feedback | 2 | approved |
+"""
+        result = run_script("validate_course_curriculum_map.py", content)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_same_sequence_does_not_create_false_prior_development(self) -> None:
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | introduce | none | Initial model | Feedback | 2 | review |
+| 1 | 1 | LO-1 | assess | none | Transfer task | Rubric | 2 | review |
+"""
+        result = run_script("validate_course_curriculum_map.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("mastery/assessment appears before introduction or practice", result.stdout)
+
+    def test_mixed_external_and_internal_prerequisites_are_checked(self) -> None:
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | introduce | external: calculus; LO-9 | Initial model | Feedback | 2 | review |
+"""
+        result = run_script("validate_course_curriculum_map.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown prerequisite outcome lo-9", result.stdout)
 
 
 class ValidatorFixtureAndCliTests(unittest.TestCase):
@@ -361,9 +503,9 @@ class ValidatorFixtureAndCliTests(unittest.TestCase):
             self.assertIn(expected, result.stdout)
 
     def test_course_map_missing_outcome_id_rule(self) -> None:
-        content = """| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
-|---|---|---|---|---|---|---|---|
-| 1 |  | introduce | none | Activity | Feedback | 1 | draft |
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 |  | introduce | none | Activity | Feedback | 1 | draft |
 """
         result = run_script("validate_course_curriculum_map.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -377,7 +519,7 @@ class ValidatorFixtureAndCliTests(unittest.TestCase):
             ),
             (
                 "validate_artifact_manifest.py",
-                "| Artifact ID | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed |\n|---|---|---|---|---|---|---|---|\n",
+                "| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |\n|---|---|---|---|---|---|---|---|---|---|---|\n",
             ),
             (
                 "validate_assessment_blueprint.py",
@@ -385,13 +527,74 @@ class ValidatorFixtureAndCliTests(unittest.TestCase):
             ),
             (
                 "validate_course_curriculum_map.py",
-                "| Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |\n|---|---|---|---|---|---|---|---|\n",
+                "| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |\n|---|---|---|---|---|---|---|---|---|\n",
             ),
         )
         for script, content in empty_cases:
             with self.subTest(script=script):
                 result = run_script(script, content)
                 self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+
+
+class ProjectValidatorTests(unittest.TestCase):
+    ALIGNMENT = """# Alignment Map
+- Schema version: 2.0
+| Outcome ID | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
+|---|---|---|---|---|---|
+| LO-1 | Explain a mechanism | Explanation | Comparison | Feedback | approved |
+"""
+
+    def test_minimal_indexed_project_passes(self) -> None:
+        index = """# Project Index
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| alignment-map.md | alignment authority | course owner | 2.0 | approved | 2026-08-01 | current |
+"""
+        result = run_project({"project-index.md": index, "alignment-map.md": self.ALIGNMENT})
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_project_detects_unknown_cross_file_outcome(self) -> None:
+        index = """# Project Index
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| alignment-map.md | alignment authority | course owner | 2.0 | approved | 2026-08-01 | current |
+| artifact-manifest.md | artifact authority | course owner | 2.0 | review | 2026-08-01 | current |
+"""
+        manifest = """# Artifact Manifest
+- Schema version: 2.0
+| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws | student | LO-9 | draft | manual | none | 2026-08-01 | https://example.edu/plan | https://example.edu/access |
+"""
+        result = run_project(
+            {
+                "project-index.md": index,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": manifest,
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("outcome is not defined in alignment-map.md: lo-9", result.stdout)
+
+    def test_project_requires_active_index_paths(self) -> None:
+        index = """| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| missing.md | state | course owner | 2.0 | draft | 2026-08-01 | current |
+"""
+        result = run_project({"project-index.md": index})
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("active state file does not exist", result.stdout)
+
+    def test_missing_project_directory_is_structural_error(self) -> None:
+        result = run_path("validate_project.py", FIXTURES / "does-not-exist")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Project directory does not exist", result.stdout)
+
+    def test_project_help_includes_usage_and_examples(self) -> None:
+        result = run_help("validate_project.py")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("usage:", result.stdout.lower())
+        self.assertIn("Examples", result.stdout)
 
 
 class RepositoryIntegrityTests(unittest.TestCase):
@@ -440,6 +643,17 @@ class RepositoryIntegrityTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("ERROR:", result.stdout)
 
+    def test_privacy_screen_passes_with_bounded_claim(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tests" / "audit_privacy.py")],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("human review still required", result.stdout)
+
 
 class PackageContentTests(unittest.TestCase):
     def test_every_reference_is_routed_from_skill(self) -> None:
@@ -459,9 +673,34 @@ class PackageContentTests(unittest.TestCase):
         skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
         reference_text = (skill_root / "references" / "accessibility-and-compliance.md").read_text(encoding="utf-8")
         self.assertIn("assets/accessibility-review.md", skill_text)
-        self.assertIn("WCAG 2.1 Level AA", reference_text)
-        self.assertIn("Purdue University", reference_text)
+        self.assertIn("WCAG 2.1", reference_text)
+        self.assertIn("WCAG 2.2", reference_text)
+        self.assertIn("WCAG2ICT", reference_text)
+        self.assertNotIn("Purdue University", reference_text)
         self.assertIn("must not make a legal or institutional compliance determination", (skill_root / "assets" / "accessibility-review.md").read_text(encoding="utf-8"))
+
+    def test_visual_guidance_offers_optional_purdue_inspired_palette(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        visual_text = (skill_root / "references" / "visual-design.md").read_text(encoding="utf-8")
+        self.assertIn("Purdue-inspired", visual_text)
+        self.assertIn("#CFB991", visual_text)
+        self.assertIn("optional", visual_text.lower())
+
+    def test_auto_mode_is_noninteractive_but_preserves_authority(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        interaction_text = (skill_root / "references" / "interaction-protocol.md").read_text(encoding="utf-8")
+        brief_text = (skill_root / "assets" / "course-design-brief.md").read_text(encoding="utf-8")
+        metadata_text = (skill_root / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        self.assertIn("Auto mode", skill_text)
+        self.assertIn("does not ask the educator", skill_text)
+        self.assertIn("do not execute the side effect", interaction_text)
+        self.assertIn("Do not end Auto output with a request", interaction_text)
+        self.assertIn("Studio | Guided | Rapid | Auto", brief_text)
+        self.assertNotIn("Goal", brief_text)
+        self.assertIn("Rapid and Auto are not aliases", interaction_text)
+        self.assertIn("one final faculty review", interaction_text)
+        self.assertIn("co-design or automatically produce", metadata_text)
 
     def test_rich_artifact_contract_requires_evidence_and_fallback(self) -> None:
         skill_root = ROOT / "course-development-partner"

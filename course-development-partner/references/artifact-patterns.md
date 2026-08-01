@@ -133,7 +133,7 @@ Explain the orientations:
 - **Error/deduction-based:** begin with full credit and subtract defined errors. Use it when correctness requirements are discrete and stable; prevent accumulated deductions from distorting the construct.
 - **Balanced — recommended:** anchor criteria and weights in the objectives, then treat errors as evidence of the degree of achievement. Scale consequences to how much an error undermines the target learning.
 
-Ask the instructor to choose an orientation before producing a final rubric. Do not infer the choice from an existing rubric or grading pattern. Default to balanced and objective-first only when the instructor delegates the choice. Do not turn the rubric into a punishment list detached from learning.
+Ask the responsible owner to approve the orientation before producing a final consequential rubric. Do not infer the choice from an existing grading pattern. When the owner delegates the choice, use the construct and stakes: favor objective-achievement or balanced logic for partial achievement, reasoning, judgment, and multiple valid approaches; favor checklist/mastery or explicit error rules for verified discrete, threshold, or safety-critical requirements. Do not turn the rubric into a punishment list detached from learning.
 
 ### Build the initial rubric
 
@@ -210,6 +210,8 @@ Verify the solution independently from the generated prompt. Do not silently rep
 ## 8. Slides and visuals
 
 Preview a storyboard or visual specification.
+
+Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional Purdue-inspired palette with contrast verification and no unauthorized marks.
 
 Use visuals for relationships, mechanisms, comparisons, hierarchy, or change over time. Check:
 

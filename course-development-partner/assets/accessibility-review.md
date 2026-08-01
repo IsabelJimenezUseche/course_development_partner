@@ -1,5 +1,8 @@
 # Accessibility Review
 
+- Schema version: 2.0
+- Last updated:
+
 ## Scope and authority
 
 - Course or project:
@@ -7,10 +10,13 @@
 - Delivery system or intended applications:
 - Institution type and jurisdiction, if relevant:
 - Authoritative institutional accessibility contact or process:
-- Legal or regulatory authority identified by an authorized source:
-- Institutional policy and effective date:
-- Required technical target: [standard, exact version, level, scope, effective date]
+- Legal or regulatory authority identified by an authoritative source:
+- Institutional policy and policy effective/revision date:
+- Required technical target: [standard, exact version, level, scope]
 - Recommended design target, if different:
+- Source last verified:
+- Applicable compliance deadline:
+- Local release or remediation date:
 - Review date:
 - Reviewers and qualifications:
 
