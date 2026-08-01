@@ -86,7 +86,7 @@ Scale scorer preparation to the stakes, judgment required, number of graders, an
 
 For consequential rubric use:
 
-1. Select a purposeful sample containing strong, weak, boundary, ambiguous, and alternative-valid responses when available.
+1. Recommend four purposeful de-identified examples—strong, boundary or middle-range, weak, and alternative-method or recurring-ambiguity—when available. For a small course or limited evidence, accept two available examples only with explicit provisional status and documented coverage limitations.
 2. Have at least two qualified graders score independently when feasible.
 3. Compare criterion-level judgments before comparing only total scores.
 4. Classify disagreements as criterion, descriptor, evidence, weight, dependency, valid-method, boundary, or expectation issues.

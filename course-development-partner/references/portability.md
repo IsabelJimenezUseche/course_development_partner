@@ -13,6 +13,7 @@ Store consequential context in ordinary Markdown:
 - `implementation-plan.md`
 - `implementation-evidence-plan.md`
 - `accessibility-review.md`
+- `production-plan.md`
 - `design-log.md`
 - `artifact-manifest.md`
 - `capability-manifest.md`
@@ -45,7 +46,7 @@ Include:
 4. source and provenance notes;
 5. validation reports;
 6. unresolved blockers, assumptions, and next decision.
-7. current curriculum, assessment, implementation, and evidence plans when they exist.
+7. current curriculum, assessment, implementation, evidence, accessibility, and production plans when they exist.
 
 Exclude:
 
@@ -53,6 +54,12 @@ Exclude:
 - passwords, tokens, private connector identifiers, or hidden tool state;
 - obsolete drafts unless needed to explain a decision;
 - client-specific temporary files.
+
+## Minimize and retire retained state
+
+Do not invent a universal retention period. Ask which instructor, institutional, privacy, research, or records policy governs the project and record the responsible owner. Keep only the content needed for the approved teaching, calibration, improvement, or handoff purpose; never place identifiable student information in portable state.
+
+At handoff, record who may access each sensitive or restricted artifact, where the authoritative copy belongs, what temporary copies exist, and who will delete or archive them. Remove temporary rubric-calibration and implementation-evidence records when their approved purpose ends, subject to the governing policy. If retention authority or duration is unresolved, flag it instead of silently preserving data.
 
 ## Resume in another client
 

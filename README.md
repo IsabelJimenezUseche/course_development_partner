@@ -16,6 +16,7 @@ The skill is designed to work with skills-compatible agents such as ChatGPT, Cod
 - Technical, pedagogical, accessibility, fairness, and artifact validation
 - ADA-, Section 504-, and WCAG-aware accessibility planning with bounded compliance claims
 - MCP- and tool-assisted research, verification, production, storage, and LMS workflows
+- Structured DOCX, PPTX, XLSX/CSV, PDF, and visual production through available host capabilities, with required render and accessibility evidence
 
 ## Design principles
 
@@ -91,6 +92,8 @@ The skill maps integrations by capability rather than vendor name. Depending on 
 
 MCP servers are not bundled into this repository. The skill discovers available capabilities, chooses the narrowest appropriate tool, records provenance, and falls back to rigorous Markdown or manual procedures when an integration is unavailable.
 
+For rich artifacts, the portable core records an approved preview, editable-source promise, output format, accessibility target, host capability, structural checks, rendered or playback inspection, reopen result, and fallback in a production plan. Format-specific mechanics remain with the host's current document, presentation, spreadsheet, PDF, or visual-production capability so the educational workflow stays client-agnostic.
+
 External systems are read-only by default. Publishing, messaging students, changing grades or permissions, overwriting live content, and modifying live course settings require explicit action-time authorization.
 
 ## ADA and WCAG awareness
@@ -154,7 +157,7 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 ## Validation
 
-The current package passes the official skill structure validator and thirteen deterministic unit tests covering design state, alignment, artifact manifests, assessment blueprints, course-curriculum coherence, accessibility routing, and package boundaries.
+The current package passes the official skill structure validator and fourteen deterministic unit tests covering design state, alignment, artifact manifests, assessment blueprints, course-curriculum coherence, accessibility and rich-artifact routing, and package boundaries.
 
 Run the repository tests with:
 
@@ -162,4 +165,4 @@ Run the repository tests with:
 python3 -m unittest discover -s tests -v
 ```
 
-The portable core has also been forward-tested on STEM, non-STEM, and rubric-calibration scenarios. Rich-artifact production, live MCP/LMS integrations, and clean cross-client installation still require environment-specific testing before a formal production release.
+The portable core has also been forward-tested on STEM, non-STEM, and rubric-calibration scenarios. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts have been produced, rendered, structurally inspected, corrected, and reopened; see `tests/rich-artifact-production-report.md` for the bounded evidence and limitations. Live MCP/LMS integrations, a faithful mock institutional authorization flow, and clean bidirectional OpenAI/ChatGPT/Codex–Claude installation and handoff still require testing before a formal production release.

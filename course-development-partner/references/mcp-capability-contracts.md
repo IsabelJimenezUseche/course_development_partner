@@ -124,9 +124,15 @@ input:
   output_format: requested format
   editable: true | false
   accessibility_requirements: list
+  approved_preview_or_storyboard: reference
+  source_and_reuse_requirements: list
+  fallback_format: markdown | csv | svg | neutral_specification
 output:
   source_file
+  distribution_file
   rendered_preview_if_supported
+  structural_inspection
+  reopen_result
   validation_report
   unresolved_issues
 write_effect: local or approved draft location

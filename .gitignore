@@ -1,6 +1,10 @@
 # Local design and implementation planning
 /design.md
-/TODO.md
+/TODO*.md
+/APP*.md
+
+# Local application prototype (includes .env and .venv)
+/app/
 
 # Generated Python caches
 __pycache__/

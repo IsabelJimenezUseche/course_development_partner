@@ -64,6 +64,8 @@ Read [references/evidence-informed-design.md](references/evidence-informed-desig
 
 Read [references/accessibility-and-compliance.md](references/accessibility-and-compliance.md) when digital content, documents, media, assessments, accommodations, ADA, Section 504, WCAG, third-party learning technology, or an institutional accessibility policy is relevant. Record the exact required standard, version, level, scope, and authority. Do not claim ADA or Section 504 compliance, or infer a legal exception, from an automated scan or AI review.
 
+Read [references/rich-artifact-production.md](references/rich-artifact-production.md) before producing or materially revising DOCX, PPTX, XLSX/CSV, PDF, diagram, image, audio, or video output. Create `production-plan.md` from `assets/production-plan.md`, use the host's specialized artifact capability, and require editable-source, structural, rendered or playback, accessibility, and reopen evidence before teaching-ready status.
+
 Read [references/course-coherence-and-implementation.md](references/course-coherence-and-implementation.md) for full-course or multi-week work, workload and sustainability decisions, implementation evidence, or course-improvement/research boundaries.
 
 Read [references/engineering-authenticity.md](references/engineering-authenticity.md) only when an engineering or engineering-technology task requires professional judgment, design, experimentation, standards, risk, safety, ethics, or sociotechnical tradeoffs.

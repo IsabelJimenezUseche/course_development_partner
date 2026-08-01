@@ -190,6 +190,17 @@ class PackageContentTests(unittest.TestCase):
         self.assertIn("Purdue University", reference_text)
         self.assertIn("must not make a legal or institutional compliance determination", (skill_root / "assets" / "accessibility-review.md").read_text(encoding="utf-8"))
 
+    def test_rich_artifact_contract_requires_evidence_and_fallback(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        reference_text = (skill_root / "references" / "rich-artifact-production.md").read_text(encoding="utf-8")
+        plan_text = (skill_root / "assets" / "production-plan.md").read_text(encoding="utf-8")
+        self.assertIn("assets/production-plan.md", skill_text)
+        self.assertIn("editable source", reference_text)
+        self.assertIn("rendered or playback inspection", reference_text)
+        self.assertIn("Markdown or neutral-data fallback", plan_text)
+        self.assertIn("Open/edit/reopen", plan_text)
+
 
 if __name__ == "__main__":
     unittest.main()

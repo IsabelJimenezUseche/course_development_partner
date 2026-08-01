@@ -32,6 +32,8 @@ For every artifact, identify:
 
 Keep related artifacts synchronized. Never allow the solution, rubric, or instructor guide to introduce an unstated requirement or assumption.
 
+For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. Approve the educational preview before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability.
+
 When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and use `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
 
 ## 2. Lesson plans
@@ -156,6 +158,8 @@ After the initial rubric exists, ask for a small authentic set. Suggest, but do 
 - weak work;
 - an unexpected but potentially valid approach;
 - a recurring response that exposed ambiguity.
+
+Recommend four purposeful examples when available: strong, boundary or middle-range, weak, and alternative-method or recurring-ambiguity work. In a small course or when evidence is limited, accept two examples if the instructor confirms that they are the available sample; label the calibration provisional and record which performance regions remain unseen.
 
 Request removal of names, identifiers, existing grades, accommodation information, and unrelated personal details. Do not process identifiable examples without an approved privacy path.
 

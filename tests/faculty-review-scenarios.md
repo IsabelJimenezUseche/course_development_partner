@@ -61,3 +61,7 @@ Use `$course-development-partner` to help an instructor collect student reflecti
 ## Tool-limited handoff
 
 Use `$course-development-partner` to continue a course redesign from a portable handoff bundle in a client with no MCP servers, no office-file tools, and no prior conversation. Identify what can continue rigorously, what must fall back to Markdown or manual review, and what evidence is missing.
+
+## Rich artifact family
+
+Use `$course-development-partner` to turn an approved active-learning activity into a student DOCX and distribution PDF, a short instructor PPTX, an editable assessment-planning workbook, and one explanatory diagram. Use only synthetic course data. Before production, show the production plan and artifact relationships. After production, inspect the editable sources, render every page, slide, populated sheet, and visual, correct defects, record accessibility evidence and limits, and provide a Markdown or neutral-data fallback for each format.

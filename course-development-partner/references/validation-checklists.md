@@ -123,6 +123,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 
 ## 8. Artifact integrity
 
+- Apply `references/rich-artifact-production.md` and preserve the approved `production-plan.md` when a rich format is promised.
 - Open the file in its intended application when possible.
 - Render every page, slide, sheet, image, audio segment, or video segment needed for review.
 - Check clipping, overflow, overlap, blank pages, broken equations, missing fonts, and corrupt media.
@@ -131,6 +132,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Verify links, references, citations, and cross-references.
 - Confirm file names and manifest entries match.
 - Record the last-reviewed date and unresolved issues.
+- Verify the editable source, final distribution artifact, renderer/playback evidence, accessibility review, and regeneration method agree with the artifact manifest.
 
 Run the deterministic state, alignment, and manifest validators when applicable. If tools cannot run, perform their documented checks manually.
 
