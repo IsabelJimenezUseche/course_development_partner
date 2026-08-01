@@ -47,7 +47,8 @@ def parse_args() -> argparse.Namespace:
         epilog=(
             "Examples:\n"
             "  validate_course_curriculum_map.py course-curriculum-map.md\n"
-            "  validate_course_curriculum_map.py map.csv --max-hours-per-module 8"
+            "  validate_course_curriculum_map.py map.csv --max-hours-per-module 8\n"
+            "  validate_course_curriculum_map.py map.md --require-complete-progression"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -56,6 +57,11 @@ def parse_args() -> argparse.Namespace:
         "--max-hours-per-module",
         type=float,
         help="Optional maximum summed student workload for a module/week",
+    )
+    parser.add_argument(
+        "--require-complete-progression",
+        action="store_true",
+        help="Require every active outcome to reach practice and mastery or assessment",
     )
     return parser.parse_args()
 
@@ -80,7 +86,11 @@ def parse_prerequisites(value: str) -> tuple[set[str], bool, list[str]]:
     return internal, has_external, invalid
 
 
-def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]:
+def validate(
+    path: Path,
+    max_hours: float | None,
+    require_complete_progression: bool = False,
+) -> tuple[list[str], list[str]]:
     try:
         _, headers, raw_rows = load_table(path, REQUIRED)
         mapping = normalized_mapping(headers, REQUIRED)
@@ -94,11 +104,72 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
     parsed_rows: list[dict[str, str]] = []
     outcome_ids: set[str] = set()
     stage_history: dict[str, set[str]] = defaultdict(set)
+    all_stages: dict[str, set[str]] = defaultdict(set)
+    external_prior_by_outcome: set[str] = set()
     graph: dict[str, set[str]] = defaultdict(set)
     workload_by_module: dict[str, float] = defaultdict(float)
 
     for row_number, raw in enumerate(raw_rows, start=1):
         row = normalized_row(raw, mapping)
+        status = normalize(row["status"])
+        if status and status not in VALID_STATUSES:
+            issues.append(
+                f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                f"unknown status {row['status']}"
+            )
+        if status == "retired":
+            for field_name in REQUIRED:
+                if not row[field_name]:
+                    issues.append(
+                        f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                        f"missing {field_name}"
+                    )
+            if row["sequence"] and parse_positive_finite(row["sequence"]) is None:
+                issues.append(
+                    f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                    "sequence must be a positive finite number"
+                )
+            if not row["outcome id"]:
+                issues.append(f"Row {row_number}: missing outcome ID")
+            else:
+                try:
+                    ids = parse_identifier_list(row["outcome id"], field_name="outcome")
+                    if len(ids) != 1:
+                        issues.append(
+                            f"Row {row_number}: outcome ID must contain exactly one identifier"
+                        )
+                except ValueError as exc:
+                    issues.append(f"Row {row_number}: {exc}")
+            stages = {
+                normalize(stage)
+                for stage in re.split(r"[;,/]", row["developmental stage"])
+                if stage.strip()
+            }
+            for stage in sorted(stages - ALLOWED_STAGES):
+                issues.append(
+                    f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                    f"invalid stage {stage}"
+                )
+            _, _, invalid_prerequisites = parse_prerequisites(
+                row["outcome prerequisites"]
+            )
+            for invalid_prerequisite in invalid_prerequisites:
+                issues.append(
+                    f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                    f"invalid prerequisite {invalid_prerequisite}"
+                )
+            if (
+                row["expected student workload (hours)"]
+                and parse_positive_finite(
+                    row["expected student workload (hours)"]
+                ) is None
+            ):
+                issues.append(
+                    f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
+                    "workload must be a positive number"
+                )
+            continue
+        row["source row number"] = str(row_number)
         parsed_rows.append(row)
         outcome_id = normalize(row["outcome id"])
         row["outcome id normalized"] = outcome_id
@@ -119,17 +190,21 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
         row["outcome id normalized"] = outcome_id
         outcome_ids.add(outcome_id)
 
+    if not parsed_rows:
+        issues.append("Course curriculum map contains no active rows")
+
     ordered_rows = sorted(
-        enumerate(parsed_rows, start=1),
-        key=lambda item: (
-            float(item[1]["sequence normalized"]) if item[1]["sequence normalized"] else float("inf"),
-            item[0],
+        parsed_rows,
+        key=lambda row: (
+            float(row["sequence normalized"]) if row["sequence normalized"] else float("inf"),
+            int(row["source row number"]),
         ),
     )
     current_sequence: float | None = None
     pending_stages: dict[str, set[str]] = defaultdict(set)
 
-    for row_number, row in ordered_rows:
+    for row in ordered_rows:
+        row_number = int(row["source row number"])
         outcome_id = row.get("outcome id normalized", normalize(row["outcome id"]))
         if not outcome_id:
             continue
@@ -148,17 +223,31 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
         for stage in sorted(invalid):
             issues.append(f"Row {row_number} ({row['outcome id']}): invalid stage {stage}")
 
-        has_prior_development = bool(stage_history[outcome_id] & {"introduce", "practice"})
         prerequisites, external_prior, invalid_prerequisites = parse_prerequisites(row["outcome prerequisites"])
+        if external_prior:
+            external_prior_by_outcome.add(outcome_id)
         for invalid_prerequisite in invalid_prerequisites:
             issues.append(
                 f"Row {row_number} ({row['outcome id']}): invalid prerequisite {invalid_prerequisite}"
             )
-        if stages & {"master", "assess"} and not has_prior_development and not external_prior:
-            issues.append(
-                f"Row {row_number} ({row['outcome id']}): mastery/assessment appears before introduction or practice"
+        if stages & {"master", "assess"}:
+            has_prior_introduction = (
+                "introduce" in stage_history[outcome_id]
+                or outcome_id in external_prior_by_outcome
             )
+            has_prior_practice = "practice" in stage_history[outcome_id]
+            if not has_prior_introduction:
+                issues.append(
+                    f"Row {row_number} ({row['outcome id']}): mastery/assessment appears "
+                    "before introduction or a declared external prior"
+                )
+            if not has_prior_practice:
+                issues.append(
+                    f"Row {row_number} ({row['outcome id']}): mastery/assessment appears "
+                    "before practice"
+                )
         pending_stages[outcome_id].update(stages & ALLOWED_STAGES)
+        all_stages[outcome_id].update(stages & ALLOWED_STAGES)
 
         if stages & {"master", "assess"} and not row["feedback/assessment"]:
             issues.append(
@@ -166,10 +255,6 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
             )
 
         graph[outcome_id].update(prerequisites)
-
-        status = normalize(row["status"])
-        if status and status not in VALID_STATUSES:
-            issues.append(f"Row {row_number} ({row['outcome id']}): unknown status {row['status']}")
 
         workload = parse_positive_finite(row["expected student workload (hours)"])
         if row["expected student workload (hours)"] and workload is None:
@@ -187,6 +272,21 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
     for cycle in find_cycles(graph):
         issues.append(f"Circular outcome prerequisites: {cycle}")
 
+    if require_complete_progression:
+        for outcome_id in sorted(outcome_ids):
+            stages = all_stages[outcome_id]
+            if "introduce" not in stages and outcome_id not in external_prior_by_outcome:
+                issues.append(
+                    f"{outcome_id.upper()}: complete progression is missing introduction "
+                    "or a declared external prior"
+                )
+            if "practice" not in stages:
+                issues.append(f"{outcome_id.upper()}: complete progression is missing practice")
+            if not stages & {"master", "assess"}:
+                issues.append(
+                    f"{outcome_id.upper()}: complete progression is missing mastery or assessment"
+                )
+
     if max_hours is not None:
         for module, hours in sorted(workload_by_module.items()):
             if hours > max_hours:
@@ -199,7 +299,11 @@ def validate(path: Path, max_hours: float | None) -> tuple[list[str], list[str]]
 
 def main() -> int:
     args = parse_args()
-    errors, issues = validate(args.path, args.max_hours_per_module)
+    errors, issues = validate(
+        args.path,
+        args.max_hours_per_module,
+        args.require_complete_progression,
+    )
     for item in errors:
         print(f"ERROR: {item}")
     for item in issues:

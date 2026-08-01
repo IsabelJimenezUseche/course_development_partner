@@ -1,5 +1,5 @@
 # Alignment Map
 
-| Outcome ID | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
-|---|---|---|---|---|---|
-| LO-1 | Explain a mechanism | Annotated diagram | Comparison activity | Exit ticket | approved |
+| Outcome ID | Observable learning outcome | Cognitive demand | Evidence of learning | Learning mechanism | Learning activity/support | Feedback or assessment | Status |
+|---|---|---|---|---|---|---|---|
+| LO-1 | Explain a mechanism | explain | Annotated diagram | contrasting cases | Comparison activity | Exit ticket | approved |

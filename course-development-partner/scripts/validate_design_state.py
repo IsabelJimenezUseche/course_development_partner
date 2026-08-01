@@ -26,16 +26,21 @@ REQUIRED_H2 = (
 )
 REQUIRED_H3 = ("confirmed", "assumed", "open", "current phase", "next decision")
 PROFILE_REQUIRED_FIELDS = {
-    "establish": ("course or module", "learning outcomes", "interaction level", "requested artifacts"),
+    "establish": (
+        "engagement tier", "course or module", "learning outcomes", "interaction level",
+        "requested artifacts"
+    ),
     "produce": (
-        "course or module", "learning outcomes", "technology and format", "interaction level",
-        "requested artifacts", "minimum viable fallback"
+        "engagement tier", "course or module", "learning outcomes", "technology and format",
+        "interaction level", "requested artifacts", "minimum viable fallback"
     ),
     "handoff": (
-        "course or module", "learning outcomes", "technology and format", "interaction level",
-        "requested artifacts", "minimum viable fallback", "accessibility contact, review, procurement, or exception process"
+        "engagement tier", "course or module", "learning outcomes", "technology and format",
+        "interaction level", "requested artifacts", "minimum viable fallback",
+        "accessibility contact, review, procurement, or exception process"
     ),
 }
+VALID_ENGAGEMENT_TIERS = {"focused", "project", "course"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -68,11 +73,15 @@ def section_body(text: str, heading: str, level: int) -> str:
     return match.group("body").strip() if match else ""
 
 
-def field_values(text: str) -> dict[str, str]:
+def field_values(text: str) -> tuple[dict[str, str], set[str]]:
     values: dict[str, str] = {}
+    duplicates: set[str] = set()
     for match in re.finditer(r"^\s*-\s+([^:\n]+):\s*(.*?)\s*$", text, flags=re.MULTILINE):
-        values[normalize_heading(match.group(1))] = match.group(2).strip()
-    return values
+        field = normalize_heading(match.group(1))
+        if field in values:
+            duplicates.add(field)
+        values[field] = match.group(2).strip()
+    return values, duplicates
 
 
 def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[str]]:
@@ -128,13 +137,24 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
         if (3, heading) in counts and not re.search(r"\w", re.sub(r"^[\s-]+$", "", body)):
             incomplete.append(f"Section is empty: {heading}")
 
-    values = field_values(text)
+    values, duplicate_fields = field_values(text)
+    tracked_fields = {
+        field
+        for required_fields in PROFILE_REQUIRED_FIELDS.values()
+        for field in required_fields
+    }
+    for field in sorted(duplicate_fields & tracked_fields):
+        errors.append(f"Duplicate scalar field: {field}")
     for field in PROFILE_REQUIRED_FIELDS[profile]:
         value = values.get(field, "")
         if not value:
             incomplete.append(f"Required field is unanswered for {profile}: {field}")
         elif normalize_heading(value) in {"n/a", "na", "not applicable"}:
             incomplete.append(f"Not-applicable field requires a rationale: {field}")
+
+    engagement_tier = normalize_heading(values.get("engagement tier", ""))
+    if engagement_tier and engagement_tier not in VALID_ENGAGEMENT_TIERS:
+        incomplete.append(f"Unknown engagement tier: {values['engagement tier']}")
 
     return errors, sorted(set(incomplete))
 

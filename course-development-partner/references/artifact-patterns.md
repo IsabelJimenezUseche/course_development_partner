@@ -93,7 +93,7 @@ For engineering tasks, apply `references/engineering-authenticity.md`. Make rele
 
 ## 5. Assessments
 
-Preview: `assets/assessment-blueprint.md` with outcome, intended interpretation/use, evidence claim, cognitive demand, item type, dependency, points, time, and construct-irrelevant barriers.
+Preview: `assets/assessment-blueprint.md` with explicit assessed-outcome scope or `all-active`, item outcome, intended interpretation/use, evidence claim, cognitive demand, item type, dependency, points, time, and construct-irrelevant barriers.
 
 Map every item to an outcome. Check:
 

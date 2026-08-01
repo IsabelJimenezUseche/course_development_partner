@@ -42,6 +42,7 @@ VALID_STATUSES = {"draft", "review", "approved", "blocked", "retired"}
 VALID_EVIDENCE_LEVELS = {
     "classroom-reviewed", "expert-reviewed", "piloted", "reliability-examined", "formally-validated"
 }
+ACTIVE_ALIGNMENT_STATUSES = {"draft", "review", "approved", "blocked"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -70,7 +71,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--alignment-map",
         type=Path,
-        help="Optional alignment map whose outcome IDs define required coverage",
+        help="Optional alignment map that bounds and validates the declared assessed-outcome scope",
     )
     return parser.parse_args()
 
@@ -80,8 +81,14 @@ def load(path: Path) -> tuple[str, list[str], list[dict[str, str]]]:
 
 
 def evidence_level(text: str, rows: list[dict[str, str]], mapping: dict[str, str]) -> str:
-    match = re.search(r"^\s*-\s*Evidence level claimed:\s*(.+?)\s*$", text, re.MULTILINE | re.I)
-    markdown_value = normalize(match.group(1)).replace(" ", "-") if match else ""
+    matches = re.findall(
+        r"^\s*-\s*Evidence level claimed:\s*(.+?)\s*$",
+        text,
+        re.MULTILINE | re.I,
+    )
+    if len(matches) > 1:
+        raise ValueError("Markdown contains duplicate evidence-level claims")
+    markdown_value = normalize(matches[0]).replace(" ", "-") if matches else ""
     column_value = ""
     if "evidence level claimed" in mapping:
         values = {
@@ -97,16 +104,51 @@ def evidence_level(text: str, rows: list[dict[str, str]], mapping: dict[str, str
     return markdown_value or column_value
 
 
+def assessed_outcome_scope(
+    text: str,
+    rows: list[dict[str, str]],
+    mapping: dict[str, str],
+) -> str:
+    matches = re.findall(
+        r"^\s*-\s*Assessed outcome scope:\s*(.+?)\s*$",
+        text,
+        re.MULTILINE | re.I,
+    )
+    if len(matches) > 1:
+        raise ValueError("Markdown contains duplicate assessed-outcome scopes")
+    markdown_value = matches[0].strip() if matches else ""
+    column_values: dict[str, str] = {}
+    if "assessed outcome scope" in mapping:
+        for row in rows:
+            value = row.get(mapping["assessed outcome scope"], "").strip()
+            if value:
+                column_values[normalize(value)] = value
+        if len(column_values) > 1:
+            raise ValueError("CSV contains conflicting assessed-outcome scopes")
+    column_value = next(iter(column_values.values()), "")
+    if (
+        markdown_value
+        and column_value
+        and normalize(markdown_value) != normalize(column_value)
+    ):
+        raise ValueError("Markdown and table assessed-outcome scopes conflict")
+    return markdown_value or column_value
+
+
 def alignment_outcomes(path: Path) -> set[str]:
     required = (
-        "outcome id", "observable learning outcome", "evidence of learning",
-        "learning activity/support", "feedback or assessment", "status"
+        "outcome id", "observable learning outcome", "cognitive demand",
+        "evidence of learning", "learning mechanism", "learning activity/support",
+        "feedback or assessment", "status"
     )
     _, headers, rows = load_table(path, required)
     mapping = normalized_mapping(headers, required)
     outcomes: set[str] = set()
     for raw in rows:
-        value = normalized_row(raw, mapping)["outcome id"]
+        row = normalized_row(raw, mapping)
+        if normalize(row["status"]) not in ACTIVE_ALIGNMENT_STATUSES:
+            continue
+        value = row["outcome id"]
         if value:
             outcomes.update(parse_identifier_list(value, field_name="outcome"))
     return outcomes
@@ -122,6 +164,7 @@ def validate(
         text, headers, raw_rows = load(path)
         mapping = normalized_mapping(headers, REQUIRED)
         claimed_level = evidence_level(text, raw_rows, mapping)
+        scope_value = assessed_outcome_scope(text, raw_rows, mapping)
         derived_outcomes = alignment_outcomes(alignment_map) if alignment_map else set()
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
@@ -130,8 +173,49 @@ def validate(
 
     issues: list[str] = []
     seen_items: set[str] = set()
+    active_items: set[str] = set()
     represented_outcomes: set[str] = set()
     dependency_values: dict[str, str] = {}
+    scoped_outcomes: set[str] = set()
+    scope_resolved = False
+
+    normalized_scope = normalize(scope_value).replace(" ", "-")
+    if not scope_value:
+        issues.append("Missing assessed outcome scope")
+    elif normalized_scope == "all-active":
+        if alignment_map is not None:
+            scoped_outcomes = set(derived_outcomes)
+            scope_resolved = True
+            if not scoped_outcomes:
+                issues.append(
+                    "Assessed outcome scope all-active contains no active aligned outcomes"
+                )
+        elif required_outcomes:
+            scoped_outcomes = {normalize(outcome) for outcome in required_outcomes}
+            scope_resolved = True
+        else:
+            issues.append(
+                "Assessed outcome scope all-active requires an alignment map or "
+                "explicit --required-outcome values"
+            )
+    else:
+        try:
+            scoped_outcomes = parse_identifier_list(
+                scope_value,
+                field_name="assessed outcome scope",
+            )
+            if not scoped_outcomes:
+                issues.append("Assessed outcome scope contains no outcome IDs")
+            else:
+                scope_resolved = True
+        except ValueError as exc:
+            issues.append(str(exc))
+
+    if alignment_map is not None:
+        for outcome in sorted(scoped_outcomes - derived_outcomes):
+            issues.append(
+                f"Assessed outcome scope is not active in the alignment map: {outcome.upper()}"
+            )
 
     for row_number, raw in enumerate(raw_rows, start=1):
         row = normalized_row(raw, mapping)
@@ -159,19 +243,24 @@ def validate(
             if not row[field_name]:
                 issues.append(f"Row {row_number} ({item_id}): missing {field_name}")
 
-        if row["outcome(s)"]:
-            try:
-                represented_outcomes.update(parse_identifier_list(row["outcome(s)"], field_name="outcome"))
-            except ValueError as exc:
-                issues.append(f"Row {row_number} ({item_id}): {exc}")
         status = normalize(row["status"])
         if status and status not in VALID_STATUSES:
             issues.append(f"Row {row_number} ({item_id}): unknown status {row['status']}")
+        if status != "retired":
+            active_items.add(normalized_id)
+            if row["outcome(s)"]:
+                try:
+                    represented_outcomes.update(
+                        parse_identifier_list(row["outcome(s)"], field_name="outcome")
+                    )
+                except ValueError as exc:
+                    issues.append(f"Row {row_number} ({item_id}): {exc}")
         if row["expected time (min)"] and parse_positive_finite(row["expected time (min)"]) is None:
             issues.append(f"Row {row_number} ({item_id}): expected time must be a positive number")
         if row["points"] and parse_positive_finite(row["points"]) is None:
             issues.append(f"Row {row_number} ({item_id}): points must be a positive number")
-        dependency_values[normalized_id] = row["dependency"]
+        if status != "retired":
+            dependency_values[normalized_id] = row["dependency"]
 
     graph: dict[str, set[str]] = {}
     for item_id, value in dependency_values.items():
@@ -185,12 +274,19 @@ def validate(
             continue
         graph[item_id] = dependencies
         for dependency in dependencies:
-            if dependency not in seen_items:
-                issues.append(f"{item_id}: unknown dependency item {dependency}")
+            if dependency not in active_items:
+                issues.append(f"{item_id}: unknown or retired dependency item {dependency}")
     for cycle in find_cycles(graph):
         issues.append(f"Circular item dependencies: {cycle}")
 
-    all_required = {normalize(outcome) for outcome in required_outcomes} | derived_outcomes
+    if not active_items:
+        issues.append("Assessment blueprint contains no active items")
+
+    if scope_resolved:
+        for outcome in sorted(represented_outcomes - scoped_outcomes):
+            issues.append(f"Assessment item uses outcome outside declared scope: {outcome.upper()}")
+
+    all_required = {normalize(outcome) for outcome in required_outcomes} | scoped_outcomes
     for outcome in sorted(all_required):
         if outcome not in represented_outcomes:
             issues.append(f"Required outcome is not sampled: {outcome.upper()}")

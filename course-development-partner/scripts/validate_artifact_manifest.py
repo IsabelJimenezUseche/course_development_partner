@@ -28,6 +28,9 @@ from _tabular import (
 REQUIRED = (
     "artifact id",
     "artifact type",
+    "artifact family",
+    "variant",
+    "required variants",
     "file or reference",
     "audience",
     "outcome(s)",
@@ -96,8 +99,10 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
     if not raw_rows:
         return [], ["Artifact manifest contains no data rows"]
 
+    errors: list[str] = []
     issues: list[str] = []
     seen_ids: set[str] = set()
+    active_ids: set[str] = set()
     family_variants: dict[str, set[str]] = {}
     family_requirements: dict[str, set[str]] = {}
     for row_number, raw in enumerate(raw_rows, start=1):
@@ -130,6 +135,8 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
         status = normalize(row["status"])
         if status and status not in VALID_STATUSES:
             issues.append(f"{label}: unknown status {row['status']}")
+        if status != "retired" and artifact_id:
+            active_ids.add(normalize(artifact_id))
         validation_tokens = {
             normalize(token)
             for token in re.split(r"[;,]", row["validation completed"])
@@ -138,13 +145,13 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
         invalid_validation = validation_tokens - VALIDATION_TOKENS
         for token in sorted(invalid_validation):
             issues.append(f"{label}: unknown validation token {token}")
+        if row["last reviewed"] and not parse_iso_date(row["last reviewed"]):
+            issues.append(f"{label}: last reviewed must use YYYY-MM-DD")
         if status in {"validated", "teaching-ready"}:
             if not validation_tokens or normalize(row["validation completed"]) in EMPTY_ISSUES:
                 issues.append(f"{label}: {status} without validation evidence")
             if not row["last reviewed"]:
                 issues.append(f"{label}: {status} without last-reviewed date")
-            elif not parse_iso_date(row["last reviewed"]):
-                issues.append(f"{label}: last reviewed must use YYYY-MM-DD")
             for token in sorted({"technical", "alignment"} - validation_tokens):
                 issues.append(f"{label}: {status} missing validation token {token}")
         if status == "teaching-ready":
@@ -160,14 +167,17 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
             if not row["accessibility review"] or is_reference_state(row["accessibility review"]):
                 issues.append(f"{label}: teaching-ready artifact is missing accessibility review")
 
-        if check_paths:
+        if check_paths and status != "retired":
             for field in ("file or reference", "production plan", "accessibility review"):
                 reference = row[field]
                 if field != "file or reference" and is_reference_state(reference):
                     continue
-                target = local_reference_path(reference, path.parent)
-                if target is not None and not target.exists():
-                    issues.append(f"{label}: local {field} does not exist: {reference}")
+                try:
+                    target = local_reference_path(reference, path.parent)
+                    if target is not None and not target.exists():
+                        issues.append(f"{label}: local {field} does not exist: {reference}")
+                except (OSError, RuntimeError) as exc:
+                    errors.append(f"{label}: cannot resolve local {field} {reference}: {exc}")
 
         family = normalize(row.get("artifact family", ""))
         variant = normalize(row.get("variant", ""))
@@ -177,12 +187,14 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
             if token.strip()
         }
         if family:
-            family_variants.setdefault(family, set())
-            family_requirements.setdefault(family, set()).update(requirements)
+            if status != "retired":
+                family_variants.setdefault(family, set())
+                family_requirements.setdefault(family, set()).update(requirements)
             if not variant:
                 issues.append(f"{label}: artifact family {family} is missing a variant label")
             else:
-                family_variants[family].add(variant)
+                if status != "retired":
+                    family_variants[family].add(variant)
                 if variant not in VALID_VARIANTS:
                     issues.append(f"{label}: unknown variant {row.get('variant', '')}")
                 audiences = {
@@ -201,7 +213,10 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
         for variant in sorted(missing_variants):
             issues.append(f"Artifact family {family}: required {variant} variant is not represented")
 
-    return [], issues
+    if not active_ids:
+        issues.append("Artifact manifest contains no active artifacts")
+
+    return errors, issues
 
 
 def main() -> int:

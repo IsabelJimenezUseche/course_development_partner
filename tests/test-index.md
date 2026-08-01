@@ -4,7 +4,7 @@ Last updated: 2026-08-01
 
 | Test or evidence set | Status | Reproducibility | Current interpretation |
 |---|---|---|---|
-| `test_skill_validators.py` | current — 54 tests passing | executable, committed fixtures | Structural and declared-semantic regression evidence only |
+| `test_skill_validators.py` | current — 86 tests passing | executable, committed fixtures | Structural and declared-semantic regression evidence only |
 | `check_repository.py` | current — passing | executable | Local links, runtime inventory, and resource routing |
 | `audit_privacy.py` | current — passing | executable plus human audit | Pattern screen; not proof of privacy safety |
 | `faculty-review-scenarios.md` + `evaluator-rubric.md` | current prompt/rubric set | reproducible when client/model/result metadata are recorded | Behavioral matrix; rerun after instruction-level changes |

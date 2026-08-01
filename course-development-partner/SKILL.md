@@ -65,7 +65,7 @@ Read [references/visual-design.md](references/visual-design.md) for visual teach
 
 Read [references/assessment-quality.md](references/assessment-quality.md) before consequential assessment, validity claims, multi-grader calibration, or permitted-AI adaptation.
 
-For rubrics, clarify objectives, use, structure, scale, weights, thresholds, scoring orientation, dependency rules, and valid alternatives. Choose an orientation from the construct and stakes:
+For assessments, declare whether the blueprint covers explicit outcome IDs or all active aligned outcomes; validate coverage only within that approved scope. For rubrics, clarify objectives, use, structure, scale, weights, thresholds, scoring orientation, dependency rules, and valid alternatives. Choose an orientation from the construct and stakes:
 
 - use objective-achievement or balanced logic when reasoning, partial achievement, judgment, or multiple valid approaches matter;
 - use checklist/mastery or explicit error rules for verified discrete, threshold, or safety-critical requirements;
@@ -88,7 +88,7 @@ Run applicable validators when their input exists and code execution is availabl
 
 Treat script success as bounded structural evidence, not a substitute for manual educational, technical, accessibility, or release review.
 
-For `validate_project.py`, select `--design-profile establish`, `produce`, or `handoff` to match the current phase. Treat missing profile-required state files as gaps rather than omitting them from the index.
+For `validate_project.py`, select `--design-profile establish`, `produce`, or `handoff` to match the current phase. Treat missing profile- or tier-required state files as gaps rather than omitting them from the index. Keep indexed state inside the portable project directory. At Course-tier handoff, require every active aligned outcome to appear in the curriculum map and require the map to show introduction or a declared external prior, practice, and mastery or assessment.
 
 Use [references/state-contract.md](references/state-contract.md) for identifiers, statuses, dates, schema versions, and project-index rules. Use [references/portability.md](references/portability.md) before cross-client transfer or handoff. Preserve source authority, supported claim, retrieval date when changeable, reuse restrictions, unresolved assumptions, validation scope, and the next decision.
 

@@ -41,6 +41,8 @@ Inspect for:
 
 Use the curriculum-map validator when available. Apply the same checks manually when it cannot run.
 
+Treat `retired` rows as historical state: do not let them satisfy current outcome development, prerequisite, evidence, or workload requirements. Require introduction or a declared external prior and practice to occur before mastery or consequential assessment. During Course-tier handoff, require every active aligned outcome to appear in the curriculum map and show that ordered progression. A working draft may expose these as gaps; it must not pass the handoff check until the progression is complete or the responsible owner retires or narrows the outcome explicitly.
+
 ## 3. Check implementation load
 
 Use `assets/implementation-plan.md`. Estimate rather than hide:

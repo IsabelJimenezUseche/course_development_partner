@@ -29,6 +29,8 @@ Do not call an assessment or rubric “validated” when only a classroom review
 
 Use `assets/assessment-blueprint.md` before drafting a consequential assessment.
 
+Declare the blueprint's assessed outcome scope before checking coverage. List explicit outcome IDs when one assessment intentionally samples a subset of the project or course alignment map. Use `all-active` only for a blueprint intended to sample every active aligned outcome. Confirm the scope with the responsible educator; do not treat unrelated course outcomes as missing from a narrower assessment.
+
 For each item, record:
 
 - mapped outcome and intended cognitive demand;
@@ -49,6 +51,8 @@ Inspect the blueprint for:
 - item dependencies that amplify one error;
 - time or reading load that distorts the target construct;
 - assessment density inconsistent with available practice and feedback.
+
+Count only active assessment items toward current outcome coverage. Preserve retired items for history, but do not let them satisfy coverage or dependency requirements. Likewise, do not require an outcome marked retired in the authoritative alignment map to be sampled by a current blueprint. Report active items mapped outside the declared scope and declared outcomes that are absent or retired in the alignment map.
 
 ## 3. State a validity argument
 

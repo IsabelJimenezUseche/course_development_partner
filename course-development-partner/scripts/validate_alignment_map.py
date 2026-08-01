@@ -25,7 +25,9 @@ from _tabular import (
 REQUIRED = (
     "outcome id",
     "observable learning outcome",
+    "cognitive demand",
     "evidence of learning",
+    "learning mechanism",
     "learning activity/support",
     "feedback or assessment",
     "status",
@@ -58,11 +60,14 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
 
     issues: list[str] = []
     seen_ids: set[str] = set()
+    active_ids: set[str] = set()
     for row_number, raw in enumerate(raw_rows, start=1):
         row = normalized_row(raw, mapping)
         outcome_id = row["outcome id"]
         outcome = row["observable learning outcome"]
+        cognitive_demand = row["cognitive demand"]
         evidence = row["evidence of learning"]
+        learning_mechanism = row["learning mechanism"]
         activity = row["learning activity/support"]
         assessment = row["feedback or assessment"]
         status = row["status"]
@@ -70,7 +75,7 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
         if status and normalize(status) not in VALID_STATUSES:
             issues.append(f"Row {row_number} ({outcome_id or 'no outcome ID'}): unknown status {status}")
 
-        if not outcome_id and any((outcome, evidence, activity, assessment)):
+        if not outcome_id and any(row.values()):
             issues.append(f"Row {row_number}: activity or assessment has no outcome ID")
         if outcome_id:
             try:
@@ -84,9 +89,13 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
             if normalized_id in seen_ids:
                 issues.append(f"Row {row_number}: duplicate outcome ID {outcome_id}")
             seen_ids.add(normalized_id)
+            if normalize(status) != "retired":
+                active_ids.add(normalized_id)
             for field_name, value in (
                 ("observable learning outcome", outcome),
+                ("cognitive demand", cognitive_demand),
                 ("evidence of learning", evidence),
+                ("learning mechanism", learning_mechanism),
                 ("learning activity/support", activity),
                 ("feedback or assessment", assessment),
                 ("status", status),
@@ -95,6 +104,9 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
                     issues.append(f"Row {row_number} ({outcome_id}): missing {field_name}")
         elif not any(row.values()):
             issues.append(f"Row {row_number}: empty row")
+
+    if not active_ids:
+        issues.append("Alignment map contains no active outcomes")
 
     return [], issues
 

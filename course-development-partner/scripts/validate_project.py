@@ -41,6 +41,7 @@ INDEX_REQUIRED = (
 )
 ACTIVE_STATUSES = {"draft", "review", "approved", "blocked"}
 INDEX_STATUSES = ACTIVE_STATUSES | {"retired", "not-applicable", "superseded"}
+VALID_ENGAGEMENT_TIERS = {"project", "course"}
 PROFILE_REQUIRED_STATE = {
     "establish": {"course-design-brief.md"},
     "produce": {"course-design-brief.md", "alignment-map.md"},
@@ -52,6 +53,10 @@ PROFILE_REQUIRED_STATE = {
         "source-register.md",
         "capability-manifest.md",
     },
+}
+TIER_REQUIRED_STATE = {
+    "project": set(),
+    "course": {"course-curriculum-map.md"},
 }
 
 
@@ -82,13 +87,31 @@ def schema_version(path: Path) -> str:
     return match.group(1) if match else ""
 
 
-def table_identifiers(path: Path, required: tuple[str, ...], field: str) -> tuple[set[str], list[str]]:
+def metadata_value(text: str, label: str) -> str:
+    match = re.search(
+        rf"^\s*-\s*{re.escape(label)}:\s*(.*?)\s*$",
+        text,
+        flags=re.I | re.M,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def table_identifiers(
+    path: Path,
+    required: tuple[str, ...],
+    field: str,
+    *,
+    active_only: bool = False,
+) -> tuple[set[str], list[str]]:
     _, headers, rows = load_table(path, required)
     mapping = normalized_mapping(headers, required)
     identifiers: set[str] = set()
     issues: list[str] = []
     for row_number, raw in enumerate(rows, start=1):
-        value = normalized_row(raw, mapping)[field]
+        row = normalized_row(raw, mapping)
+        if active_only and normalize(row.get("status", "")) == "retired":
+            continue
+        value = row[field]
         if not value:
             continue
         try:
@@ -98,21 +121,41 @@ def table_identifiers(path: Path, required: tuple[str, ...], field: str) -> tupl
     return identifiers, issues
 
 
-def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]]:
+def validate_index(
+    project: Path,
+) -> tuple[list[str], list[str], dict[str, Path], str]:
     index = project / "project-index.md"
     try:
-        _, headers, raw_rows = load_table(index, INDEX_REQUIRED)
+        resolved_project = project.resolve()
+        resolved_index = index.resolve()
+    except (OSError, RuntimeError) as exc:
+        return [f"Cannot resolve project-index.md: {exc}"], [], {}, ""
+    try:
+        resolved_index.relative_to(resolved_project)
+    except ValueError:
+        return [], ["project-index.md resolves outside the project directory"], {}, ""
+    try:
+        index_text, headers, raw_rows = load_table(index, INDEX_REQUIRED)
         mapping = normalized_mapping(headers, INDEX_REQUIRED)
         index_version = schema_version(index)
     except (OSError, UnicodeError, ValueError) as exc:
-        return [str(exc)], [], {}
+        return [str(exc)], [], {}, ""
 
     errors: list[str] = []
     issues: list[str] = []
     active_files: dict[str, Path] = {}
     seen: set[str] = set()
+    seen_targets: dict[Path, int] = {}
+    engagement_tier = normalize(metadata_value(index_text, "Engagement tier"))
     if not index_version:
         issues.append("project-index.md: missing schema version")
+    if not engagement_tier:
+        issues.append("project-index.md: missing engagement tier")
+    elif engagement_tier not in VALID_ENGAGEMENT_TIERS:
+        issues.append(
+            f"project-index.md: unknown engagement tier "
+            f"{metadata_value(index_text, 'Engagement tier')}"
+        )
     if not raw_rows:
         issues.append("Project index contains no state-file rows")
     for row_number, raw in enumerate(raw_rows, start=1):
@@ -122,7 +165,8 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
         if not state_file:
             issues.append(f"Project index row {row_number}: missing state file")
             continue
-        if state_file in seen:
+        raw_duplicate = state_file in seen
+        if raw_duplicate:
             issues.append(f"Project index row {row_number}: duplicate state file {state_file}")
         seen.add(state_file)
         if status not in INDEX_STATUSES:
@@ -133,7 +177,31 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
         if row["last updated"] and not parse_iso_date(row["last updated"]):
             issues.append(f"Project index row {row_number} ({state_file}): last updated must use YYYY-MM-DD")
 
-        target = local_reference_path(state_file, project)
+        try:
+            target = local_reference_path(state_file, project)
+            if target is not None:
+                target = target.resolve()
+        except (OSError, RuntimeError) as exc:
+            errors.append(f"Cannot resolve state file {state_file}: {exc}")
+            continue
+        if target is not None:
+            try:
+                target.relative_to(resolved_project)
+            except ValueError:
+                issues.append(
+                    f"Project index row {row_number}: state file resolves outside "
+                    f"the project directory: {state_file}"
+                )
+                continue
+            previous_row = seen_targets.get(target)
+            if previous_row is not None:
+                if not raw_duplicate:
+                    issues.append(
+                        f"Project index row {row_number}: state file resolves to the same "
+                        f"target as row {previous_row}: {state_file}"
+                    )
+                continue
+            seen_targets[target] = row_number
         if status in ACTIVE_STATUSES:
             if target is None or not target.is_file():
                 issues.append(f"Project index row {row_number}: active state file does not exist: {state_file}")
@@ -161,7 +229,7 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
                 )
         elif status == "not-applicable" and not row["notes"]:
             issues.append(f"Project index row {row_number} ({state_file}): not-applicable requires a rationale")
-    return errors, issues, active_files
+    return errors, issues, active_files, engagement_tier
 
 
 def validate_project(
@@ -172,7 +240,7 @@ def validate_project(
 ) -> tuple[list[str], list[str]]:
     if not project.is_dir():
         return [f"Project directory does not exist: {project}"], []
-    errors, issues, active = validate_index(project)
+    errors, issues, active, engagement_tier = validate_index(project)
     if errors:
         return errors, issues
 
@@ -181,14 +249,41 @@ def validate_project(
             f"{design_profile} profile requires an active project-index entry for {name}"
         )
 
+    if engagement_tier in TIER_REQUIRED_STATE and design_profile in {"produce", "handoff"}:
+        for name in sorted(TIER_REQUIRED_STATE[engagement_tier] - set(active)):
+            issues.append(
+                f"{engagement_tier} engagement tier with {design_profile} profile requires "
+                f"an active project-index entry for {name}"
+            )
+
+    brief_path = active.get("course-design-brief.md")
+    if brief_path is not None:
+        try:
+            brief_tier = normalize(
+                metadata_value(brief_path.read_text(encoding="utf-8-sig"), "Engagement tier")
+            )
+            if engagement_tier and brief_tier and engagement_tier != brief_tier:
+                issues.append(
+                    "course-design-brief.md engagement tier does not match "
+                    f"project-index.md: {brief_tier} != {engagement_tier}"
+                )
+        except (OSError, UnicodeError) as exc:
+            errors.append(f"Cannot read course-design-brief.md engagement tier: {exc}")
+
+    alignment_path = active.get("alignment-map.md")
+
     component_calls = {
         "course-design-brief.md": lambda path: validate_design_state.validate(path, design_profile),
         "alignment-map.md": validate_alignment_map.validate,
         "artifact-manifest.md": lambda path: validate_artifact_manifest.validate(path, True),
         "assessment-blueprint.md": lambda path: validate_assessment_blueprint.validate(
-            path, [], allow_formal_validation, None
+            path, [], allow_formal_validation, alignment_path
         ),
-        "course-curriculum-map.md": lambda path: validate_course_curriculum_map.validate(path, max_hours),
+        "course-curriculum-map.md": lambda path: validate_course_curriculum_map.validate(
+            path,
+            max_hours,
+            design_profile == "handoff",
+        ),
     }
     for name, call in component_calls.items():
         path = active.get(name)
@@ -198,7 +293,6 @@ def validate_project(
         errors.extend(f"{name}: {item}" for item in component_errors)
         issues.extend(f"{name}: {item}" for item in component_issues)
 
-    alignment_path = active.get("alignment-map.md")
     if errors or alignment_path is None:
         return errors, issues
 
@@ -206,10 +300,12 @@ def validate_project(
         alignment_ids, identifier_issues = table_identifiers(
             alignment_path,
             (
-                "outcome id", "observable learning outcome", "evidence of learning",
-                "learning activity/support", "feedback or assessment", "status"
+                "outcome id", "observable learning outcome", "cognitive demand",
+                "evidence of learning", "learning mechanism", "learning activity/support",
+                "feedback or assessment", "status"
             ),
             "outcome id",
+            active_only=True,
         )
         issues.extend(identifier_issues)
         cross_files = (
@@ -241,10 +337,21 @@ def validate_project(
             path = active.get(name)
             if path is None:
                 continue
-            identifiers, identifier_issues = table_identifiers(path, required, field)
+            identifiers, identifier_issues = table_identifiers(
+                path,
+                required,
+                field,
+                active_only=True,
+            )
             issues.extend(identifier_issues)
             for identifier in sorted(identifiers - alignment_ids):
                 issues.append(f"{name}: outcome is not defined in alignment-map.md: {identifier}")
+            if name == "course-curriculum-map.md" and engagement_tier == "course":
+                for identifier in sorted(alignment_ids - identifiers):
+                    issues.append(
+                        "course-curriculum-map.md: active aligned outcome is not mapped "
+                        f"for the Course tier: {identifier}"
+                    )
     except (OSError, UnicodeError, ValueError) as exc:
         errors.append(str(exc))
     return errors, issues

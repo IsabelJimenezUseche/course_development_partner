@@ -6,6 +6,7 @@
 ## Assessment context
 
 - Purpose: diagnostic | formative | summative | combined
+- Assessed outcome scope:
 - Intended interpretation or decision:
 - Student population and conditions:
 - Applicable policy and requirements:
@@ -31,4 +32,4 @@
 
 Status values: `draft`, `review`, `approved`, `blocked`, `retired`.
 
-For CSV, add an `Evidence level claimed` column and repeat the same assessment-level value on every row.
+For CSV, add `Assessed outcome scope` and `Evidence level claimed` columns and repeat the same assessment-level values on every row. Use explicit semicolon-separated outcome IDs for an assessment that intentionally samples a subset. Use `all-active` only when every active outcome in the authoritative alignment map belongs to this blueprint.

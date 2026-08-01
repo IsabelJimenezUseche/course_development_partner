@@ -1,6 +1,7 @@
 # Course Design Brief
 
 - Schema version: 1.0
+- Engagement tier: Project
 
 ## Course context
 

@@ -1,6 +1,7 @@
 # Compact Brief
 
 - Schema version: 1.0
+- Engagement tier: Project
 
 ## COURSE CONTEXT
 - Course or module: Seminar
