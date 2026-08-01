@@ -4,11 +4,11 @@ Last updated: 2026-08-01
 
 | Test or evidence set | Status | Reproducibility | Current interpretation |
 |---|---|---|---|
-| `test_skill_validators.py` | current — 51 tests passing | executable, committed fixtures | Structural and declared-semantic regression evidence only |
+| `test_skill_validators.py` | current — 54 tests passing | executable, committed fixtures | Structural and declared-semantic regression evidence only |
 | `check_repository.py` | current — passing | executable | Local links, runtime inventory, and resource routing |
 | `audit_privacy.py` | current — passing | executable plus human audit | Pattern screen; not proof of privacy safety |
 | `faculty-review-scenarios.md` + `evaluator-rubric.md` | current prompt/rubric set | reproducible when client/model/result metadata are recorded | Behavioral matrix; rerun after instruction-level changes |
-| `remediation-forward-test-report.md` + `remediation-forward-test-results.json` | current — five focused probes passed after one visual-boundary revision/retest | fresh-agent narrative and machine-readable result with prompt/rubric hashes | Bounded instruction-level evidence in one agent environment |
+| `remediation-forward-test-report.md` + `remediation-forward-test-results.json` | historical/provisional — insufficient metadata and retained evidence | prompt/rubric hashes retained; exact model, evaluator, responses, and excerpts missing | Exploratory observations only; rerun the current matrix before citing passing behavioral evidence |
 | `forward-test-report.md` | historical/superseded | narrative only | Documents early failures and fixes; not current package inventory |
 | `rich-artifact-production-report.md` | historical bounded pass | not independently reproducible because temporary files were not retained | Evidence about one past host/toolchain only |
 | `rich-artifact-fixture-spec.md` | current rerun contract | specification committed; rerun pending | Defines what a reproducible future rich-artifact result must retain |

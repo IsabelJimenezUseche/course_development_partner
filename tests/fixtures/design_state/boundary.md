@@ -1,6 +1,6 @@
 # Compact Brief
 
-- Schema version: 2.0
+- Schema version: 1.0
 
 ## COURSE CONTEXT
 - Course or module: Seminar

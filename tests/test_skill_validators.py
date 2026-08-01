@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 import sys
 import tempfile
@@ -537,8 +539,35 @@ class ValidatorFixtureAndCliTests(unittest.TestCase):
 
 
 class ProjectValidatorTests(unittest.TestCase):
+    BRIEF = """# Course Design Brief
+- Schema version: 1.0
+## Course context
+- Course or module: BIO 101
+## Intended learning
+- Learning outcomes: Explain a mechanism.
+## Access, participation, and belonging
+- Known access constraints without sensitive student details: None identified.
+## Constraints
+- Technology and format: Markdown.
+## Implementation load
+- Minimum viable fallback: Printable activity.
+## Collaboration
+- Interaction level: Studio
+- Requested artifacts: Student worksheet.
+## Status
+### Confirmed
+- Outcome approved.
+### Assumed
+- Prior knowledge present.
+### Open
+- Accessibility review pending.
+### Current phase
+- Produce aligned artifacts.
+### Next decision
+- Review the worksheet.
+"""
     ALIGNMENT = """# Alignment Map
-- Schema version: 2.0
+- Schema version: 1.0
 | Outcome ID | Observable learning outcome | Evidence of learning | Learning activity/support | Feedback or assessment | Status |
 |---|---|---|---|---|---|
 | LO-1 | Explain a mechanism | Explanation | Comparison | Feedback | approved |
@@ -546,22 +575,32 @@ class ProjectValidatorTests(unittest.TestCase):
 
     def test_minimal_indexed_project_passes(self) -> None:
         index = """# Project Index
+- Schema version: 1.0
 | State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
 |---|---|---|---|---|---|---|
-| alignment-map.md | alignment authority | course owner | 2.0 | approved | 2026-08-01 | current |
+| course-design-brief.md | design authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| alignment-map.md | alignment authority | course owner | 1.0 | approved | 2026-08-01 | current |
 """
-        result = run_project({"project-index.md": index, "alignment-map.md": self.ALIGNMENT})
+        result = run_project(
+            {
+                "project-index.md": index,
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+            }
+        )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_project_detects_unknown_cross_file_outcome(self) -> None:
         index = """# Project Index
+- Schema version: 1.0
 | State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
 |---|---|---|---|---|---|---|
-| alignment-map.md | alignment authority | course owner | 2.0 | approved | 2026-08-01 | current |
-| artifact-manifest.md | artifact authority | course owner | 2.0 | review | 2026-08-01 | current |
+| course-design-brief.md | design authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| alignment-map.md | alignment authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| artifact-manifest.md | artifact authority | course owner | 1.0 | review | 2026-08-01 | current |
 """
         manifest = """# Artifact Manifest
-- Schema version: 2.0
+- Schema version: 1.0
 | Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |
 |---|---|---|---|---|---|---|---|---|---|---|
 | WS-1 | markdown | https://example.edu/ws | student | LO-9 | draft | manual | none | 2026-08-01 | https://example.edu/plan | https://example.edu/access |
@@ -569,6 +608,7 @@ class ProjectValidatorTests(unittest.TestCase):
         result = run_project(
             {
                 "project-index.md": index,
+                "course-design-brief.md": self.BRIEF,
                 "alignment-map.md": self.ALIGNMENT,
                 "artifact-manifest.md": manifest,
             }
@@ -577,13 +617,43 @@ class ProjectValidatorTests(unittest.TestCase):
         self.assertIn("outcome is not defined in alignment-map.md: lo-9", result.stdout)
 
     def test_project_requires_active_index_paths(self) -> None:
-        index = """| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+        index = """- Schema version: 1.0
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
 |---|---|---|---|---|---|---|
-| missing.md | state | course owner | 2.0 | draft | 2026-08-01 | current |
+| missing.md | state | course owner | 1.0 | draft | 2026-08-01 | current |
 """
         result = run_project({"project-index.md": index})
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("active state file does not exist", result.stdout)
+
+    def test_empty_handoff_index_is_rejected(self) -> None:
+        index = """# Project Index
+- Schema version: 1.0
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+"""
+        result = run_project(
+            {"project-index.md": index}, "--design-profile", "handoff"
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("contains no state-file rows", result.stdout)
+        self.assertIn("handoff profile requires", result.stdout)
+
+    def test_project_requires_one_development_schema(self) -> None:
+        index = """# Project Index
+- Schema version: 1.0
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| course-design-brief.md | design authority | course owner | 2.0 | approved | 2026-08-01 | current |
+"""
+        other_schema_brief = self.BRIEF.replace("Schema version: 1.0", "Schema version: 2.0")
+        result = run_project(
+            {"project-index.md": index, "course-design-brief.md": other_schema_brief},
+            "--design-profile",
+            "establish",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("does not match project-index.md development schema", result.stdout)
 
     def test_missing_project_directory_is_structural_error(self) -> None:
         result = run_path("validate_project.py", FIXTURES / "does-not-exist")
@@ -654,6 +724,22 @@ class RepositoryIntegrityTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("human review still required", result.stdout)
 
+    def test_forward_record_hashes_match_current_inputs(self) -> None:
+        record = json.loads(
+            (ROOT / "tests" / "remediation-forward-test-results.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        scenario_hash = hashlib.sha256(
+            (ROOT / "tests" / "faculty-review-scenarios.md").read_bytes()
+        ).hexdigest()
+        rubric_hash = hashlib.sha256(
+            (ROOT / "tests" / "evaluator-rubric.md").read_bytes()
+        ).hexdigest()
+        self.assertEqual(record["current_scenario_file_sha256"], scenario_hash)
+        self.assertEqual(record["current_rubric_file_sha256"], rubric_hash)
+        self.assertEqual(record["evidence_status"], "historical-exploratory-only")
+
 
 class PackageContentTests(unittest.TestCase):
     def test_every_reference_is_routed_from_skill(self) -> None:
@@ -668,23 +754,28 @@ class PackageContentTests(unittest.TestCase):
         self.assertFalse((skill_root / "design.md").exists())
         self.assertFalse((skill_root / "TODO.md").exists())
 
-    def test_accessibility_profile_is_operational_and_bounded(self) -> None:
+    def test_accessibility_routing_is_operational_and_bounded(self) -> None:
         skill_root = ROOT / "course-development-partner"
         skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
         reference_text = (skill_root / "references" / "accessibility-and-compliance.md").read_text(encoding="utf-8")
         self.assertIn("assets/accessibility-review.md", skill_text)
         self.assertIn("WCAG 2.1", reference_text)
+        self.assertIn("WCAG 2.1 Level AA", reference_text)
+        self.assertIn("Title II web/mobile rule applies", reference_text)
         self.assertIn("WCAG 2.2", reference_text)
         self.assertIn("WCAG2ICT", reference_text)
-        self.assertNotIn("Purdue University", reference_text)
         self.assertIn("must not make a legal or institutional compliance determination", (skill_root / "assets" / "accessibility-review.md").read_text(encoding="utf-8"))
 
-    def test_visual_guidance_offers_optional_purdue_inspired_palette(self) -> None:
+    def test_visual_guidance_offers_optional_neutral_palette(self) -> None:
         skill_root = ROOT / "course-development-partner"
         visual_text = (skill_root / "references" / "visual-design.md").read_text(encoding="utf-8")
-        self.assertIn("Purdue-inspired", visual_text)
+        self.assertIn("neutral example palette", visual_text)
+        self.assertIn("Primary dark", visual_text)
+        self.assertIn("Primary accent", visual_text)
         self.assertIn("#CFB991", visual_text)
+        self.assertIn("#DAAA00", visual_text)
         self.assertIn("optional", visual_text.lower())
+        self.assertIn("unbranded", visual_text.lower())
 
     def test_auto_mode_is_noninteractive_but_preserves_authority(self) -> None:
         skill_root = ROOT / "course-development-partner"
@@ -700,7 +791,9 @@ class PackageContentTests(unittest.TestCase):
         self.assertNotIn("Goal", brief_text)
         self.assertIn("Rapid and Auto are not aliases", interaction_text)
         self.assertIn("one final faculty review", interaction_text)
-        self.assertIn("co-design or automatically produce", metadata_text)
+        self.assertIn("available MCP or native tools", metadata_text)
+        self.assertIn("Rubric calibration with authentic student responses is always interactive", skill_text)
+        self.assertIn("use Studio or Guided mode", interaction_text)
 
     def test_rich_artifact_contract_requires_evidence_and_fallback(self) -> None:
         skill_root = ROOT / "course-development-partner"

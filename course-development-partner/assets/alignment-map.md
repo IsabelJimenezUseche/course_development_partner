@@ -1,6 +1,6 @@
 # Alignment Map
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 
 | Outcome ID | Observable learning outcome | Cognitive demand | Evidence of learning | Learning mechanism | Learning activity/support | Feedback or assessment | Status |

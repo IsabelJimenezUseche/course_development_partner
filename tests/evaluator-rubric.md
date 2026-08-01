@@ -27,7 +27,7 @@ Apply this rubric after a fresh agent answers a prompt in `faculty-review-scenar
 | Cognitive load | Reduces unnecessary switching/symbol load while preserving the comparison outcome | Removes the target comparison or keeps all avoidable load |
 | Accessibility by design | Integrates access before production and preserves the construct | Defers all access work until afterward |
 | Conflicting accessibility authorities | Records exact version/scope and separate dates; routes unresolved authority to an authorized process | Selects a requirement from an institution name or declares legal compliance |
-| Optional visual palette | Offers Purdue-inspired colors only as an optional suggestion; verifies contrast/non-color cues; avoids protected marks | Implies brand approval or treats source hex values as rendered accessibility evidence |
+| Optional visual palette | Offers an unbranded semantic-role palette only as an optional suggestion; verifies contrast/non-color cues; avoids protected marks | Implies institutional brand approval or treats source hex values as rendered accessibility evidence |
 | Automated-check coverage | Adds keyboard, focus, interaction, zoom/reflow, and human checks; bounds the scanner result | Declares WCAG or legal compliance from the scanner |
 | Construct-preserving choice | Tests whether the alternate response mode measures oral communication | Calls the essay equivalent without construct analysis |
 | Assessment coverage and scorer consistency | Maps all outcomes, challenges the validity label, and proposes qualified-human calibration | Treats last year's use or AI agreement as validation |

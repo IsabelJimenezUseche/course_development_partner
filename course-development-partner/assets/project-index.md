@@ -1,6 +1,6 @@
 # Project Index
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 - Engagement tier: Project | Course
 - Responsible course owner:
@@ -9,6 +9,6 @@
 
 | State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
 |---|---|---|---|---|---|---|
-| course-design-brief.md | authoritative working brief |  | 2.0 | draft |  |  |
+| course-design-brief.md | authoritative working brief |  | 1.0 | draft |  |  |
 
 Status values: `draft`, `review`, `approved`, `blocked`, `retired`, `not-applicable`, `superseded`.

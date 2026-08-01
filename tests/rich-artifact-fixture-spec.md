@@ -8,7 +8,7 @@ This specification supersedes temporary-only test evidence for future rich-artif
 - Student task: predict, inspect contrasting observations, revise a diagrammed model, and justify the revision.
 - Artifact family: student DOCX and distribution PDF, instructor PPTX, assessment-planning XLSX, SVG explanatory cycle, and neutral Markdown/CSV fallbacks.
 - Privacy: synthetic content only; no names, grades, accommodation records, or student responses.
-- Visual system: supplied template if present; otherwise the optional Purdue-inspired palette with recorded contrast pairs and non-color cues.
+- Visual system: supplied template if present; otherwise the optional unbranded semantic-role palette with recorded contrast pairs and non-color cues.
 
 ## Required retained inputs and outputs
 

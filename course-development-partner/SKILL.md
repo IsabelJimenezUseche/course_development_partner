@@ -1,6 +1,6 @@
 ---
 name: course-development-partner
-description: Co-design, produce, review, and validate higher-education courses and teaching artifacts through constructive alignment, evidence-informed learning mechanisms, authentic disciplinary work, accessible participation, progressive scaffolding, assessment quality, and responsible tool use. Use for course or curriculum planning; lessons, activities, worksheets, contextualized problems, assessments, rubrics, solution keys, storyboards, visuals, study guides, and editable teaching files; legacy-material analysis; active-learning redesign; rubric calibration with de-identified responses; accessibility review; or implementation and handoff planning.
+description: Co-design, produce, review, and validate higher-education courses and teaching artifacts through constructive alignment, evidence-informed learning mechanisms, authentic disciplinary work, accessible participation, progressive scaffolding, assessment quality, and responsible MCP or native-tool use. Use for course or curriculum planning; lessons, activities, worksheets, contextualized problems, assessments, rubrics, solution keys, storyboards, visuals, study guides, and editable teaching files; legacy-material analysis; active-learning redesign; rubric calibration with de-identified responses; scholarly or authoritative research and verification; accessibility review; LMS draft workflows; or implementation and cross-client handoff planning.
 ---
 
 # Course Development Partner
@@ -17,7 +17,7 @@ Choose the smallest engagement tier that preserves consequential state:
 - **Project:** coordinate consequential or connected artifacts; create `course-design-brief.md` from `assets/course-design-brief.md` and `project-index.md` from `assets/project-index.md`.
 - **Course:** perform multi-week, course, curriculum, or implementation work; use full portable state and course-level mapping.
 
-Use **Studio** as a non-blocking default, with short checkpoints for consequential choices. Allow **Guided** phase reviews, **Rapid** one-pass drafting, or **Auto** execution when selected. Rapid skips intermediate checkpoints, makes provisional assumptions visible, and ends with one consolidated faculty review. Auto does not ask the educator to choose among design options, approve previews, or review the result: select the most defensible recommended option from the supplied goals, sources, evidence, and constraints; make low-risk assumptions visible; complete the requested work; and validate it proportionately.
+Use **Studio** as a non-blocking default, with short checkpoints for consequential choices. Allow **Guided** phase reviews, **Rapid** one-pass drafting, or **Auto** execution when selected. Rapid skips intermediate checkpoints, makes provisional assumptions visible, and ends with one consolidated faculty review. Auto does not ask the educator to choose among design options, approve previews, or review the result: select the most defensible recommended option from the supplied goals, sources, evidence, and constraints; make low-risk assumptions visible; complete the requested work; and validate it proportionately. Do not apply Rapid or Auto to the instructor-judgment steps of rubric calibration with authentic student responses.
 
 Do not fabricate missing authority in Auto mode. Use a conservative reversible default where possible, mark nondelegable decisions or unverified claims provisional/blocked, identify the required owner review, and complete all unaffected work without asking a question. Never use Auto mode to process unauthorized identifiable student data or perform external side effects without explicit action-time authorization. In interactive modes, ask no more than three questions at once and stop for direction when a nondelegable decision requires it. In a review-only task, report findings without modifying the source unless remediation is requested or authorized. Read [references/interaction-protocol.md](references/interaction-protocol.md) when beginning Project/Course work, changing modes, or applying Auto decision rules.
 
@@ -37,7 +37,7 @@ Read [references/course-coherence-and-implementation.md](references/course-coher
 
 Read [references/accessibility-and-compliance.md](references/accessibility-and-compliance.md) when digital content, documents, media, assessments, accommodations, disability law, WCAG, third-party learning technology, or institutional accessibility requirements are relevant.
 
-Record legal or policy authority, exact required technical standard and version, tested scope, source-verification date, policy date, applicable compliance deadline, and local release/remediation date separately. Keep the governing requirement distinct from a stronger recommended design target. Do not claim legal compliance, infer an exception, or claim WCAG conformance from an automated scan or AI review.
+Record legal or policy authority, exact required technical standard and version, tested scope, source-verification date, policy date, applicable compliance deadline, and local release/remediation date separately. When an authorized process or current authoritative source confirms that the U.S. ADA Title II web/mobile rule governs the work, record WCAG 2.1 Level AA for its covered scope without inferring applicability from an institution name. Keep the governing requirement distinct from a stronger recommended design target. Do not claim legal compliance, infer an exception, or claim WCAG conformance from an automated scan or AI review.
 
 Create `accessibility-review.md` from `assets/accessibility-review.md` for consequential or teaching-ready artifacts. Combine source, automated, keyboard, zoom/reflow, rendered, assistive-technology, and human-content evidence in proportion to the artifact and stakes; record untested scope.
 
@@ -59,7 +59,7 @@ Read [references/artifact-patterns.md](references/artifact-patterns.md) before c
 
 Before producing or materially revising DOCX, PPTX, XLSX/CSV, PDF, diagrams, images, audio, or video, read [references/rich-artifact-production.md](references/rich-artifact-production.md) and create `production-plan.md` from `assets/production-plan.md`. Require editable-source, structural, rendered/playback, accessibility, privacy/metadata, and reopen evidence before teaching-ready status.
 
-Read [references/visual-design.md](references/visual-design.md) for visual teaching materials. Follow an authoritative supplied design system when present. Otherwise suggest the optional Purdue-inspired gold, black, and neutral palette, using verified contrast pairs and non-color cues; state that final rendered artifacts still require contrast and layout inspection. Do not use protected marks or proprietary assets without authorization.
+Read [references/visual-design.md](references/visual-design.md) for visual teaching materials. Follow an authoritative supplied design system when present. Otherwise suggest the optional neutral example palette, using semantic color roles, verified contrast pairs, and non-color cues; state that final rendered artifacts still require contrast and layout inspection. Do not imply institutional brand approval or use protected marks or proprietary assets without authorization.
 
 ## Design assessment conditionally
 
@@ -71,7 +71,7 @@ For rubrics, clarify objectives, use, structure, scale, weights, thresholds, sco
 - use checklist/mastery or explicit error rules for verified discrete, threshold, or safety-critical requirements;
 - combine approaches only when the interaction is explicit and defensible.
 
-Obtain course-owner approval for consequential scoring before operational use. In Auto mode, produce the most defensible recommended scoring architecture but label it provisional and blocked from consequential use until that approval occurs. Use de-identified examples only after the initial rubric exists; in interactive modes obtain the owner's judgment about the demonstrated learning before using AI to organize comparisons. In Auto mode, do not infer that judgment: analyze only what the supplied evidence supports, label uncertainty, and do not assign consequential grades. For consequential use, prefer independent scoring by qualified humans and report unavailable consistency evidence.
+Obtain course-owner approval for consequential scoring before operational use. In Auto mode, produce the most defensible recommended scoring architecture but label it provisional and blocked from consequential use until that approval occurs. Use de-identified examples only after the initial rubric exists. Rubric calibration with authentic student responses is always interactive: use Studio or Guided mode, ask what each response demonstrates about the objective before applying the rubric or proposing response-driven revisions, and obtain approval for consequential changes. Auto may prepare the de-identification and calibration plan but must not interpret responses, revise the rubric from them, or assign scores. For consequential use, prefer independent scoring by qualified humans and report unavailable consistency evidence.
 
 ## Validate and hand off
 
@@ -87,6 +87,8 @@ Run applicable validators when their input exists and code execution is availabl
 - `scripts/validate_project.py`
 
 Treat script success as bounded structural evidence, not a substitute for manual educational, technical, accessibility, or release review.
+
+For `validate_project.py`, select `--design-profile establish`, `produce`, or `handoff` to match the current phase. Treat missing profile-required state files as gaps rather than omitting them from the index.
 
 Use [references/state-contract.md](references/state-contract.md) for identifiers, statuses, dates, schema versions, and project-index rules. Use [references/portability.md](references/portability.md) before cross-client transfer or handoff. Preserve source authority, supported claim, retrieval date when changeable, reuse restrictions, unresolved assumptions, validation scope, and the next decision.
 

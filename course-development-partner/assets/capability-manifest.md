@@ -1,6 +1,6 @@
 # Capability Manifest
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 
 | Capability | Available provider or tool | Access level | Intended use | Approval required | Fallback | Verification date |

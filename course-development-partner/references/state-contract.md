@@ -11,7 +11,7 @@
 
 ## 1. Use schema metadata
 
-Keep the template's `Schema version` when creating a state file. Record `Last updated` as an ISO date (`YYYY-MM-DD`). Do not silently migrate an older state file: preserve it, create a new version, and record the change in the design log.
+The package currently uses one development schema. Keep the current template's `Schema version` when creating or updating every active state file, and keep that same value in `project-index.md`. Update development files in place; do not create parallel schema versions or a migration workflow before a public schema is released. Record `Last updated` as an ISO date (`YYYY-MM-DD`) and record consequential structural changes in the design log.
 
 ## 2. Use identifiers consistently
 

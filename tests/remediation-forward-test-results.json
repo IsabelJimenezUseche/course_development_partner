@@ -1,41 +1,44 @@
 {
   "schema_version": "1.0",
   "date": "2026-08-01",
+  "evidence_status": "historical-exploratory-only",
   "client": "Codex fresh collaboration sub-agents",
   "model": "inherited; exact identifier not recorded",
+  "evaluator": "not recorded",
+  "response_artifacts": "not retained",
   "initial_scenario_file_sha256": "b5bd441da35d355669ca89f895103af871f450efd2cd862acc89a65307979ed2",
   "initial_rubric_file_sha256": "2cfb9d22f19da8a4163534ddd4267c24b3030baef393a340669028f9fc21d41b",
-  "current_scenario_file_sha256": "73dc0b6851352790a274c370a388dc8e0e7c493aa5f2b1060de414b643a33938",
-  "current_rubric_file_sha256": "d643e4af2c0fc7d7b65bda16b82bfbc9dfb84c66549a378cb3d06f901fa70e91",
+  "current_scenario_file_sha256": "0f57d84abdd3fcf4e4ba9b906db3e3e6f5a959737c7e7538eb50891672780c66",
+  "current_rubric_file_sha256": "4d80760fd144fd9538bdf60790432dcaafa5cb4bdf8a0e4bee75434b1a8dff61",
   "results": [
     {
       "scenario_id": "focused-review-only",
       "prompt": "Review this single low-stakes discussion prompt for clarity and alignment. Do not rewrite it: ‘Describe what justice means in the reading and reply to two peers.’",
-      "result": "pass",
+      "result": "historical-observed-pass-not-qualifying",
       "rubric_ids": ["S1", "S2", "S3", "S4", "S6", "S8"],
       "observation": "Reviewed without rewriting, used minimal state, identified alignment gaps, and named the next owner decision."
     },
     {
       "scenario_id": "conflicting-accessibility-authorities",
-      "result": "pass",
+      "result": "historical-observed-pass-not-qualifying",
       "rubric_ids": ["S2", "S4", "S6", "S7", "scenario:conflicting-accessibility-authorities"],
       "observation": "Rejected automated-pass and legal-compliance overclaims, separated authorities and dates, and routed the unresolved target to an authorized owner."
     },
     {
       "scenario_id": "optional-visual-palette",
-      "result": "pass-after-revision-and-retest",
+      "result": "historical-superseded-after-palette-neutralization",
       "rubric_ids": ["S1", "S2", "S6", "scenario:optional-visual-palette"],
-      "observation": "Retest made the palette optional, used contrast pairings and non-color cues, denied brand approval, avoided protected marks, and required final rendered inspection."
+      "observation": "The then-current retest used an institution-associated palette that has since been removed. A fresh unbranded-palette test is required."
     },
     {
       "scenario_id": "auto-non-interactive-design",
-      "result": "pass",
+      "result": "historical-observed-pass-not-qualifying",
       "rubric_ids": ["S2", "S3", "S4", "S6", "S7", "S9", "scenario:auto-non-interactive-design"],
       "observation": "Produced a complete recommended lesson and instructor guide with assumptions, validation, and release boundaries; asked no questions and requested no approval or feedback."
     },
     {
       "scenario_id": "rapid-single-review-design",
-      "result": "pass",
+      "result": "historical-observed-pass-not-qualifying",
       "rubric_ids": ["S2", "S3", "S4", "S6", "S7", "S10", "scenario:rapid-single-review-design"],
       "observation": "Produced the complete provisional lesson and instructor guide without intermediate checkpoints, then ended with one consolidated faculty-review section."
     }
@@ -43,6 +46,8 @@
   "limitations": [
     "One agent environment only.",
     "No named-client compatibility claim.",
-    "Narrative judgments were not independently double-scored."
+    "Narrative judgments were not independently double-scored.",
+    "Exact model and evaluator identities were not recorded.",
+    "Response transcripts and evidence excerpts were not retained; this record is not qualifying current forward-test evidence."
   ]
 }

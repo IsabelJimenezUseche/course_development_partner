@@ -150,7 +150,7 @@ Then:
 
 ### Request de-identified student responses
 
-After the initial rubric exists, ask for a small authentic set. Suggest, but do not require, examples representing:
+After the initial rubric exists, ask for a small authentic set. This calibration remains interactive regardless of another selected mode; use Studio or Guided mode for the judgment and revision steps. Suggest, but do not require, examples representing:
 
 - strong work;
 - typical or middle-range work;
@@ -211,7 +211,7 @@ Verify the solution independently from the generated prompt. Do not silently rep
 
 Preview a storyboard or visual specification.
 
-Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional Purdue-inspired palette with contrast verification and no unauthorized marks.
+Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional neutral example palette with semantic color roles, contrast verification, and no implication of institutional brand approval.
 
 Use visuals for relationships, mechanisms, comparisons, hierarchy, or change over time. Check:
 

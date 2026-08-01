@@ -28,7 +28,7 @@ Use `$course-development-partner` to review a new public-university course modul
 
 ## Optional visual palette
 
-Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest a restrained Purdue-inspired color scheme, identify safe contrast pairs and non-color cues, and explain the limits: do not imply brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
+Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest a restrained, unbranded palette organized by semantic roles, identify safe contrast pairs and non-color cues, and explain the limits: do not imply institutional brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
 
 ## Automated-check coverage
 

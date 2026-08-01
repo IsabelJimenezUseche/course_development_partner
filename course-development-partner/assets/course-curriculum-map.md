@@ -1,6 +1,6 @@
 # Course Curriculum Map
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 
 ## Course-level context

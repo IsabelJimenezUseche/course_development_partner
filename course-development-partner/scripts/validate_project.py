@@ -41,6 +41,20 @@ INDEX_REQUIRED = (
 )
 ACTIVE_STATUSES = {"draft", "review", "approved", "blocked"}
 INDEX_STATUSES = ACTIVE_STATUSES | {"retired", "not-applicable", "superseded"}
+PROFILE_REQUIRED_STATE = {
+    "establish": {"course-design-brief.md"},
+    "produce": {"course-design-brief.md", "alignment-map.md"},
+    "handoff": {
+        "course-design-brief.md",
+        "alignment-map.md",
+        "artifact-manifest.md",
+        "design-log.md",
+        "source-register.md",
+        "capability-manifest.md",
+    },
+}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Validate indexed state files and cross-file identifiers in a course project.",
@@ -89,6 +103,7 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
     try:
         _, headers, raw_rows = load_table(index, INDEX_REQUIRED)
         mapping = normalized_mapping(headers, INDEX_REQUIRED)
+        index_version = schema_version(index)
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], [], {}
 
@@ -96,6 +111,10 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
     issues: list[str] = []
     active_files: dict[str, Path] = {}
     seen: set[str] = set()
+    if not index_version:
+        issues.append("project-index.md: missing schema version")
+    if not raw_rows:
+        issues.append("Project index contains no state-file rows")
     for row_number, raw in enumerate(raw_rows, start=1):
         row = normalized_row(raw, mapping)
         state_file = row["state file"]
@@ -119,6 +138,10 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
             if target is None or not target.is_file():
                 issues.append(f"Project index row {row_number}: active state file does not exist: {state_file}")
                 continue
+            if target.name in active_files and active_files[target.name] != target:
+                issues.append(
+                    f"Project index row {row_number}: duplicate active basename {target.name}"
+                )
             active_files[target.name] = target
             try:
                 actual_version = schema_version(target)
@@ -130,6 +153,11 @@ def validate_index(project: Path) -> tuple[list[str], list[str], dict[str, Path]
             elif actual_version != row["schema version"]:
                 issues.append(
                     f"{state_file}: schema version {actual_version} does not match index {row['schema version']}"
+                )
+            if index_version and actual_version and actual_version != index_version:
+                issues.append(
+                    f"{state_file}: schema version {actual_version} does not match "
+                    f"project-index.md development schema {index_version}"
                 )
         elif status == "not-applicable" and not row["notes"]:
             issues.append(f"Project index row {row_number} ({state_file}): not-applicable requires a rationale")
@@ -147,6 +175,11 @@ def validate_project(
     errors, issues, active = validate_index(project)
     if errors:
         return errors, issues
+
+    for name in sorted(PROFILE_REQUIRED_STATE[design_profile] - set(active)):
+        issues.append(
+            f"{design_profile} profile requires an active project-index entry for {name}"
+        )
 
     component_calls = {
         "course-design-brief.md": lambda path: validate_design_state.validate(path, design_profile),

@@ -33,7 +33,7 @@ Allow mode changes at any time. In Studio or Guided mode, stop when a required u
 
 Use Studio when the owner does not choose a mode. Treat it as a non-blocking default: continue to the next useful preview or action when the request is sufficiently specified. Do not force a mode-selection exchange for Focused work. Never silently select Guided, Rapid, or Auto merely because a request appears complete.
 
-Rapid and Auto are not aliases. Rapid delivers a provisional draft for one final faculty review and may end with consolidated questions. Auto chooses the recommended defaults, does not request faculty review, and ends only with assumptions, validation, limitations, and nondelegable release blockers.
+Rapid and Auto are not aliases. Rapid delivers a provisional draft for one final faculty review and may end with consolidated questions. Auto chooses the recommended defaults, does not request faculty review, and ends only with assumptions, validation, limitations, and nondelegable release blockers. Rubric calibration with authentic student responses is an explicit exception: use Studio or Guided mode because instructor judgment must precede scoring and response-driven revision.
 
 ## Run Auto mode
 
@@ -51,6 +51,7 @@ Auto mode does not supply authority that the user has not provided:
 
 - For an unresolved policy, standard, accessibility target, or legal claim, choose no governing rule by inference. Use the most conservative compatible design, make no compliance claim, and mark the authority decision Open.
 - For consequential grading or scoring, recommend and draft the strongest defensible structure, but mark it provisional and not approved for operational use.
+- For rubric calibration with authentic student responses, prepare only the de-identification check, sample plan, and calibration questions. Do not interpret responses, apply scores, or revise the rubric from the examples in Auto mode; switch to Studio or Guided interaction and obtain the owner's judgment first.
 - For identifiable student data without an authorized path, do not process the data; continue with a synthetic schema, method, or de-identified template when useful.
 - For publishing, messaging, grading, permissions, overwrites, or live settings, prepare the draft or action plan but do not execute the side effect without explicit action-time authorization.
 - If a missing fact makes the requested artifact impossible to complete responsibly, provide the maximum safe partial result and a concise blocker instead of asking a question.

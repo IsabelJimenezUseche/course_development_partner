@@ -1,6 +1,6 @@
 # Artifact Manifest
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 
 | Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review |

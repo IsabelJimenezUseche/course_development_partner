@@ -4,7 +4,7 @@
 
 1. Start with the teaching job
 2. Apply an accessible design system
-3. Suggest the optional Purdue-inspired palette
+3. Suggest an optional neutral example palette
 4. Verify the rendered result
 
 ## 1. Start with the teaching job
@@ -23,26 +23,24 @@ Choose hierarchy, layout, typography, color, and imagery to help learners locate
 
 Apply the project's exact accessibility target. A palette recommendation is not evidence of WCAG conformance or institutional brand approval.
 
-## 3. Suggest the optional Purdue-inspired palette
+## 3. Suggest an optional neutral example palette
 
-When the instructor provides no visual system, suggest this restrained Purdue-inspired teaching palette:
+When the instructor provides no visual system, offer this restrained, unbranded example palette. Present it as a replaceable starting point rather than an institutional identity. Preserve the semantic roles when adapting colors so hierarchy and accessibility evidence remain explicit.
 
 | Role | Color | Hex | Recommended use |
 |---|---|---|---|
 | Primary dark | Black | `#000000` | Body text, strong headings, rules |
-| Primary accent | Boilermaker Gold | `#CFB991` | Section bands, callouts, highlights with black text |
-| Dark neutral | Steel | `#555960` | Secondary dark panels with white text |
-| Warm dark accent | Aged | `#8E6F3E` | Limited emphasis with white text after size/contrast review |
-| Bright accent | Rush | `#DAAA00` | Icons, borders, and highlights with black text |
-| Light warm background | Dust | `#EBD99F` | Low-intensity callouts with black text |
-| Light neutral | Steam | `#C4BFC0` | Dividers or quiet panels with black text |
+| Primary accent | Warm gold | `#CFB991` | Section bands, callouts, highlights with black text |
+| Dark neutral | Graphite | `#555960` | Secondary dark panels with white text |
+| Warm dark accent | Bronze | `#8E6F3E` | Limited emphasis with white text after size/contrast review |
+| Bright accent | Bright gold | `#DAAA00` | Icons, borders, and highlights with black text |
+| Light warm background | Pale gold | `#EBD99F` | Low-intensity callouts with black text |
+| Light neutral | Light gray | `#C4BFC0` | Dividers or quiet panels with black text |
 | Base | White | `#FFFFFF` | Primary page or slide background |
 
-Preferred verified pairs include black on Boilermaker Gold (about 11:1), black on Rush (about 9.7:1), black on Dust (about 15:1), white on Steel (about 7:1), and black on white (21:1). Recalculate contrast when opacity, gradients, images, export conversion, or different colors are used.
+Calculated source-color pairs include black on Warm gold (about 11:1), white on Graphite (about 7:1), white on Bronze (about 4.6:1), black on Bright gold (about 9.7:1), black on Pale gold (about 15:1), black on Light gray (about 11.6:1), and black on white (21:1). Recalculate contrast when opacity, gradients, images, export conversion, text size, or different colors are used.
 
-Use gold as an accent rather than the only carrier of meaning. Avoid white text on the gold accents. Do not use university logos, seals, proprietary fonts, or other protected marks unless the instructor supplies authorized assets and usage requirements.
-
-The suggested color values are drawn from Purdue's published visual-identity palette: <https://marcom.purdue.edu/our-brand/visual-identity/>. Verify the current source before claiming exact brand alignment; this teaching palette is a suggestion, not brand approval.
+Use accent colors as supplements rather than the only carrier of meaning. Do not claim that an example palette is approved by an institution. Do not use institutional logos, seals, proprietary fonts, or other protected marks unless the instructor supplies authorized assets and usage requirements.
 
 ## 4. Verify the rendered result
 

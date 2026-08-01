@@ -187,7 +187,7 @@ write_effect: none unless remediation is separately authorized
 fallback: manual accessibility checklist
 ```
 
-An accessibility tool reports bounded evidence, not ADA or Section 504 compliance. Do not silently map WCAG 2.2 results to a requirement that names WCAG 2.1, or vice versa. Require authoritative institutional review for legal applicability, exceptions, alternate versions, equivalent facilitation, fundamental alteration, undue burden, procurement acceptance, and release with unresolved barriers.
+An accessibility tool reports bounded evidence, not ADA or Section 504 compliance. When an authorized process or current authoritative source confirms that the U.S. ADA Title II web/mobile rule applies, pass WCAG 2.1 Level AA and the confirmed covered scope to the capability; do not infer applicability from an institution name. Do not silently map WCAG 2.2 results to a requirement that names WCAG 2.1, or vice versa. Require authoritative institutional review for legal applicability, exceptions, alternate versions, equivalent facilitation, fundamental alteration, undue burden, procurement acceptance, and release with unresolved barriers.
 
 ```yaml
 capability: analyze_learning_evidence

@@ -46,6 +46,7 @@ Do not use disability law, WCAG conformance, universal design, accommodations, a
 
 Apply the exact criterion set named by the governing target. Record additional current-design checks separately.
 
+- When an authorized institutional process or current authoritative source confirms that the U.S. Department of Justice Title II web/mobile rule applies, record **WCAG 2.1 Level AA** as the governing technical target for the covered web content and mobile apps. Do not infer applicability from an institution name. Verify and record the current scope, compliance deadline, exceptions, and institutional interpretation separately.
 - For a **WCAG 2.1** target, test the applicable WCAG 2.1 A/AA criteria, including Parsing 4.1.1 where required.
 - For a **WCAG 2.2** target, test the WCAG 2.2 A/AA criteria. WCAG 2.2 adds criteria including Focus Not Obscured (Minimum) 2.4.11, Dragging Movements 2.5.7, Target Size (Minimum) 2.5.8, Consistent Help 3.2.6, Redundant Entry 3.3.7, and Accessible Authentication (Minimum) 3.3.8; it removes 4.1.1 from the WCAG 2.2 criterion set.
 - When WCAG 2.1 governs but WCAG 2.2 is used as a recommended design target, report two results: governing-target findings and additional 2.2 findings.

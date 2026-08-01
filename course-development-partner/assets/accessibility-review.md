@@ -1,6 +1,6 @@
 # Accessibility Review
 
-- Schema version: 2.0
+- Schema version: 1.0
 - Last updated:
 
 ## Scope and authority
