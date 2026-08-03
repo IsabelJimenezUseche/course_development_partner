@@ -4,6 +4,16 @@ Read this reference when the teaching task involves engineering, engineering tec
 
 Authenticity means that students do the discipline's characteristic work — formulating, modeling, measuring, designing, interpreting, and judging under real constraints — rather than executing a procedure whose result changes nothing. The dimensions below are shared across STEM; the disciplinary profiles adapt them.
 
+## Contents
+
+1. Establish authority
+2. Build an authentic task
+3. Use a decision brief
+4. Apply the disciplinary profile
+5. Preserve appropriate complexity
+6. Treat laboratory and field safety as a release blocker
+7. Validate authenticity
+
 ## Establish authority
 
 Ask which institutional, program, professional, accreditation, code, or standard requirements apply. Treat instructor-provided and institutional requirements as authoritative. Treat external frameworks as conditional benchmarks until the instructor confirms applicability.

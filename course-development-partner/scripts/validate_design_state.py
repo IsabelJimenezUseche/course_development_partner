@@ -27,17 +27,30 @@ REQUIRED_H2 = (
 REQUIRED_H3 = ("confirmed", "assumed", "open", "current phase", "next decision")
 PROFILE_REQUIRED_FIELDS = {
     "establish": (
-        "engagement tier", "course or module", "learning outcomes", "interaction level",
-        "requested artifacts"
+        "engagement tier",
+        "course or module",
+        "learning outcomes",
+        "interaction level",
+        "requested artifacts",
     ),
     "produce": (
-        "engagement tier", "course or module", "learning outcomes", "technology and format",
-        "interaction level", "requested artifacts", "minimum viable fallback"
+        "engagement tier",
+        "course or module",
+        "learning outcomes",
+        "technology and format",
+        "interaction level",
+        "requested artifacts",
+        "minimum viable fallback",
     ),
     "handoff": (
-        "engagement tier", "course or module", "learning outcomes", "technology and format",
-        "interaction level", "requested artifacts", "minimum viable fallback",
-        "accessibility contact, review, procurement, or exception process"
+        "engagement tier",
+        "course or module",
+        "learning outcomes",
+        "technology and format",
+        "interaction level",
+        "requested artifacts",
+        "minimum viable fallback",
+        "accessibility contact, review, procurement, or exception process",
     ),
 }
 VALID_ENGAGEMENT_TIERS = {"focused", "project", "course"}
@@ -46,13 +59,12 @@ VALID_ENGAGEMENT_TIERS = {"focused", "project", "course"}
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Validate required sections and completion state in course-design-brief.md.",
-        epilog=(
-            "Example:\n"
-            "  validate_design_state.py course-design-brief.md"
-        ),
+        epilog=("Example:\n" "  validate_design_state.py course-design-brief.md"),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("path", type=Path, help="Path to a Markdown course-design brief")
+    parser.add_argument(
+        "path", type=Path, help="Path to a Markdown course-design brief"
+    )
     parser.add_argument(
         "--profile",
         choices=tuple(PROFILE_REQUIRED_FIELDS),
@@ -68,7 +80,9 @@ def normalize_heading(value: str) -> str:
 
 def section_body(text: str, heading: str, level: int) -> str:
     hashes = "#" * level
-    pattern = rf"^{hashes}\s+{re.escape(heading)}\s*$\n(?P<body>.*?)(?=^#{{1,{level}}}\s+|\Z)"
+    pattern = (
+        rf"^{hashes}\s+{re.escape(heading)}\s*$\n(?P<body>.*?)(?=^#{{1,{level}}}\s+|\Z)"
+    )
     match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
     return match.group("body").strip() if match else ""
 
@@ -76,7 +90,9 @@ def section_body(text: str, heading: str, level: int) -> str:
 def field_values(text: str) -> tuple[dict[str, str], set[str]]:
     values: dict[str, str] = {}
     duplicates: set[str] = set()
-    for match in re.finditer(r"^\s*-\s+([^:\n]+):\s*(.*?)\s*$", text, flags=re.MULTILINE):
+    for match in re.finditer(
+        r"^\s*-\s+([^:\n]+):\s*(.*?)\s*$", text, flags=re.MULTILINE
+    ):
         field = normalize_heading(match.group(1))
         if field in values:
             duplicates.add(field)
@@ -112,19 +128,22 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
         elif counts[(3, heading)] > 1:
             errors.append(f"Duplicate required heading: {heading}")
 
-    status_start = re.search(r"^##\s+Status\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
+    status_start = re.search(
+        r"^##\s+Status\s*$", text, flags=re.IGNORECASE | re.MULTILINE
+    )
     if status_start:
         trailing = text[status_start.end() :]
         next_h2 = re.search(r"^##\s+", trailing, flags=re.MULTILINE)
         status_text = trailing[: next_h2.start()] if next_h2 else trailing
         for heading in REQUIRED_H3:
-            if not re.search(rf"^###\s+{re.escape(heading)}\s*$", status_text, flags=re.I | re.M):
+            if not re.search(
+                rf"^###\s+{re.escape(heading)}\s*$", status_text, flags=re.I | re.M
+            ):
                 errors.append(f"Status subsection is outside Status: {heading}")
 
     incomplete: list[str] = []
     placeholder_patterns = (
         (r"\b(?:TODO|TBD)\b", "Contains TODO/TBD marker"),
-        (r"\[[^\]\n]+\](?!\()", "Contains bracketed placeholder"),
         (r"^\s*-\s*$", "Contains an empty list item"),
         (r"^\s*-\s+[^:\n]+:\s*$", "Contains an unanswered field"),
     )
@@ -134,10 +153,14 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
 
     for heading in REQUIRED_H3:
         body = section_body(text, heading, 3)
-        if (3, heading) in counts and not re.search(r"\w", re.sub(r"^[\s-]+$", "", body)):
+        if (3, heading) in counts and not re.search(
+            r"\w", re.sub(r"^[\s-]+$", "", body)
+        ):
             incomplete.append(f"Section is empty: {heading}")
 
     values, duplicate_fields = field_values(text)
+    if any(re.fullmatch(r"\[[^\]\n]+\]", value) for value in values.values()):
+        incomplete.append("Contains bracketed placeholder")
     tracked_fields = {
         field
         for required_fields in PROFILE_REQUIRED_FIELDS.values()

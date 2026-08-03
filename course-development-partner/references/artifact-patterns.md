@@ -34,7 +34,7 @@ For every artifact, identify:
 
 Keep related artifacts synchronized. Never allow the solution, rubric, or instructor guide to introduce an unstated requirement or assumption.
 
-For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. Approve the educational preview before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability.
+For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. Approve the educational preview before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability. In Auto mode, select and record the strongest recommended preview internally as provisional and proceed without an approval checkpoint.
 
 When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and use `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
 
@@ -192,7 +192,7 @@ Explain the orientations:
 
 - **Objective-achievement-based:** award credit for evidence that the objective was achieved. Favor it when reasoning, interpretation, transfer, design judgment, or multiple valid approaches matter.
 - **Error/deduction-based:** begin with full credit and subtract defined errors. Use it when correctness requirements are discrete and stable; prevent accumulated deductions from distorting the construct.
-- **Balanced — recommended:** anchor criteria and weights in the objectives, then treat errors as evidence of the degree of achievement. Scale consequences to how much an error undermines the target learning.
+- **Balanced:** anchor criteria and weights in the objectives, then treat errors as evidence of the degree of achievement. Scale consequences to how much an error undermines the target learning.
 
 Ask the responsible owner to approve the orientation before producing a final consequential rubric. Do not infer the choice from an existing grading pattern. When the owner delegates the choice, use the construct and stakes: favor objective-achievement or balanced logic for partial achievement, reasoning, judgment, and multiple valid approaches; favor checklist/mastery or explicit error rules for verified discrete, threshold, or safety-critical requirements. Do not turn the rubric into a punishment list detached from learning.
 

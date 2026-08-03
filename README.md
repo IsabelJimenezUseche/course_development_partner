@@ -184,7 +184,7 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, and package inventory boundaries. Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or `all-active`; retired records remain structurally checked but do not satisfy current coverage, artifact-family, progression, dependency, or workload requirements; Course-tier production requires a curriculum map; Course-tier handoff requires ordered active-outcome progression; and the project index contains one confined, resolvable entry per state file.
 
-Run the repository tests **from the repository root**:
+Run the repository tests with Python 3.10 or later **from the repository root**:
 
 ```bash
 python3 -m unittest discover -s tests -v

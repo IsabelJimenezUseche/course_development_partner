@@ -52,7 +52,9 @@ def parse_args() -> argparse.Namespace:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("path", type=Path, help="Path to course-curriculum-map.md or CSV")
+    parser.add_argument(
+        "path", type=Path, help="Path to course-curriculum-map.md or CSV"
+    )
     parser.add_argument(
         "--max-hours-per-module",
         type=float,
@@ -88,7 +90,9 @@ def parse_prerequisites(value: str) -> tuple[set[str], bool, list[str]]:
                 invalid.append(token)
             continue
         try:
-            internal.update(parse_identifier_list(token, field_name="prerequisite outcome"))
+            internal.update(
+                parse_identifier_list(token, field_name="prerequisite outcome")
+            )
         except ValueError:
             invalid.append(token)
     return internal, has_external, invalid
@@ -170,9 +174,8 @@ def validate(
                 )
             if (
                 row["expected student workload (hours)"]
-                and parse_positive_finite(
-                    row["expected student workload (hours)"]
-                ) is None
+                and parse_positive_finite(row["expected student workload (hours)"])
+                is None
             ):
                 issues.append(
                     f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
@@ -185,7 +188,9 @@ def validate(
         row["outcome id normalized"] = outcome_id
         sequence = parse_positive_finite(row["sequence"])
         if row["sequence"] and sequence is None:
-            issues.append(f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): sequence must be a positive finite number")
+            issues.append(
+                f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): sequence must be a positive finite number"
+            )
         row["sequence normalized"] = str(sequence) if sequence is not None else ""
         if not outcome_id:
             issues.append(f"Row {row_number}: missing outcome ID")
@@ -193,7 +198,9 @@ def validate(
         try:
             ids = parse_identifier_list(row["outcome id"], field_name="outcome")
             if len(ids) != 1:
-                issues.append(f"Row {row_number}: outcome ID must contain exactly one identifier")
+                issues.append(
+                    f"Row {row_number}: outcome ID must contain exactly one identifier"
+                )
             outcome_id = next(iter(ids))
         except ValueError as exc:
             issues.append(f"Row {row_number}: {exc}")
@@ -206,7 +213,9 @@ def validate(
     ordered_rows = sorted(
         parsed_rows,
         key=lambda row: (
-            float(row["sequence normalized"]) if row["sequence normalized"] else float("inf"),
+            float(row["sequence normalized"])
+            if row["sequence normalized"]
+            else float("inf"),
             int(row["source row number"]),
         ),
     )
@@ -218,7 +227,9 @@ def validate(
         outcome_id = row.get("outcome id normalized", normalize(row["outcome id"]))
         if not outcome_id:
             continue
-        sequence = float(row["sequence normalized"]) if row["sequence normalized"] else None
+        sequence = (
+            float(row["sequence normalized"]) if row["sequence normalized"] else None
+        )
         if sequence != current_sequence:
             for pending_outcome, stages_to_add in pending_stages.items():
                 stage_history[pending_outcome].update(stages_to_add)
@@ -226,20 +237,39 @@ def validate(
             current_sequence = sequence
         for field_name in REQUIRED:
             if not row[field_name]:
-                issues.append(f"Row {row_number} ({row['outcome id']}): missing {field_name}")
+                issues.append(
+                    f"Row {row_number} ({row['outcome id']}): missing {field_name}"
+                )
 
-        stages = {normalize(stage) for stage in re.split(r"[;,/]", row["developmental stage"]) if stage.strip()}
+        stages = {
+            normalize(stage)
+            for stage in re.split(r"[;,/]", row["developmental stage"])
+            if stage.strip()
+        }
         invalid = stages - ALLOWED_STAGES
         for stage in sorted(invalid):
-            issues.append(f"Row {row_number} ({row['outcome id']}): invalid stage {stage}")
+            issues.append(
+                f"Row {row_number} ({row['outcome id']}): invalid stage {stage}"
+            )
 
-        prerequisites, external_prior, invalid_prerequisites = parse_prerequisites(row["outcome prerequisites"])
+        prerequisites, external_prior, invalid_prerequisites = parse_prerequisites(
+            row["outcome prerequisites"]
+        )
         if external_prior:
             external_prior_by_outcome.add(outcome_id)
         for invalid_prerequisite in invalid_prerequisites:
             issues.append(
                 f"Row {row_number} ({row['outcome id']}): invalid prerequisite {invalid_prerequisite}"
             )
+        for prerequisite in sorted(prerequisites & outcome_ids):
+            if (
+                not stage_history[prerequisite]
+                and prerequisite not in external_prior_by_outcome
+            ):
+                issues.append(
+                    f"Row {row_number} ({row['outcome id']}): prerequisite outcome "
+                    f"{prerequisite} has no earlier development or declared external prior"
+                )
         if stages & {"master", "assess"}:
             has_prior_introduction = (
                 "introduce" in stage_history[outcome_id]
@@ -289,13 +319,18 @@ def validate(
     if require_complete_progression:
         for outcome_id in sorted(outcome_ids):
             stages = all_stages[outcome_id]
-            if "introduce" not in stages and outcome_id not in external_prior_by_outcome:
+            if (
+                "introduce" not in stages
+                and outcome_id not in external_prior_by_outcome
+            ):
                 issues.append(
                     f"{outcome_id.upper()}: complete progression is missing introduction "
                     "or a declared external prior"
                 )
             if "practice" not in stages:
-                issues.append(f"{outcome_id.upper()}: complete progression is missing practice")
+                issues.append(
+                    f"{outcome_id.upper()}: complete progression is missing practice"
+                )
             if not stages & {"master", "assess"}:
                 issues.append(
                     f"{outcome_id.upper()}: complete progression is missing mastery or assessment"
@@ -336,7 +371,9 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: curriculum sequence and declared-coherence checks passed; manual course review still required: {args.path}")
+    print(
+        f"OK: curriculum sequence and declared-coherence checks passed; manual course review still required: {args.path}"
+    )
     return 0
 
 

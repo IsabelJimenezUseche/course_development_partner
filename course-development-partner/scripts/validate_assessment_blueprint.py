@@ -24,6 +24,7 @@ from _tabular import (
     normalized_row,
     parse_cognitive_demand,
     parse_identifier_list,
+    parse_nonnegative_finite,
     parse_positive_finite,
 )
 
@@ -43,7 +44,11 @@ REQUIRED = (
 )
 VALID_STATUSES = {"draft", "review", "approved", "blocked", "retired"}
 VALID_EVIDENCE_LEVELS = {
-    "classroom-reviewed", "expert-reviewed", "piloted", "reliability-examined", "formally-validated"
+    "classroom-reviewed",
+    "expert-reviewed",
+    "piloted",
+    "reliability-examined",
+    "formally-validated",
 }
 ACTIVE_ALIGNMENT_STATUSES = {"draft", "review", "approved", "blocked"}
 
@@ -59,7 +64,9 @@ def parse_args() -> argparse.Namespace:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("path", type=Path, help="Path to assessment-blueprint.md or CSV")
+    parser.add_argument(
+        "path", type=Path, help="Path to assessment-blueprint.md or CSV"
+    )
     parser.add_argument(
         "--required-outcome",
         action="append",
@@ -83,7 +90,9 @@ def load(path: Path) -> tuple[str, list[str], list[dict[str, str]]]:
     return load_table(path, REQUIRED)
 
 
-def evidence_level(text: str, rows: list[dict[str, str]], mapping: dict[str, str]) -> str:
+def evidence_level(
+    text: str, rows: list[dict[str, str]], mapping: dict[str, str]
+) -> str:
     matches = re.findall(
         r"^\s*-\s*Evidence level claimed:\s*(.+?)\s*$",
         text,
@@ -141,9 +150,14 @@ def assessed_outcome_scope(
 def alignment_outcome_demands(path: Path) -> dict[str, str]:
     """Map each active aligned outcome ID to its declared cognitive-demand token."""
     required = (
-        "outcome id", "observable learning outcome", "cognitive demand",
-        "evidence of learning", "learning mechanism", "learning activity/support",
-        "feedback or assessment", "status"
+        "outcome id",
+        "observable learning outcome",
+        "cognitive demand",
+        "evidence of learning",
+        "learning mechanism",
+        "learning activity/support",
+        "feedback or assessment",
+        "status",
     )
     _, headers, rows = load_table(path, required)
     mapping = normalized_mapping(headers, required)
@@ -171,7 +185,9 @@ def validate(
         mapping = normalized_mapping(headers, REQUIRED)
         claimed_level = evidence_level(text, raw_rows, mapping)
         scope_value = assessed_outcome_scope(text, raw_rows, mapping)
-        outcome_demands = alignment_outcome_demands(alignment_map) if alignment_map else {}
+        outcome_demands = (
+            alignment_outcome_demands(alignment_map) if alignment_map else {}
+        )
         derived_outcomes = set(outcome_demands)
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
@@ -239,7 +255,9 @@ def validate(
         try:
             ids = parse_identifier_list(item_id, field_name="item")
             if len(ids) != 1:
-                issues.append(f"Row {row_number}: item ID must contain exactly one identifier")
+                issues.append(
+                    f"Row {row_number}: item ID must contain exactly one identifier"
+                )
             normalized_id = next(iter(ids))
         except ValueError as exc:
             issues.append(f"Row {row_number}: {exc}")
@@ -253,7 +271,9 @@ def validate(
 
         status = normalize(row["status"])
         if status and status not in VALID_STATUSES:
-            issues.append(f"Row {row_number} ({item_id}): unknown status {row['status']}")
+            issues.append(
+                f"Row {row_number} ({item_id}): unknown status {row['status']}"
+            )
         item_demand = parse_cognitive_demand(row["cognitive demand"])
         if row["cognitive demand"] and item_demand is None:
             issues.append(
@@ -275,10 +295,17 @@ def validate(
                             )
                 except ValueError as exc:
                     issues.append(f"Row {row_number} ({item_id}): {exc}")
-        if row["expected time (min)"] and parse_positive_finite(row["expected time (min)"]) is None:
-            issues.append(f"Row {row_number} ({item_id}): expected time must be a positive number")
-        if row["points"] and parse_positive_finite(row["points"]) is None:
-            issues.append(f"Row {row_number} ({item_id}): points must be a positive number")
+        if (
+            row["expected time (min)"]
+            and parse_positive_finite(row["expected time (min)"]) is None
+        ):
+            issues.append(
+                f"Row {row_number} ({item_id}): expected time must be a positive number"
+            )
+        if row["points"] and parse_nonnegative_finite(row["points"]) is None:
+            issues.append(
+                f"Row {row_number} ({item_id}): points must be a nonnegative finite number"
+            )
         if status != "retired":
             dependency_values[normalized_id] = row["dependency"]
 
@@ -295,7 +322,9 @@ def validate(
         graph[item_id] = dependencies
         for dependency in dependencies:
             if dependency not in active_items:
-                issues.append(f"{item_id}: unknown or retired dependency item {dependency}")
+                issues.append(
+                    f"{item_id}: unknown or retired dependency item {dependency}"
+                )
     for cycle in find_cycles(graph):
         issues.append(f"Circular item dependencies: {cycle}")
 
@@ -304,9 +333,13 @@ def validate(
 
     if scope_resolved:
         for outcome in sorted(represented_outcomes - scoped_outcomes):
-            issues.append(f"Assessment item uses outcome outside declared scope: {outcome.upper()}")
+            issues.append(
+                f"Assessment item uses outcome outside declared scope: {outcome.upper()}"
+            )
 
-    all_required = {normalize(outcome) for outcome in required_outcomes} | scoped_outcomes
+    all_required = {
+        normalize(outcome) for outcome in required_outcomes
+    } | scoped_outcomes
     for outcome in sorted(all_required):
         if outcome not in represented_outcomes:
             issues.append(f"Required outcome is not sampled: {outcome.upper()}")
@@ -344,7 +377,10 @@ def validate(
 def main() -> int:
     args = parse_args()
     errors, issues = validate(
-        args.path, args.required_outcome, args.allow_formal_validation, args.alignment_map
+        args.path,
+        args.required_outcome,
+        args.allow_formal_validation,
+        args.alignment_map,
     )
     for item in errors:
         print(f"ERROR: {item}")
@@ -354,7 +390,9 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: blueprint structural and declared-coverage checks passed; manual validity review still required: {args.path}")
+    print(
+        f"OK: blueprint structural and declared-coverage checks passed; manual validity review still required: {args.path}"
+    )
     return 0
 
 

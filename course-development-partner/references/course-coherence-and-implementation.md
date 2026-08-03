@@ -34,7 +34,7 @@ Record a positive numeric sequence, display module or week, prerequisite outcome
 
 Inspect for:
 
-- hidden, broken, or circular prerequisites;
+- hidden, broken, circular, or late prerequisites that have no earlier development or declared external prior;
 - outcomes assessed before adequate introduction and practice;
 - practice massed in the module where the outcome is introduced and never revisited;
 - long gaps without retrieval or use;

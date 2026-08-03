@@ -35,3 +35,5 @@ Status values: `draft`, `review`, `approved`, `blocked`, `retired`.
 Cognitive demand values, in ascending order: `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create`. Items below the outcome's demand are legitimate as scaffolding; an outcome whose entire active sample sits below its aligned demand is a coverage gap. See `references/state-contract.md`.
 
 For CSV, add `Assessed outcome scope` and `Evidence level claimed` columns and repeat the same assessment-level values on every row. Use explicit semicolon-separated outcome IDs for an assessment that intentionally samples a subset. Use `all-active` only when every active outcome in the authoritative alignment map belongs to this blueprint.
+
+Use a nonnegative finite number for `Points`; use `0` for an ungraded diagnostic or formative item. Use a positive finite number for `Expected time (min)`.

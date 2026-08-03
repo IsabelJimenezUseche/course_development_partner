@@ -249,7 +249,7 @@ Team composition is a design decision, not an administrative one.
 
 - State the formation basis — instructor-assigned, self-selected, or criterion-based — and the reason for it. Self-selection is fastest and tends to reproduce existing social groupings and isolate students who lack them.
 - Distribute relevant prior experience across teams rather than concentrating it, so that no team depends on one member and no team lacks a foothold.
-- Avoid placing a single student from an underrepresented group alone on a team when the cohort makes an alternative possible. Isolation removes any peer who shares the student's position when participation or role assignment goes wrong, and this pattern is reported often enough in the literature to design against.
+- Avoid placing a single student from an underrepresented group alone on a team when the cohort makes an alternative possible and an institution-authorized process supplies the relevant information. Never infer identity from names, appearance, or records collected for another purpose, and do not request sensitive identity data solely to form teams. When authorized information is unavailable, improve role rotation, participation structures, monitoring, and escalation pathways for every team rather than identity-matching students.
 - Consider schedule, modality, and access constraints, which determine whether a team can meet at all. Ask about availability rather than about personal circumstances.
 - Set team size from the task: large enough that the work genuinely requires division, small enough that no member can be passive. Fix the duration and say whether teams persist across the term.
 

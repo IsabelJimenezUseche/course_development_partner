@@ -40,7 +40,9 @@ def parse_cognitive_demand(value: str) -> int | None:
 
 def cognitive_demand_vocabulary() -> str:
     """Return the controlled tokens in ascending rank order for error messages."""
-    return ", ".join(sorted(COGNITIVE_DEMANDS, key=COGNITIVE_DEMANDS.get))
+    return ", ".join(
+        sorted(COGNITIVE_DEMANDS, key=lambda token: COGNITIVE_DEMANDS[token])
+    )
 
 
 def split_markdown_row(line: str) -> list[str]:
@@ -116,7 +118,9 @@ def markdown_rows(
     table_headers_seen: list[list[str]] = []
 
     for index in range(len(lines) - 1):
-        if not lines[index].strip().startswith("|") or not lines[index + 1].strip().startswith("|"):
+        if not lines[index].strip().startswith("|") or not lines[
+            index + 1
+        ].strip().startswith("|"):
             continue
         try:
             header = split_markdown_row(lines[index])
@@ -155,7 +159,9 @@ def markdown_rows(
         raise ValueError("No Markdown table found")
     if len(candidates) > 1:
         locations = ", ".join(str(item[0]) for item in candidates)
-        raise ValueError(f"Multiple Markdown tables match the required schema at lines {locations}")
+        raise ValueError(
+            f"Multiple Markdown tables match the required schema at lines {locations}"
+        )
     _, headers, rows = candidates[0]
     return headers, rows
 
@@ -177,7 +183,9 @@ def load_table(
             missing = [header for header in required_headers if header not in mapping]
             if missing:
                 raise ValueError(
-                    "; ".join(f"Missing required column: {header}" for header in missing)
+                    "; ".join(
+                        f"Missing required column: {header}" for header in missing
+                    )
                 )
             rows: list[dict[str, str]] = []
             for row_number, cells in enumerate(reader, start=2):
@@ -196,7 +204,9 @@ def normalized_mapping(headers: list[str], required: tuple[str, ...]) -> dict[st
     mapping = _validate_headers(headers)
     missing = [column for column in required if column not in mapping]
     if missing:
-        raise ValueError("; ".join(f"Missing required column: {column}" for column in missing))
+        raise ValueError(
+            "; ".join(f"Missing required column: {column}" for column in missing)
+        )
     return mapping
 
 
@@ -205,7 +215,11 @@ def normalized_row(raw: dict[str, str], mapping: dict[str, str]) -> dict[str, st
 
 
 def parse_identifier_list(value: str, *, field_name: str) -> set[str]:
-    tokens = [token.strip() for token in re.split(r"[;,]", value) if token.strip()]
+    tokens = [token.strip() for token in value.split(";") if token.strip()]
+    if value.strip() and not tokens:
+        raise ValueError(
+            f"invalid {field_name} identifier list contains no identifiers"
+        )
     invalid = [token for token in tokens if not IDENTIFIER_PATTERN.fullmatch(token)]
     if invalid:
         raise ValueError(f"invalid {field_name} identifier {invalid[0]}")
@@ -218,6 +232,14 @@ def parse_positive_finite(value: str) -> float | None:
     except ValueError:
         return None
     return number if number > 0 and math.isfinite(number) else None
+
+
+def parse_nonnegative_finite(value: str) -> float | None:
+    try:
+        number = float(value)
+    except ValueError:
+        return None
+    return number if number >= 0 and math.isfinite(number) else None
 
 
 def parse_iso_date(value: str) -> bool:

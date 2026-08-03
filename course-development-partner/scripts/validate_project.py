@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import validate_alignment_map
@@ -70,7 +71,9 @@ def parse_args() -> argparse.Namespace:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("path", type=Path, help="Project directory containing project-index.md")
+    parser.add_argument(
+        "path", type=Path, help="Project directory containing project-index.md"
+    )
     parser.add_argument(
         "--design-profile",
         choices=("establish", "produce", "handoff"),
@@ -96,12 +99,19 @@ def schema_version(path: Path) -> str:
 
 
 def metadata_value(text: str, label: str) -> str:
-    match = re.search(
-        rf"^\s*-\s*{re.escape(label)}:\s*(.*?)\s*$",
-        text,
-        flags=re.I | re.M,
-    )
-    return match.group(1).strip() if match else ""
+    values = metadata_values(text, label)
+    return values[0] if values else ""
+
+
+def metadata_values(text: str, label: str) -> list[str]:
+    return [
+        match.group(1).strip()
+        for match in re.finditer(
+            rf"^[ \t]*-[ \t]*{re.escape(label)}:[ \t]*([^\r\n]*)[ \t]*$",
+            text,
+            flags=re.I | re.M,
+        )
+    ]
 
 
 def table_identifiers(
@@ -155,8 +165,15 @@ def validate_index(
     seen: set[str] = set()
     seen_targets: dict[Path, int] = {}
     engagement_tier = normalize(metadata_value(index_text, "Engagement tier"))
+    index_dates = metadata_values(index_text, "Last updated")
     if not index_version:
         issues.append("project-index.md: missing schema version")
+    if not index_dates or not index_dates[0]:
+        issues.append("project-index.md: missing last-updated date")
+    elif len(index_dates) > 1:
+        issues.append("project-index.md: duplicate last-updated metadata")
+    elif not parse_iso_date(index_dates[0]):
+        issues.append("project-index.md: last updated must use YYYY-MM-DD")
     if not engagement_tier:
         issues.append("project-index.md: missing engagement tier")
     elif engagement_tier not in VALID_ENGAGEMENT_TIERS:
@@ -175,15 +192,29 @@ def validate_index(
             continue
         raw_duplicate = state_file in seen
         if raw_duplicate:
-            issues.append(f"Project index row {row_number}: duplicate state file {state_file}")
+            issues.append(
+                f"Project index row {row_number}: duplicate state file {state_file}"
+            )
         seen.add(state_file)
         if status not in INDEX_STATUSES:
-            issues.append(f"Project index row {row_number}: unknown status {row['status']}")
-        for field in ("purpose", "authority/owner", "schema version", "status", "last updated"):
+            issues.append(
+                f"Project index row {row_number}: unknown status {row['status']}"
+            )
+        for field in (
+            "purpose",
+            "authority/owner",
+            "schema version",
+            "status",
+            "last updated",
+        ):
             if not row[field]:
-                issues.append(f"Project index row {row_number} ({state_file}): missing {field}")
+                issues.append(
+                    f"Project index row {row_number} ({state_file}): missing {field}"
+                )
         if row["last updated"] and not parse_iso_date(row["last updated"]):
-            issues.append(f"Project index row {row_number} ({state_file}): last updated must use YYYY-MM-DD")
+            issues.append(
+                f"Project index row {row_number} ({state_file}): last updated must use YYYY-MM-DD"
+            )
 
         try:
             target = local_reference_path(state_file, project)
@@ -212,7 +243,9 @@ def validate_index(
             seen_targets[target] = row_number
         if status in ACTIVE_STATUSES:
             if target is None or not target.is_file():
-                issues.append(f"Project index row {row_number}: active state file does not exist: {state_file}")
+                issues.append(
+                    f"Project index row {row_number}: active state file does not exist: {state_file}"
+                )
                 continue
             if target.name in active_files and active_files[target.name] != target:
                 issues.append(
@@ -220,6 +253,7 @@ def validate_index(
                 )
             active_files[target.name] = target
             try:
+                target_text = target.read_text(encoding="utf-8-sig")
                 actual_version = schema_version(target)
             except (OSError, UnicodeError) as exc:
                 errors.append(f"Cannot read {state_file}: {exc}")
@@ -235,8 +269,22 @@ def validate_index(
                     f"{state_file}: schema version {actual_version} does not match "
                     f"project-index.md development schema {index_version}"
                 )
+            state_dates = metadata_values(target_text, "Last updated")
+            if not state_dates or not state_dates[0]:
+                issues.append(f"{state_file}: missing last-updated date")
+            elif len(state_dates) > 1:
+                issues.append(f"{state_file}: duplicate last-updated metadata")
+            elif not parse_iso_date(state_dates[0]):
+                issues.append(f"{state_file}: last updated must use YYYY-MM-DD")
+            elif state_dates[0] != row["last updated"]:
+                issues.append(
+                    f"{state_file}: last updated {state_dates[0]} does not match index "
+                    f"{row['last updated']}"
+                )
         elif status == "not-applicable" and not row["notes"]:
-            issues.append(f"Project index row {row_number} ({state_file}): not-applicable requires a rationale")
+            issues.append(
+                f"Project index row {row_number} ({state_file}): not-applicable requires a rationale"
+            )
     return errors, issues, active_files, engagement_tier
 
 
@@ -258,7 +306,10 @@ def validate_project(
             f"{design_profile} profile requires an active project-index entry for {name}"
         )
 
-    if engagement_tier in TIER_REQUIRED_STATE and design_profile in {"produce", "handoff"}:
+    if engagement_tier in TIER_REQUIRED_STATE and design_profile in {
+        "produce",
+        "handoff",
+    }:
         for name in sorted(TIER_REQUIRED_STATE[engagement_tier] - set(active)):
             issues.append(
                 f"{engagement_tier} engagement tier with {design_profile} profile requires "
@@ -269,7 +320,9 @@ def validate_project(
     if brief_path is not None:
         try:
             brief_tier = normalize(
-                metadata_value(brief_path.read_text(encoding="utf-8-sig"), "Engagement tier")
+                metadata_value(
+                    brief_path.read_text(encoding="utf-8-sig"), "Engagement tier"
+                )
             )
             if engagement_tier and brief_tier and engagement_tier != brief_tier:
                 issues.append(
@@ -281,10 +334,14 @@ def validate_project(
 
     alignment_path = active.get("alignment-map.md")
 
-    component_calls = {
-        "course-design-brief.md": lambda path: validate_design_state.validate(path, design_profile),
+    component_calls: dict[str, Callable[[Path], tuple[list[str], list[str]]]] = {
+        "course-design-brief.md": lambda path: validate_design_state.validate(
+            path, design_profile
+        ),
         "alignment-map.md": validate_alignment_map.validate,
-        "artifact-manifest.md": lambda path: validate_artifact_manifest.validate(path, True),
+        "artifact-manifest.md": lambda path: validate_artifact_manifest.validate(
+            path, True
+        ),
         "assessment-blueprint.md": lambda path: validate_assessment_blueprint.validate(
             path, [], allow_formal_validation, alignment_path
         ),
@@ -310,9 +367,14 @@ def validate_project(
         alignment_ids, identifier_issues = table_identifiers(
             alignment_path,
             (
-                "outcome id", "observable learning outcome", "cognitive demand",
-                "evidence of learning", "learning mechanism", "learning activity/support",
-                "feedback or assessment", "status"
+                "outcome id",
+                "observable learning outcome",
+                "cognitive demand",
+                "evidence of learning",
+                "learning mechanism",
+                "learning activity/support",
+                "feedback or assessment",
+                "status",
             ),
             "outcome id",
             active_only=True,
@@ -322,18 +384,32 @@ def validate_project(
             (
                 "assessment-blueprint.md",
                 (
-                    "item id", "outcome(s)", "intended interpretation/use", "evidence claim",
-                    "cognitive demand", "item type", "dependency", "expected time (min)", "points",
-                    "construct-irrelevant barriers", "status"
+                    "item id",
+                    "outcome(s)",
+                    "intended interpretation/use",
+                    "evidence claim",
+                    "cognitive demand",
+                    "item type",
+                    "dependency",
+                    "expected time (min)",
+                    "points",
+                    "construct-irrelevant barriers",
+                    "status",
                 ),
                 "outcome(s)",
             ),
             (
                 "course-curriculum-map.md",
                 (
-                    "sequence", "module/week", "outcome id", "developmental stage",
-                    "outcome prerequisites", "learning experience/evidence", "feedback/assessment",
-                    "expected student workload (hours)", "status"
+                    "sequence",
+                    "module/week",
+                    "outcome id",
+                    "developmental stage",
+                    "outcome prerequisites",
+                    "learning experience/evidence",
+                    "feedback/assessment",
+                    "expected student workload (hours)",
+                    "status",
                 ),
                 "outcome id",
             ),
@@ -355,7 +431,9 @@ def validate_project(
             )
             issues.extend(identifier_issues)
             for identifier in sorted(identifiers - alignment_ids):
-                issues.append(f"{name}: outcome is not defined in alignment-map.md: {identifier}")
+                issues.append(
+                    f"{name}: outcome is not defined in alignment-map.md: {identifier}"
+                )
             if name == "course-curriculum-map.md" and engagement_tier == "course":
                 for identifier in sorted(alignment_ids - identifiers):
                     issues.append(
@@ -384,7 +462,9 @@ def main() -> int:
         return 1
     if issues:
         return 2
-    print(f"OK: indexed structural and cross-file checks passed; manual project review still required: {args.path}")
+    print(
+        f"OK: indexed structural and cross-file checks passed; manual project review still required: {args.path}"
+    )
     return 0
 
 
