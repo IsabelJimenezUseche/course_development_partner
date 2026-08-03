@@ -41,6 +41,27 @@ Keep retired records structurally valid enough to preserve trustworthy history. 
 
 Use semicolons for controlled multi-value cells. Use `none` only when the template permits it. Do not use `TBD`, `TODO`, or a blank-equivalent value as validation evidence.
 
+### Cognitive demand
+
+`Cognitive demand` is a controlled, ordered field wherever it appears — the alignment map and the assessment blueprint. Use exactly one token:
+
+| Token | Rank | Target performance |
+|---|---|---|
+| `remember` | 1 | Recall facts, terms, notation, conventions, or values |
+| `understand` | 2 | Explain, interpret, represent, classify, or translate between representations |
+| `apply` | 3 | Execute a known method, model, or procedure in a familiar situation |
+| `analyze` | 4 | Compare, decompose, diagnose, select among models, or identify governing assumptions |
+| `evaluate` | 5 | Judge against criteria, quantify uncertainty, or justify a decision under constraints |
+| `create` | 6 | Design, formulate, or synthesize a solution, investigation, or model that did not exist |
+
+The ranks are comparable so that alignment can be checked rather than asserted. Instructors who work in SOLO, Depth of Knowledge, or a discipline- or program-specific taxonomy record their own level in the outcome text or the design log and map it onto the nearest token here; do not invent new tokens, because unmapped values disable the demand checks.
+
+Record the demand of the **target performance**, not of the hardest sub-step. A task whose arithmetic is demanding but whose decision is prescribed is `apply`, not `evaluate`.
+
+An assessment may sample below an outcome's demand deliberately — scaffolding items, prerequisite checks, and partial-credit ladders are legitimate. What is not legitimate is an outcome whose *entire* active sample sits below its declared demand. `validate_assessment_blueprint.py` reports that case when an alignment map is supplied, and reports nothing about individual low-demand items.
+
+**Know what the check cannot see.** The ranks order *kinds* of cognition, not difficulty. A shallow item labeled `evaluate` outranks a demanding multi-step `apply` item, and the validator cannot tell them apart — it compares tokens. So a passing demand check is evidence that the sample is labeled at the outcome's level, not evidence that it is adequate. It cannot substitute for reading the items. Treat a token that is hard to choose as a signal that the outcome may be doing two jobs, and consider splitting it rather than forcing a rank.
+
 ## 4. Record dates and applicability
 
 Use ISO dates. Keep these meanings separate:

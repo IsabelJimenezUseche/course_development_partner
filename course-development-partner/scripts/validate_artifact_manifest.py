@@ -40,6 +40,7 @@ REQUIRED = (
     "last reviewed",
     "production plan",
     "accessibility review",
+    "safety review",
 )
 VALID_STATUSES = {"draft", "review", "validated", "teaching-ready", "retired"}
 EMPTY_ISSUES = {"", "-", "none", "n/a", "na"}
@@ -166,9 +167,19 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                 issues.append(f"{label}: teaching-ready rich artifact is missing production plan")
             if not row["accessibility review"] or is_reference_state(row["accessibility review"]):
                 issues.append(f"{label}: teaching-ready artifact is missing accessibility review")
+            # Safety applies only to hazard-bearing work, which the validator cannot detect.
+            # Require an affirmative declaration instead: a review reference, or an explicit
+            # not-required/not-applicable statement. A blank cell is an undeclared decision.
+            if not row["safety review"]:
+                issues.append(
+                    f"{label}: teaching-ready artifact has no safety review declaration; "
+                    "reference the review or state not required"
+                )
 
         if check_paths and status != "retired":
-            for field in ("file or reference", "production plan", "accessibility review"):
+            for field in (
+                "file or reference", "production plan", "accessibility review", "safety review"
+            ):
                 reference = row[field]
                 if field != "file or reference" and is_reference_state(reference):
                     continue

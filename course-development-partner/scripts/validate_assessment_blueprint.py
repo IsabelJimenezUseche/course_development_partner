@@ -15,11 +15,14 @@ import sys
 from pathlib import Path
 
 from _tabular import (
+    COGNITIVE_DEMANDS,
+    cognitive_demand_vocabulary,
     find_cycles,
     load_table,
     normalize,
     normalized_mapping,
     normalized_row,
+    parse_cognitive_demand,
     parse_identifier_list,
     parse_positive_finite,
 )
@@ -135,7 +138,8 @@ def assessed_outcome_scope(
     return markdown_value or column_value
 
 
-def alignment_outcomes(path: Path) -> set[str]:
+def alignment_outcome_demands(path: Path) -> dict[str, str]:
+    """Map each active aligned outcome ID to its declared cognitive-demand token."""
     required = (
         "outcome id", "observable learning outcome", "cognitive demand",
         "evidence of learning", "learning mechanism", "learning activity/support",
@@ -143,15 +147,17 @@ def alignment_outcomes(path: Path) -> set[str]:
     )
     _, headers, rows = load_table(path, required)
     mapping = normalized_mapping(headers, required)
-    outcomes: set[str] = set()
+    demands: dict[str, str] = {}
     for raw in rows:
         row = normalized_row(raw, mapping)
         if normalize(row["status"]) not in ACTIVE_ALIGNMENT_STATUSES:
             continue
         value = row["outcome id"]
-        if value:
-            outcomes.update(parse_identifier_list(value, field_name="outcome"))
-    return outcomes
+        if not value:
+            continue
+        for outcome in parse_identifier_list(value, field_name="outcome"):
+            demands[outcome] = normalize(row["cognitive demand"])
+    return demands
 
 
 def validate(
@@ -165,7 +171,8 @@ def validate(
         mapping = normalized_mapping(headers, REQUIRED)
         claimed_level = evidence_level(text, raw_rows, mapping)
         scope_value = assessed_outcome_scope(text, raw_rows, mapping)
-        derived_outcomes = alignment_outcomes(alignment_map) if alignment_map else set()
+        outcome_demands = alignment_outcome_demands(alignment_map) if alignment_map else {}
+        derived_outcomes = set(outcome_demands)
     except (OSError, UnicodeError, ValueError) as exc:
         return [str(exc)], []
     if not raw_rows:
@@ -178,6 +185,7 @@ def validate(
     dependency_values: dict[str, str] = {}
     scoped_outcomes: set[str] = set()
     scope_resolved = False
+    highest_item_demand: dict[str, int] = {}
 
     normalized_scope = normalize(scope_value).replace(" ", "-")
     if not scope_value:
@@ -246,13 +254,25 @@ def validate(
         status = normalize(row["status"])
         if status and status not in VALID_STATUSES:
             issues.append(f"Row {row_number} ({item_id}): unknown status {row['status']}")
+        item_demand = parse_cognitive_demand(row["cognitive demand"])
+        if row["cognitive demand"] and item_demand is None:
+            issues.append(
+                f"Row {row_number} ({item_id}): unknown cognitive demand "
+                f"{row['cognitive demand']}; use one of {cognitive_demand_vocabulary()}"
+            )
         if status != "retired":
             active_items.add(normalized_id)
             if row["outcome(s)"]:
                 try:
-                    represented_outcomes.update(
-                        parse_identifier_list(row["outcome(s)"], field_name="outcome")
+                    item_outcomes = parse_identifier_list(
+                        row["outcome(s)"], field_name="outcome"
                     )
+                    represented_outcomes.update(item_outcomes)
+                    if item_demand is not None:
+                        for outcome in item_outcomes:
+                            highest_item_demand[outcome] = max(
+                                highest_item_demand.get(outcome, 0), item_demand
+                            )
                 except ValueError as exc:
                     issues.append(f"Row {row_number} ({item_id}): {exc}")
         if row["expected time (min)"] and parse_positive_finite(row["expected time (min)"]) is None:
@@ -290,6 +310,23 @@ def validate(
     for outcome in sorted(all_required):
         if outcome not in represented_outcomes:
             issues.append(f"Required outcome is not sampled: {outcome.upper()}")
+
+    # Cognitive-demand match. A blueprint may legitimately contain items below the
+    # outcome's demand as scaffolding, so compare at the outcome level: report only
+    # when no active item reaches the demand the alignment map declares.
+    rank_names = {rank: name for name, rank in COGNITIVE_DEMANDS.items()}
+    for outcome in sorted(represented_outcomes & set(outcome_demands)):
+        outcome_rank = parse_cognitive_demand(outcome_demands[outcome])
+        if outcome_rank is None:
+            continue
+        item_rank = highest_item_demand.get(outcome)
+        if item_rank is None:
+            continue
+        if item_rank < outcome_rank:
+            issues.append(
+                f"{outcome.upper()}: highest active item demand {rank_names[item_rank]} is below "
+                f"the aligned outcome demand {rank_names[outcome_rank]}"
+            )
 
     if not claimed_level:
         issues.append("Missing evidence level claimed")

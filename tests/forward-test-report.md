@@ -1,6 +1,8 @@
 # Initial Forward-Test Report
 
 > Historical and superseded as a current inventory/status record. Retained to document the initial failures and revisions. See `test-index.md` for current status and `rich-artifact-production-report.md` for the later bounded production exercise.
+>
+> The default interaction mode named "Studio" below was later renamed **Co-design**, to avoid collision with studio-format course delivery in STEM. This record is left unedited because it documents runs actually performed against the earlier name.
 
 Date: 2026-07-31
 

@@ -78,6 +78,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--max-hours-per-module", type=float)
     parser.add_argument("--allow-formal-validation", action="store_true")
+    parser.add_argument(
+        "--check-practice-distribution",
+        action="store_true",
+        help=(
+            "Report outcomes whose repeated practice is massed in a single module/week "
+            "in the course curriculum map"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -237,6 +245,7 @@ def validate_project(
     design_profile: str,
     max_hours: float | None,
     allow_formal_validation: bool,
+    check_practice_distribution: bool = False,
 ) -> tuple[list[str], list[str]]:
     if not project.is_dir():
         return [f"Project directory does not exist: {project}"], []
@@ -283,6 +292,7 @@ def validate_project(
             path,
             max_hours,
             design_profile == "handoff",
+            check_practice_distribution,
         ),
     }
     for name, call in component_calls.items():
@@ -364,6 +374,7 @@ def main() -> int:
         args.design_profile,
         args.max_hours_per_module,
         args.allow_formal_validation,
+        args.check_practice_distribution,
     )
     for item in errors:
         print(f"ERROR: {item}")

@@ -52,20 +52,41 @@
 - Technology and format:
 - Accessibility or policy requirements not captured above:
 - Grading or assessment constraints:
+- How scores combine into a course grade:
+- Revision, resubmission, retake, or replacement policy:
+- Threshold, gateway, or minimum-competency requirement:
+- Late work, missed assessment, and excused-absence handling:
 - Permitted collaboration, resources, and AI use:
 - Applicable program, professional, accreditation, code, or standard requirements:
+
+## Team and collaborative work
+
+- Collaborative or team work required: yes | no | undecided
+- Team formation basis and rationale:
+- Team size, duration, and persistence across the term:
+- How team and individual performance each reach the grade:
+- Peer-evaluation instrument and its bounded grade effect:
+- Escalation path for non-participation or conflict:
+
+## Safety authority when physical hazards are involved
+
+- Physical hazards present: yes | no | undecided
+- Responsible safety owner and role:
+- Governing institutional safety document, version, and date:
+- Approval status before student use:
 
 ## Implementation load
 
 - Professor preparation and maintenance capacity:
 - TA or grader preparation, facilitation, and moderation capacity:
+- TA or grader disciplinary preparation, calibration, and decision authority:
 - Student workload expectation:
 - Room, laboratory, technology, data, and support resources:
 - Minimum viable fallback:
 
 ## Collaboration
 
-- Interaction level: Studio | Guided | Rapid | Auto
+- Interaction level: Co-design | Guided | Rapid | Auto
 - Instructor preferences:
 - Requested artifacts:
 - Evidence-informed rationale needed: yes | no | undecided

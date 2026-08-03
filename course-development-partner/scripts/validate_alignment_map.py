@@ -14,10 +14,12 @@ import sys
 from pathlib import Path
 
 from _tabular import (
+    cognitive_demand_vocabulary,
     load_table,
     normalize,
     normalized_mapping,
     normalized_row,
+    parse_cognitive_demand,
     parse_identifier_list,
 )
 
@@ -74,6 +76,12 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
 
         if status and normalize(status) not in VALID_STATUSES:
             issues.append(f"Row {row_number} ({outcome_id or 'no outcome ID'}): unknown status {status}")
+
+        if cognitive_demand and parse_cognitive_demand(cognitive_demand) is None:
+            issues.append(
+                f"Row {row_number} ({outcome_id or 'no outcome ID'}): unknown cognitive demand "
+                f"{cognitive_demand}; use one of {cognitive_demand_vocabulary()}"
+            )
 
         if not outcome_id and any(row.values()):
             issues.append(f"Row {row_number}: activity or assessment has no outcome ID")

@@ -58,6 +58,17 @@ Decision: Pilot structured pairs with individual commitment and an exit check; d
 
 Formulate the educational question before searching. Prefer primary or authoritative sources for current policy, technical standards, and factual claims. For learning research, begin with strong syntheses and inspect the underlying population and outcome. Record stable references, retrieval dates for changing material, and reuse restrictions.
 
+### Route: student difficulty with a specific concept
+
+When the question is what students already believe, where they reliably fail, or how a concept is misunderstood, search discipline-based education research for that concept rather than general pedagogy:
+
+1. Look for a **validated concept inventory or diagnostic instrument** for the topic before drafting one. Record the instrument's validated population, level, and intended use, its access conditions, and whether items are secured. Do not reproduce or imitate secured items in student-facing material.
+2. Look for **documented misconception or error catalogs** for the specific concept, which exist for many core STEM topics and outperform generated guesses.
+3. Check the **fit** before transferring a finding: course level, prior curriculum, national or institutional context, and whether the notation and representation match this course.
+4. Prefer the instructor's own prior-offering evidence when it exists; it has the highest fit of any source.
+
+Record the result in `assets/source-register.md` with the population it describes. When nothing is found, say that the expected student model is provisional and state what would confirm it.
+
 Do not cite a source solely from a search snippet or secondary paraphrase when the original is available. Do not use citation count, venue prestige, or confident wording as a substitute for fit and quality.
 
 ## 5. Report bounded recommendations

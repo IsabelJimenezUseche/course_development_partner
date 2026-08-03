@@ -6,12 +6,14 @@
 2. Lesson plans
 3. Active-learning worksheets
 4. Context-rich problems
-5. Assessments
-6. Rubrics and calibration
-7. Solution keys
-8. Slides and visuals
-9. Study guides
-10. Communications, surveys, and media
+5. Laboratory and studio sessions
+6. Multi-week projects and capstones
+7. Assessments
+8. Rubrics and calibration
+9. Solution keys
+10. Slides and visuals
+11. Study guides
+12. Communications, surveys, and media
 
 ## 1. Common contract
 
@@ -89,9 +91,68 @@ When appropriate, ask students to:
 
 Remove irrelevant detail unless distinguishing signal from noise is an explicit objective. Independently verify facts, data, equations, and solvability.
 
-For engineering tasks, apply `references/engineering-authenticity.md`. Make relevant standards, multiple constraints, safety, welfare, ethics, stakeholder perspectives, uncertainty, and lifecycle effects part of the decision rather than decorative context.
+For STEM tasks, apply `references/stem-authenticity.md`. Make relevant standards, multiple constraints, safety, welfare, ethics, stakeholder perspectives, uncertainty, and lifecycle effects part of the decision rather than decorative context.
 
-## 5. Assessments
+## 5. Laboratory and studio sessions
+
+Covers wet labs, instrumentation and measurement labs, computing labs, makerspace and fabrication sessions, field work, and studio-format sessions.
+
+Preview: the session plan with the investigative question, hazard summary, time blocks, and the data students will leave with.
+
+**Before anything else, apply the safety rules in `references/stem-authenticity.md`.** Route every hazard-bearing element to the responsible safety owner for approval. An unverified or unreviewed safety element is a Blocker and prevents teaching-ready status.
+
+Create:
+
+- student lab or session handout;
+- instructor and teaching-assistant facilitation guide, including setup, staging, and reset;
+- safety documentation routed to the responsible owner, recorded in `assets/safety-review.md`;
+- data-recording format — notebook conventions, template, or repository structure;
+- exemplar analysis or expected result range with its tolerance;
+- scoring or feedback guide for the report or notebook.
+
+Design the session around the reasoning, not the procedure:
+
+- State the investigative question and the decision or claim the data will support.
+- Distinguish confirmatory, structured-inquiry, guided-inquiry, and open-inquiry design, and say which this is. Do not describe a procedure with a known answer as inquiry.
+- Require students to predict before observing when the result should challenge a model.
+- Make measurement limits, calibration, uncertainty, error propagation, and repeat measurements part of the task rather than an appendix.
+- Define what students do when the apparatus, code, or sample fails — this is the most common way lab time is lost.
+- Specify data handling: units, significant figures, recording conventions, retention, sharing, and provenance.
+- Give the analysis and interpretation their own time and support; students routinely spend the whole session collecting data and never reason about it.
+
+Validate that the session fits the available stations, equipment, consumables, staffing, and scheduled time, and that the equipment count supports the group size without leaving students idle or passive. Verify that expected results are physically reasonable and reproducible with the specified equipment. Check accessibility of bench height, reach, handling, protective equipment fit, visual and auditory alarms, and software; record any barrier that requires an approved alternative.
+
+## 6. Multi-week projects and capstones
+
+Covers design projects, build projects, research projects, computing projects, and capstone or senior design experiences.
+
+Preview: outcome map, milestone schedule, deliverable list, and the team and assessment structure.
+
+Create:
+
+- project brief with scope, deliverables, and constraints;
+- milestone schedule with review points;
+- team formation, agreement, and peer-evaluation instrument when the work is collaborative;
+- rubric for each assessed deliverable;
+- instructor and mentor guide, including review protocols;
+- client or stakeholder communication materials when external parties are involved.
+
+Structure the project so that learning is visible before the end:
+
+- Map deliverables to outcomes. A single terminal artifact cannot evidence a semester of outcomes.
+- Schedule review points that can change the project's direction — a design review, proposal defense, prototype demonstration, or code review — not only progress reports.
+- Require documented decisions, alternatives considered, and their rationale, so that judgment is assessable and not inferred from the final object.
+- Plan for scope failure: define the minimum acceptable deliverable and the recovery path when a team's approach does not work. A failed technical result is not automatically a failed learning outcome; say in advance how each is judged.
+- Preserve individual evidence for every outcome claimed for individuals, per `references/evidence-informed-design.md`.
+- Fade scaffolding across milestones deliberately, and state which supports are removed before the final independent performance.
+
+When an external client, community partner, or sponsor is involved, clarify in advance: who owns the deliverable and any intellectual property, what the student obligation is if the project fails, how the partner's input affects grades — normally it should not directly — how the partner's availability is guaranteed, and what happens to student work afterward. Do not let a partner relationship convert the assessment into client satisfaction.
+
+For capstones, confirm which program-level outcomes the experience is expected to evidence, and whether the program collects assessment data from it. Requirements imposed for program assessment are authoritative constraints supplied by the instructor; do not infer them.
+
+Apply `references/stem-authenticity.md` for the disciplinary profile, and `references/course-coherence-and-implementation.md` for mentoring and review workload, which is routinely underestimated.
+
+## 7. Assessments
 
 Preview: `assets/assessment-blueprint.md` with explicit assessed-outcome scope or `all-active`, item outcome, intended interpretation/use, evidence claim, cognitive demand, item type, dependency, points, time, and construct-irrelevant barriers.
 
@@ -112,7 +173,7 @@ Map every item to an outcome. Check:
 
 Independently solve quantitative items before use. Distinguish diagnostic, formative, and summative purposes. Apply `references/assessment-quality.md` for consequential use and state the evidence level accurately; do not call an assessment validated based only on classroom review.
 
-## 6. Rubrics and calibration
+## 8. Rubrics and calibration
 
 ### Clarify rubric intent
 
@@ -150,7 +211,7 @@ Then:
 
 ### Request de-identified student responses
 
-After the initial rubric exists, ask for a small authentic set. This calibration remains interactive regardless of another selected mode; use Studio or Guided mode for the judgment and revision steps. Suggest, but do not require, examples representing:
+After the initial rubric exists, ask for a small authentic set. This calibration remains interactive regardless of another selected mode; use Co-design or Guided mode for the judgment and revision steps. Suggest, but do not require, examples representing:
 
 - strong work;
 - typical or middle-range work;
@@ -193,7 +254,7 @@ Confirm:
 - scorer-consistency evidence and unresolved disagreements are represented accurately;
 - student expectations are clear without revealing answers or constraining valid approaches.
 
-## 7. Solution keys
+## 9. Solution keys
 
 Include:
 
@@ -207,7 +268,7 @@ Include:
 
 Verify the solution independently from the generated prompt. Do not silently repair an unsolvable or ambiguous student item only in the key.
 
-## 8. Slides and visuals
+## 10. Slides and visuals
 
 Preview a storyboard or visual specification.
 
@@ -224,7 +285,7 @@ Use visuals for relationships, mechanisms, comparisons, hierarchy, or change ove
 
 Keep text, diagrams, and tables editable where the format permits. Render and inspect final slides or images.
 
-## 9. Study guides
+## 11. Study guides
 
 Organize around what students should be able to do, not merely topic names. Include:
 
@@ -238,7 +299,7 @@ Organize around what students should be able to do, not merely topic names. Incl
 
 Do not reproduce an exam or disclose protected answers.
 
-## 10. Communications, surveys, and media
+## 12. Communications, surveys, and media
 
 ### Student communications
 

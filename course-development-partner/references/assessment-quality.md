@@ -8,8 +8,10 @@
 4. Protect fairness and accessibility
 5. Prepare and calibrate scorers
 6. Design for the permitted-AI context
-7. Apply high-stakes release gates
-8. Report claims and limitations
+7. Assess team and collaborative work
+8. Know the grading-system boundary
+9. Apply high-stakes release gates
+10. Report claims and limitations
 
 ## 1. Scale rigor to consequences
 
@@ -118,7 +120,64 @@ Prefer assessment evidence aligned to the objective, such as:
 
 Do not claim an item is “AI-proof.” Do not default to surveillance, hidden traps, or unnecessary complexity. Check whether an AI restriction changes the construct, creates unequal access, or adds workload unrelated to the objective.
 
-## 7. Apply high-stakes release gates
+## 7. Assess team and collaborative work
+
+Design the collaboration first using `references/evidence-informed-design.md`. This section covers only how team work becomes a score.
+
+### Separate the claims
+
+Distinguish three different things a team assessment can measure, and score them separately:
+
+- **the team product** — quality of the deliverable itself;
+- **individual learning** — what each student can now do, evidenced individually;
+- **team process** — how the team functioned, when that is a stated outcome.
+
+Do not let a team product score stand as evidence of an individual outcome. Every outcome claimed for an individual needs an individual evidence channel: an individual component, an exam item, an oral check, a documented and attributable contribution, or an individually written analysis.
+
+### Use peer evaluation carefully
+
+Peer input is the only practical window into contribution, and it is also the channel most vulnerable to bias.
+
+1. Assess observable behavior — preparation, meeting attendance, delivering on commitments, quality of contributed work, responsiveness — rather than personality, likability, or global merit.
+2. Use the same criteria and scale for every team, published to students in advance along with exactly how peer scores affect grades.
+3. Collect at least one formative round early enough that a student can respond to the feedback before a grade depends on it.
+4. Keep individual ratings confidential from teammates; return aggregated or summarized feedback.
+5. Require self-assessment alongside peer assessment so that discrepancies are visible.
+6. Have the instructor review the ratings before they affect a grade. Peer scores are evidence for an instructor's judgment, not an automatic grade transformation.
+
+Watch for these failure modes and check for them in the collected data:
+
+- **Bias.** Ratings can track gender, race, language background, and accent rather than contribution. Compare rating patterns across teams and demographic groups when the data support it and privacy allows; a systematic pattern is a reason to reduce the weight of peer input, not to accept it.
+- **Reciprocity and collusion.** Teams that agree in advance to rate everyone identically produce no information. Flat ratings across a whole team are uninformative, not confirmation of equal contribution.
+- **Retaliation.** A student who reports a free-riding teammate may be penalized in return. Provide a route to raise a problem outside the instrument.
+- **Small-n instability.** In a team of three or four, one outlier rating moves an individual score substantially. Bound the effect.
+
+Bound the consequence: cap how much peer input can move an individual grade, define what happens when ratings conflict sharply, and define the escalation and appeal path. State that a validated published instrument is validated for its own population and use, and that a locally modified version does not inherit that claim.
+
+Do not use AI to interpret peer-evaluation narratives into a consequential individual grade. It may organize, de-identify, or summarize them for the instructor's judgment.
+
+### Prevent predictable unfairness
+
+Ask what happens when a team member withdraws, becomes ill, or stops participating, and define the remedy before the term begins rather than case by case. Confirm that the deliverable is achievable by a team whose members have different access, schedules, equipment, or software licenses.
+
+## 8. Know the grading-system boundary
+
+Rubric design and grading-system design are different decisions. This skill designs assessment instruments; the grading system that converts their output into a course grade belongs to the responsible course owner and to institutional policy.
+
+Ask for, rather than infer, the following, because they change how an instrument should be built:
+
+- how scores combine into a course grade — weighted average, category weights, points, or another rule;
+- whether revision, resubmission, retakes, or replacement of a low score are permitted, and under what limits;
+- whether any threshold, gateway, or minimum-competency requirement governs passing;
+- how late work, missed assessments, and excused absences are handled;
+- whether the course uses a conventional points or percentage scheme, a mastery or specifications scheme, or a program-mandated scheme;
+- whether any grade distribution expectation or norm-referenced practice applies.
+
+The revision policy is load-bearing on a pedagogical claim this skill makes elsewhere: feedback should be followed by an opportunity to use it. If no resubmission or later reuse of the skill is possible, say so, and place the feedback where it can still affect a subsequent task instead of implying an opportunity that the grading system does not permit.
+
+Do not propose a change to the grading system, apply a curve, set a passing threshold, or alter weights already approved without the course owner's decision. When an instrument's scoring logic conflicts with the grading system — for example, a mastery-oriented rubric feeding a weighted-average scheme — surface the conflict as a decision card rather than resolving it silently.
+
+## 9. Apply high-stakes release gates
 
 Before releasing a high-stakes assessment, confirm:
 
@@ -136,7 +195,7 @@ Before releasing a high-stakes assessment, confirm:
 
 Treat a failure involving safety, solvability, material unfairness, inaccessible required use, or unsupported consequential interpretation as a blocker.
 
-## 8. Report claims and limitations
+## 10. Report claims and limitations
 
 Use this record:
 

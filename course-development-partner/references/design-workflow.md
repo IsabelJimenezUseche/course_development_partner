@@ -19,7 +19,7 @@ Inputs: user request, available sources, current portable state.
 Actions:
 
 1. Identify teaching use, audience, artifact scope, desired output, and responsible owner.
-2. Select Focused, Project, or Course engagement; use Studio non-blockingly unless Guided, Rapid, or Auto mode is selected. Rapid produces one provisional draft followed by consolidated faculty review. Auto chooses the strongest recommendation, records assumptions and nondelegable blockers, and proceeds without faculty checkpoints or a feedback request.
+2. Select Focused, Project, or Course engagement; use Co-design non-blockingly unless Guided, Rapid, or Auto mode is selected. Rapid produces one provisional draft followed by consolidated faculty review. Auto chooses the strongest recommendation, records assumptions and nondelegable blockers, and proceeds without faculty checkpoints or a feedback request.
 3. Determine whether the task creates, revises, reviews, or adapts. In review-only work, do not edit without authorization.
 4. For Project/Course work, create or update the course-design brief and project index.
 5. Identify the next pivotal question or useful action.
@@ -60,10 +60,12 @@ Output: accepted alignment map.
 
 ## 4. Diagnose the challenge
 
+Establish the current student model from evidence before designing against it: a validated concept inventory or diagnostic for the topic, documented misconception research for the specific concept, the instructor's prior-offering evidence, or a short purpose-built diagnostic. Mark it provisional when none is available. See `references/evidence-informed-design.md` §3.
+
 Identify:
 
 - prerequisites students must activate;
-- common misconceptions and errors;
+- common misconceptions and errors, with the evidence behind them;
 - conceptual, procedural, computational, communication, or transfer difficulty;
 - where students must choose, interpret, compare, justify, diagnose, design, or transfer;
 - supports students need now and supports that should later be removed.
@@ -87,7 +89,9 @@ Draft tasks before polished prose. Use only steps that advance learning. A usefu
 
 For each step, record purpose, learning mechanism, expected evidence, time, student action, instructor/TA move, likely error or model, feedback use, access/participation design, and contingency. Include opening, active work, checkpoints, debrief, closure, and a later opportunity to use feedback.
 
-When appropriate, include retrieval, worked or contrasting examples, self-explanation, scaffold fading, and a transfer task. For collaborative work, define equitable participation, individual accountability, interdependence, team-process support, and evidence of both individual and collective learning.
+When appropriate, include retrieval, worked or contrasting examples, self-explanation, scaffold fading, and a transfer task. Decide distributed and interleaved practice here and record it in the curriculum map, since both are scheduling choices. Make the purpose and success criteria visible to students, and sequence an attainable early success on the target construct.
+
+For collaborative work, define the reason collaboration improves this task, the team formation basis, an early team agreement, a process checkpoint before the final deliverable, equitable participation, individual accountability, interdependence, team-process support, and evidence of both individual and collective learning.
 
 Output: accepted sequence map or lesson storyboard.
 
@@ -106,7 +110,7 @@ Use context only when it changes or clarifies disciplinary reasoning. Define:
 
 Verify discipline-specific and time-sensitive facts. Avoid irrelevant detail, stereotypes, contrived urgency, and fake precision.
 
-For engineering or engineering-technology work, read `references/engineering-authenticity.md` and examine applicable standards, constraints, uncertainty, risk, safety, welfare, ethics, lifecycle effects, stakeholder perspectives, and sociotechnical tradeoffs. Include only relevant dimensions and justify omission of a consequential one.
+For engineering, engineering-technology, computing, laboratory-science, or quantitative work, read `references/stem-authenticity.md`, apply the matching disciplinary profile, and examine applicable standards, constraints, uncertainty, risk, safety, welfare, ethics, lifecycle effects, stakeholder perspectives, and sociotechnical tradeoffs. Include only relevant dimensions and justify omission of a consequential one. Route every hazard-bearing element to the responsible safety owner before students see it.
 
 Use `assets/context-brief.md`.
 
@@ -142,7 +146,7 @@ Run separate passes for:
 6. assessment integrity and fairness;
 7. file and rendering integrity.
 8. evidence rationale and source quality;
-9. engineering authenticity when applicable;
+9. STEM authenticity and, when hazards are present, safety approval;
 10. implementation feasibility and sustainability.
 
 Classify issues as Blocker, Important, or Polish. Correct unambiguous blockers. Request instructor direction when a change alters intent or grading.

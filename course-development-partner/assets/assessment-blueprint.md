@@ -17,7 +17,7 @@
 
 | Item ID | Outcome(s) | Intended interpretation/use | Evidence claim | Cognitive demand | Item type | Dependency | Expected time (min) | Points | Construct-irrelevant barriers | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| A-1 | LO-1 |  |  |  |  | independent |  |  |  | draft |
+| A-1 | LO-1 |  |  | apply |  | independent |  |  |  | draft |
 
 ## Coverage and validity notes
 
@@ -31,5 +31,7 @@
 - Instructor approval:
 
 Status values: `draft`, `review`, `approved`, `blocked`, `retired`.
+
+Cognitive demand values, in ascending order: `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create`. Items below the outcome's demand are legitimate as scaffolding; an outcome whose entire active sample sits below its aligned demand is a coverage gap. See `references/state-contract.md`.
 
 For CSV, add `Assessed outcome scope` and `Evidence level claimed` columns and repeat the same assessment-level values on every row. Use explicit semicolon-separated outcome IDs for an assessment that intentionally samples a subset. Use `all-active` only when every active outcome in the authoritative alignment map belongs to this blueprint.

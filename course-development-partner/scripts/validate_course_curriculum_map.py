@@ -63,6 +63,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Require every active outcome to reach practice and mastery or assessment",
     )
+    parser.add_argument(
+        "--check-practice-distribution",
+        action="store_true",
+        help=(
+            "Report outcomes whose repeated practice is massed in a single module/week "
+            "instead of distributed across the sequence"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -90,6 +98,7 @@ def validate(
     path: Path,
     max_hours: float | None,
     require_complete_progression: bool = False,
+    check_practice_distribution: bool = False,
 ) -> tuple[list[str], list[str]]:
     try:
         _, headers, raw_rows = load_table(path, REQUIRED)
@@ -108,6 +117,7 @@ def validate(
     external_prior_by_outcome: set[str] = set()
     graph: dict[str, set[str]] = defaultdict(set)
     workload_by_module: dict[str, float] = defaultdict(float)
+    practice_modules: dict[str, list[str]] = defaultdict(list)
 
     for row_number, raw in enumerate(raw_rows, start=1):
         row = normalized_row(raw, mapping)
@@ -248,6 +258,10 @@ def validate(
                 )
         pending_stages[outcome_id].update(stages & ALLOWED_STAGES)
         all_stages[outcome_id].update(stages & ALLOWED_STAGES)
+        if "practice" in stages and normalize(row["module/week"]):
+            # A blank module/week is reported separately as a missing field; without it
+            # there is no placement to judge, so it cannot count toward massed practice.
+            practice_modules[outcome_id].append(normalize(row["module/week"]))
 
         if stages & {"master", "assess"} and not row["feedback/assessment"]:
             issues.append(
@@ -287,6 +301,15 @@ def validate(
                     f"{outcome_id.upper()}: complete progression is missing mastery or assessment"
                 )
 
+    if check_practice_distribution:
+        for outcome_id in sorted(practice_modules):
+            modules = practice_modules[outcome_id]
+            if len(modules) >= 2 and len(set(modules)) == 1:
+                issues.append(
+                    f"{outcome_id.upper()}: {len(modules)} practice occurrences are massed in "
+                    f"module/week {modules[0]}; distribute practice across the sequence"
+                )
+
     if max_hours is not None:
         for module, hours in sorted(workload_by_module.items()):
             if hours > max_hours:
@@ -303,6 +326,7 @@ def main() -> int:
         args.path,
         args.max_hours_per_module,
         args.require_complete_progression,
+        args.check_practice_distribution,
     )
     for item in errors:
         print(f"ERROR: {item}")

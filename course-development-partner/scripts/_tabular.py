@@ -15,9 +15,32 @@ from urllib.parse import unquote, urlparse
 IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9][A-Za-z0-9_-]*$")
 REMOTE_SCHEMES = {"http", "https", "mailto", "data", "app", "plugin"}
 
+# Ordinal cognitive-demand vocabulary shared by the alignment map, the assessment
+# blueprint, and cross-file demand-match checks. Ranks are comparable; higher means
+# a more demanding target. Instructors using SOLO, Depth of Knowledge, or a
+# discipline-specific scale map their level onto these tokens in the state files.
+COGNITIVE_DEMANDS: dict[str, int] = {
+    "remember": 1,
+    "understand": 2,
+    "apply": 3,
+    "analyze": 4,
+    "evaluate": 5,
+    "create": 6,
+}
+
 
 def normalize(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def parse_cognitive_demand(value: str) -> int | None:
+    """Return the ordinal rank of a controlled cognitive-demand token, or None."""
+    return COGNITIVE_DEMANDS.get(normalize(value))
+
+
+def cognitive_demand_vocabulary() -> str:
+    """Return the controlled tokens in ascending rank order for error messages."""
+    return ", ".join(sorted(COGNITIVE_DEMANDS, key=COGNITIVE_DEMANDS.get))
 
 
 def split_markdown_row(line: str) -> list[str]:

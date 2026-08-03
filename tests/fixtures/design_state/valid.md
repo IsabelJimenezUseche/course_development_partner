@@ -25,7 +25,7 @@
 
 ## Collaboration
 
-- Interaction level: Studio
+- Interaction level: Co-design
 - Requested artifacts: Student worksheet.
 
 ## Status

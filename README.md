@@ -9,8 +9,11 @@ The skill is designed for skills-compatible agents and portable Markdown handoff
 - Course, module, lesson, and activity design
 - Lecture-to-active-learning redesign
 - Context-rich disciplinary problems
+- Laboratory, studio, field, design-project, and capstone experiences, with safety routed to the responsible owner
 - Assessments, solution keys, and feedback guides
 - Interactive rubric construction and calibration
+- Team learning, peer evaluation, and individual-versus-team evidence
+- Teaching-assistant and grader preparation, and class-size adaptation
 - Worksheets, study guides, slide storyboards, visuals, surveys, and communications
 - Review of legacy teaching materials
 - Technical, pedagogical, accessibility, fairness, and artifact validation
@@ -26,9 +29,16 @@ The core design chain is:
 
 > learning outcome → evidence of learning → learning activity → instructional support → feedback or assessment
 
+Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint validator reports an outcome whose entire active assessment sample falls below its aligned demand, while allowing lower-demand scaffolding items.
+
+Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval, and every teaching-ready artifact must declare a safety review in its manifest or state that none is required.
+
 The skill also:
 
 - inspects supplied course materials before asking for information;
+- establishes what students already know from a diagnostic, a validated concept inventory, documented research, or the instructor's prior-offering evidence rather than assumption;
+- distributes and interleaves practice across the course sequence, and states the in-the-moment performance cost of doing so;
+- designs for motivation, self-efficacy, and belonging alongside the cognitive path;
 - records confirmed facts, working assumptions, and open decisions;
 - previews small design structures before producing large artifacts;
 - makes authentic context affect student reasoning rather than merely decorating a problem;
@@ -46,12 +56,12 @@ The skill also:
 
 | Mode | How it works |
 |---|---|
-| **Studio — default** | Uses frequent, focused co-design checkpoints for consequential decisions. |
+| **Co-design — default** | Uses frequent, focused checkpoints on each consequential decision. |
 | **Guided** | Requests instructor review at major phase boundaries. |
 | **Rapid** | Produces the complete provisional draft in one pass without intermediate checkpoints, then requests one consolidated faculty review. |
 | **Auto** | Works without faculty checkpoints, selects the strongest recommended option, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
 
-Studio is a non-blocking default rather than a required mode-selection exchange. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
+Co-design is a non-blocking default rather than a required mode-selection exchange. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
 
 ## Educational-design workflow
 
@@ -84,6 +94,8 @@ The supported orientations are:
 - **Balanced:** anchors criteria and weights in the educational objectives, then treats errors according to how much they undermine the targeted learning.
 
 The skill selects a recommendation from the construct and stakes rather than using a universal default. Objective-achievement or balanced logic usually fits partial, multidimensional, reasoned, or legitimately diverse evidence; checklist/mastery or explicit error rules fit verified discrete, threshold, or safety-critical requirements.
+
+The grading system itself — weighting, revision and retake policy, thresholds, late work, and any mandated scheme — stays with the course owner. The skill asks for it rather than inferring it, because it determines whether feedback can actually be used, and it surfaces conflicts between an instrument's scoring logic and the grading system instead of resolving them silently.
 
 After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies the rubric, diagnoses disagreements, proposes focused revisions, re-scores the examples, and records approved boundary interpretations in a separate grader guide.
 
@@ -172,11 +184,19 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, and package inventory boundaries. Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or `all-active`; retired records remain structurally checked but do not satisfy current coverage, artifact-family, progression, dependency, or workload requirements; Course-tier production requires a curriculum map; Course-tier handoff requires ordered active-outcome progression; and the project index contains one confined, resolvable entry per state file.
 
-Run the repository tests with:
+Run the repository tests **from the repository root**:
 
 ```bash
 python3 -m unittest discover -s tests -v
 python3 tests/check_repository.py
 ```
+
+The working directory matters. `unittest` resolves `-s tests` as a path only when that path exists relative to the current directory; otherwise it falls back to treating `tests` as a dotted module name. Some third-party packages install a top-level `tests` package into `site-packages`, so from any other directory that fallback silently discovers and runs *their* suite instead of this one — reporting unrelated errors that look like failures in this repository. To run from elsewhere, give an absolute path:
+
+```bash
+python3 -m unittest discover -s /path/to/course_development_partner/tests
+```
+
+Do not add `-t .` to work around this: `tests/` is intentionally not an importable package, and a separate top-level directory makes discovery fail outright.
 
 Exploratory forward tests have covered focused review, accessibility-authority, visual-design, STEM, non-STEM, and rubric-calibration scenarios, but the historical records do not retain all metadata, responses, and evaluator evidence required for a current passing claim. See [the current test index](tests/test-index.md) for current, historical, and pending evidence. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts were produced and inspected, but those temporary files were not retained; [the historical report](tests/rich-artifact-production-report.md) therefore remains bounded and non-reproducible. Current behavioral reruns, live integrations, a faithful mock institutional authorization flow, a retained rich-artifact rerun, and clean bidirectional named-client installation and handoff still require testing before broader production or compatibility claims.
