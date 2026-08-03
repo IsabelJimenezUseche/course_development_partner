@@ -455,6 +455,33 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_teaching_ready_distinguishes_prose_from_a_local_review_path(
+        self,
+    ) -> None:
+        prose_result = run_script(
+            "validate_artifact_manifest.py",
+            self._teaching_ready_row("Approved by EHS. See lab binder"),
+        )
+        self.assertEqual(
+            prose_result.returncode,
+            2,
+            prose_result.stdout + prose_result.stderr,
+        )
+        self.assertIn(
+            "must be a review reference",
+            prose_result.stdout,
+        )
+
+        path_result = run_script(
+            "validate_artifact_manifest.py",
+            self._teaching_ready_row("safety reviews/lab approval.pdf"),
+        )
+        self.assertEqual(
+            path_result.returncode,
+            0,
+            path_result.stdout + path_result.stderr,
+        )
+
     def test_teaching_ready_rejects_pending_or_bare_safety_status(self) -> None:
         for safety in ("pending", "approved"):
             with self.subTest(safety=safety):
@@ -526,6 +553,18 @@ class AssessmentBlueprintValidatorTests(unittest.TestCase):
             "LO-1",
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_comma_separated_outcomes_are_rejected_with_separator_help(self) -> None:
+        content = """# Assessment Blueprint
+- Assessed outcome scope: LO-1; LO-2
+| Item ID | Outcome(s) | Intended interpretation/use | Evidence claim | Cognitive demand | Item type | Dependency | Expected time (min) | Points | Construct-irrelevant barriers | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A-1 | LO-1, LO-2 | Formative feedback | Explain a relationship | Analyze | Constructed response | independent | 12 | 10 | none identified | approved |
+- Evidence level claimed: classroom-reviewed
+"""
+        result = run_script("validate_assessment_blueprint.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("use semicolons between identifiers", result.stdout)
 
     def test_blueprint_detects_missing_coverage_and_overclaim(self) -> None:
         content = """# Assessment Blueprint
@@ -1025,6 +1064,25 @@ class CourseCurriculumMapValidatorTests(unittest.TestCase):
         result = run_script("validate_course_curriculum_map.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("unknown prerequisite outcome lo-9", result.stdout)
+
+    def test_comma_separated_prerequisites_are_rejected_with_separator_help(
+        self,
+    ) -> None:
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-3 | introduce | LO-1, LO-2 | Initial model | Feedback | 2 | review |
+"""
+        result = run_script("validate_course_curriculum_map.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("use semicolons between identifiers", result.stdout)
+
+    def test_external_prerequisite_description_preserves_a_comma(self) -> None:
+        content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | LO-1 | introduce | external: OSHA standard, 2024 edition | Initial model | Feedback | 2 | approved |
+"""
+        result = run_script("validate_course_curriculum_map.py", content)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_prerequisite_must_be_developed_before_dependent_outcome(self) -> None:
         content = """| Sequence | Module/week | Outcome ID | Developmental stage | Outcome prerequisites | Learning experience/evidence | Feedback/assessment | Expected student workload (hours) | Status |

@@ -80,21 +80,21 @@ def parse_prerequisites(value: str) -> tuple[set[str], bool, list[str]]:
     internal: set[str] = set()
     has_external = False
     invalid: list[str] = []
-    for token in (part.strip() for part in re.split(r"[;,]", value) if part.strip()):
+    for token in (part.strip() for part in value.split(";") if part.strip()):
         normalized = normalize(token)
         if normalized == "none":
             continue
         if normalized.startswith("external:"):
             has_external = True
             if not token.split(":", 1)[1].strip():
-                invalid.append(token)
+                invalid.append("external prerequisite is missing a source")
             continue
         try:
             internal.update(
                 parse_identifier_list(token, field_name="prerequisite outcome")
             )
-        except ValueError:
-            invalid.append(token)
+        except ValueError as exc:
+            invalid.append(str(exc))
     return internal, has_external, invalid
 
 
@@ -170,7 +170,7 @@ def validate(
             for invalid_prerequisite in invalid_prerequisites:
                 issues.append(
                     f"Row {row_number} ({row['outcome id'] or 'missing outcome'}): "
-                    f"invalid prerequisite {invalid_prerequisite}"
+                    f"invalid prerequisite: {invalid_prerequisite}"
                 )
             if (
                 row["expected student workload (hours)"]
@@ -259,7 +259,8 @@ def validate(
             external_prior_by_outcome.add(outcome_id)
         for invalid_prerequisite in invalid_prerequisites:
             issues.append(
-                f"Row {row_number} ({row['outcome id']}): invalid prerequisite {invalid_prerequisite}"
+                f"Row {row_number} ({row['outcome id']}): invalid prerequisite: "
+                f"{invalid_prerequisite}"
             )
         for prerequisite in sorted(prerequisites & outcome_ids):
             if (

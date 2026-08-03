@@ -215,6 +215,11 @@ def normalized_row(raw: dict[str, str], mapping: dict[str, str]) -> dict[str, st
 
 
 def parse_identifier_list(value: str, *, field_name: str) -> set[str]:
+    if "," in value:
+        raise ValueError(
+            f"invalid {field_name} identifier list uses a comma; "
+            "use semicolons between identifiers"
+        )
     tokens = [token.strip() for token in value.split(";") if token.strip()]
     if value.strip() and not tokens:
         raise ValueError(

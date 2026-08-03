@@ -54,6 +54,17 @@ UNAPPROVED_SAFETY_STATES = {
     "unreviewed",
     "unverified",
 }
+REVIEW_REFERENCE_SUFFIXES = {
+    ".doc",
+    ".docx",
+    ".htm",
+    ".html",
+    ".md",
+    ".odt",
+    ".pdf",
+    ".rtf",
+    ".txt",
+}
 VALID_ARTIFACT_TYPES = {
     "markdown",
     "document",
@@ -124,10 +135,9 @@ def looks_like_review_reference(value: str) -> bool:
     target = value.strip()
     if re.fullmatch(r"!?\[[^\]]*\]\(.+\)", target):
         return True
-    parsed = re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", target)
-    if parsed:
+    if re.fullmatch(r"[A-Za-z][A-Za-z0-9+.-]*://\S+", target):
         return True
-    return "/" in target or bool(Path(target).suffix)
+    return Path(target).suffix.casefold() in REVIEW_REFERENCE_SUFFIXES
 
 
 def parse_args() -> argparse.Namespace:
