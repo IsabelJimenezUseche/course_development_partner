@@ -183,6 +183,52 @@ class DesignStateValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
+class LookalikeCharacterTests(unittest.TestCase):
+    """Typographic look-alikes must not decide whether a valid file is accepted.
+
+    Generated Markdown routinely carries a non-breaking hyphen or an en dash where
+    ASCII was meant. A reader cannot see the difference, so rejecting the file
+    teaches nothing and the author has no way to find the cause.
+    """
+
+    def test_non_breaking_hyphen_in_a_column_heading_is_accepted(self) -> None:
+        """The exact failure seen in production: `Construct-irrelevant barriers`
+        written with U+2011 made the whole blueprint unparseable."""
+        blueprint = (FIXTURES / "assessment_blueprint" / "valid.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Construct-irrelevant barriers", blueprint)
+        # Swap only the ASCII hyphen for U+2011 NON-BREAKING HYPHEN.
+        hyphenated = blueprint.replace(
+            "Construct-irrelevant barriers", "Construct‑irrelevant barriers"
+        )
+        self.assertNotEqual(blueprint, hyphenated)
+
+        control = run_script("validate_assessment_blueprint.py", blueprint)
+        result = run_script("validate_assessment_blueprint.py", hyphenated)
+
+        self.assertEqual(control.returncode, 0, control.stdout + control.stderr)
+        self.assertEqual(
+            result.returncode,
+            control.returncode,
+            f"one look-alike character changed the verdict:\n{result.stdout}",
+        )
+
+    def test_en_dash_in_a_controlled_token_is_still_rejected(self) -> None:
+        """Folding must not turn an unknown token into a valid one."""
+        sys.path.insert(0, str(SCRIPTS))
+        try:
+            from _tabular import fold_lookalikes, normalize, parse_cognitive_demand
+        finally:
+            sys.path.pop(0)
+
+        self.assertEqual(fold_lookalikes("Construct‑irrelevant"), "Construct-irrelevant")
+        self.assertEqual(normalize("Construct‑irrelevant"), "construct-irrelevant")
+        # A look-alike inside a real word is folded, but nonsense stays nonsense.
+        self.assertIsNone(parse_cognitive_demand("analyse‑ish"))
+        self.assertEqual(parse_cognitive_demand("Analyze"), 4)
+
+
 class AlignmentValidatorTests(unittest.TestCase):
     def test_complete_alignment_passes(self) -> None:
         content = """# Alignment Map

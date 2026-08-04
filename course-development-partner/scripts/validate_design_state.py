@@ -14,6 +14,8 @@ import re
 import sys
 from pathlib import Path
 
+from _tabular import fold_lookalikes
+
 
 REQUIRED_H2 = (
     "course context",
@@ -75,7 +77,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def normalize_heading(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
+    return re.sub(r"\s+", " ", fold_lookalikes(value).strip().lower())
 
 
 def section_body(text: str, heading: str, level: int) -> str:

@@ -29,8 +29,34 @@ COGNITIVE_DEMANDS: dict[str, int] = {
 }
 
 
+# Typographic characters that look like their ASCII counterparts and routinely arrive
+# in generated Markdown: a column heading written with a non-breaking hyphen reads as
+# identical to a human and fails an exact match. Folded for comparison only, so the
+# file's own text is never rewritten and error messages still echo what was written.
+LOOKALIKE_CHARACTERS = {
+    "‐": "-",  # hyphen
+    "‑": "-",  # non-breaking hyphen
+    "‒": "-",  # figure dash
+    "–": "-",  # en dash
+    "—": "-",  # em dash
+    "−": "-",  # minus sign
+    " ": " ",  # no-break space
+    " ": " ",  # narrow no-break space
+    "‘": "'",  # left single quote
+    "’": "'",  # right single quote
+    "“": '"',  # left double quote
+    "”": '"',  # right double quote
+}
+_LOOKALIKE_TABLE = str.maketrans(LOOKALIKE_CHARACTERS)
+
+
+def fold_lookalikes(value: str) -> str:
+    """Map typographic look-alikes onto ASCII so matching compares meaning, not glyphs."""
+    return value.translate(_LOOKALIKE_TABLE)
+
+
 def normalize(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
+    return re.sub(r"\s+", " ", fold_lookalikes(value).strip().lower())
 
 
 def parse_cognitive_demand(value: str) -> int | None:
