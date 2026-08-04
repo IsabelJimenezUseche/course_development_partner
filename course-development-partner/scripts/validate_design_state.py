@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-from _tabular import fold_lookalikes
+from _tabular import fold_lookalikes, emit_report
 
 
 REQUIRED_H2 = (
@@ -73,6 +73,11 @@ def parse_args() -> argparse.Namespace:
         default="establish",
         help="Completion profile to apply (default: establish)",
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
+    )
     return parser.parse_args()
 
 
@@ -121,14 +126,17 @@ def field_values(text: str) -> tuple[dict[str, str], set[str]]:
     return {field: value for field, (value, _) in located.items()}, duplicates
 
 
-def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[str]]:
+def validate_detailed(
+    path: Path, profile: str = "establish"
+) -> tuple[list[str], list[str], list[str]]:
+    """Return (errors, blocking gaps, advisory notes) for one brief at one phase."""
     if not path.is_file():
-        return [f"File does not exist: {path}"], []
+        return [f"File does not exist: {path}"], [], []
 
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as exc:
-        return [f"Cannot read {path}: {exc}"], []
+        return [f"Cannot read {path}: {exc}"], [], []
 
     heading_records = [
         (len(match.group(1)), normalize_heading(match.group(2)))
@@ -179,16 +187,25 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
             more = f" (+{len(hits) - 5} more)" if len(hits) > 5 else ""
             incomplete.append(f"{message} on line {shown}{more}")
 
+    # A field the current phase does not ask for is not yet a gap. An instructor at
+    # `establish` may legitimately not know their fallback plan or accessibility
+    # contact; those belong to `produce` and `handoff`. Blanks outside the phase's
+    # own list are recorded so nothing is lost, but they do not withhold the pass.
     located_fields, _ = field_lines(text)
-    unanswered = sorted(
+    required_now = set(PROFILE_REQUIRED_FIELDS[profile])
+    notes: list[str] = []
+    deferred = sorted(
         (lineno, field)
         for field, (value, lineno) in located_fields.items()
-        if not value
+        if not value and field not in required_now
     )
-    for lineno, field in unanswered[:8]:
-        incomplete.append(f"Unanswered field on line {lineno}: {field}")
-    if len(unanswered) > 8:
-        incomplete.append(f"{len(unanswered) - 8} further fields are unanswered")
+    for lineno, field in deferred[:8]:
+        notes.append(f"Unanswered field on line {lineno}: {field}")
+    if len(deferred) > 8:
+        notes.append(
+            f"{len(deferred) - 8} further fields are unanswered and not required "
+            f"for {profile}"
+        )
 
     for heading in REQUIRED_H3:
         body = section_body(text, heading, 3)
@@ -223,25 +240,31 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
     if engagement_tier and engagement_tier not in VALID_ENGAGEMENT_TIERS:
         incomplete.append(f"Unknown engagement tier: {values['engagement tier']}")
 
-    return errors, sorted(set(incomplete))
+    return errors, sorted(set(incomplete)), sorted(set(notes))
+
+
+def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[str]]:
+    """Blocking findings only, for callers that judge pass or fail.
+
+    Advisory notes are dropped here on purpose: a caller asking "does this brief
+    clear its phase" should not be told no because a later phase's field is blank.
+    """
+    errors, incomplete, _ = validate_detailed(path, profile)
+    return errors, incomplete
 
 
 def main() -> int:
     args = parse_args()
-    errors, incomplete = validate(args.path, args.profile)
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in incomplete:
-        print(f"INCOMPLETE: {item}")
-    if errors:
-        return 1
-    if incomplete:
-        return 2
-    print(
-        f"OK: structurally complete course-design brief for profile {args.profile}; "
-        f"manual design review still required: {args.path}"
+    errors, incomplete, notes = validate_detailed(args.path, args.profile)
+    return emit_report(
+        args.path,
+        errors,
+        incomplete,
+        issue_label="INCOMPLETE",
+        ok_message=f"structurally complete course-design brief for profile {args.profile}; manual design review still required: {args.path}",
+        as_json=args.json,
+        notes=notes,
     )
-    return 0
 
 
 if __name__ == "__main__":

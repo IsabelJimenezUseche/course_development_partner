@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from _tabular import (
+    emit_report,
     load_table,
     local_reference_path,
     normalize,
@@ -157,6 +158,11 @@ def parse_args() -> argparse.Namespace:
         "--check-paths",
         action="store_true",
         help="Verify local file references relative to the manifest directory",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
     )
     return parser.parse_args()
 
@@ -370,18 +376,14 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
 def main() -> int:
     args = parse_args()
     errors, issues = validate(args.path, args.check_paths)
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in issues:
-        print(f"ISSUE: {item}")
-    if errors:
-        return 1
-    if issues:
-        return 2
-    print(
-        f"OK: manifest readiness rules passed; manual release review still required: {args.path}"
+    return emit_report(
+        args.path,
+        errors,
+        issues,
+        issue_label="ISSUE",
+        ok_message=f"manifest readiness rules passed; manual release review still required: {args.path}",
+        as_json=args.json,
     )
-    return 0
 
 
 if __name__ == "__main__":

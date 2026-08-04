@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from _tabular import (
+    emit_report,
     COGNITIVE_DEMANDS,
     cognitive_demand_vocabulary,
     find_cycles,
@@ -82,6 +83,11 @@ def parse_args() -> argparse.Namespace:
         "--alignment-map",
         type=Path,
         help="Optional alignment map that bounds and validates the declared assessed-outcome scope",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
     )
     return parser.parse_args()
 
@@ -384,18 +390,14 @@ def main() -> int:
         args.allow_formal_validation,
         args.alignment_map,
     )
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in issues:
-        print(f"GAP: {item}")
-    if errors:
-        return 1
-    if issues:
-        return 2
-    print(
-        f"OK: blueprint structural and declared-coverage checks passed; manual validity review still required: {args.path}"
+    return emit_report(
+        args.path,
+        errors,
+        issues,
+        issue_label="GAP",
+        ok_message=f"blueprint structural and declared-coverage checks passed; manual validity review still required: {args.path}",
+        as_json=args.json,
     )
-    return 0
 
 
 if __name__ == "__main__":

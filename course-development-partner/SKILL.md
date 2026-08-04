@@ -98,6 +98,8 @@ Run applicable validators when their input exists and code execution is availabl
 - `scripts/validate_course_curriculum_map.py`
 - `scripts/validate_project.py`
 
+Every validator shares one contract. Exit `0` means the structural checks passed, `1` means a hard error — the file could not be read as its schema claims — and `2` means gaps or incompleteness: the file parses, but a design step has not been taken yet. Keep the two apart, because an error is something to fix and a gap is something to finish. Findings print one per line on stdout, prefixed `ERROR:`, `GAP:`, `ISSUE:`, or `INCOMPLETE:`, and a clean run prints a single `OK:` line. Pass `--json` to receive `{path, status, exit_code, findings[{level, message}], summary}` instead; use that form whenever a tool or agent runs these in a loop rather than a person reading output, and act on the findings before replying rather than reporting them onward unresolved.
+
 Treat script success as bounded structural evidence, not a substitute for manual educational, technical, accessibility, or release review.
 
 For `validate_project.py`, select `--design-profile establish`, `produce`, or `handoff` to match the current phase. Treat missing profile- or tier-required state files as gaps rather than omitting them from the index. Keep indexed state inside the portable project directory. At Course-tier handoff, require every active aligned outcome to appear in the curriculum map and require the map to show introduction or a declared external prior, practice, and mastery or assessment.

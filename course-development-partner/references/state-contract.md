@@ -41,6 +41,12 @@ Keep retired records structurally valid enough to preserve trustworthy history. 
 
 Use semicolons for controlled multi-value cells. Use `none` only when the template permits it. Do not use `TBD`, `TODO`, or a blank-equivalent value as validation evidence.
 
+When a field cannot be answered because nobody has supplied the fact, say so in the field rather than leaving it blank. Write what is missing and who would supply it — `not yet supplied by the course owner`, `not yet identified by an authorized source` — and carry the same item in the `Open` section. A blank is indistinguishable from an oversight, so it reads as work forgotten rather than a decision still owed; a named absence is an answer, records where the authority sits, and survives validation at every profile. Reserve `none` for a field that genuinely does not apply, and never use it to mean "unknown".
+
+Identifiers are `PREFIX-SUFFIX`: a letter-led prefix, a hyphen, then alphanumerics — `LO-1`, `M-2`, `ART-3`. `M1` is not an identifier. Separate several with semicolons, never commas.
+
+Write plain ASCII hyphens, apostrophes, and quotation marks in column headings and controlled tokens. Typographic look-alikes such as the non-breaking hyphen, en dash, and curly quote are folded before matching, so they will not fail a check, but they make files harder to diff and search.
+
 ### Cognitive demand
 
 `Cognitive demand` is a controlled, ordered field wherever it appears — the alignment map and the assessment blueprint. Use exactly one token:

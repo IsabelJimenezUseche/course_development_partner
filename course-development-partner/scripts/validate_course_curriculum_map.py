@@ -16,6 +16,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from _tabular import (
+    emit_report,
     find_cycles,
     load_table,
     normalize,
@@ -72,6 +73,11 @@ def parse_args() -> argparse.Namespace:
             "Report outcomes whose repeated practice is massed in a single module/week "
             "instead of distributed across the sequence"
         ),
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
     )
     return parser.parse_args()
 
@@ -364,18 +370,14 @@ def main() -> int:
         args.require_complete_progression,
         args.check_practice_distribution,
     )
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in issues:
-        print(f"GAP: {item}")
-    if errors:
-        return 1
-    if issues:
-        return 2
-    print(
-        f"OK: curriculum sequence and declared-coherence checks passed; manual course review still required: {args.path}"
+    return emit_report(
+        args.path,
+        errors,
+        issues,
+        issue_label="GAP",
+        ok_message=f"curriculum sequence and declared-coherence checks passed; manual course review still required: {args.path}",
+        as_json=args.json,
     )
-    return 0
 
 
 if __name__ == "__main__":

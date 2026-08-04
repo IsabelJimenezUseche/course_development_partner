@@ -121,6 +121,44 @@ class DesignStateValidatorTests(unittest.TestCase):
             "unanswered for establish: engagement tier", result.stdout.lower()
         )
 
+    def test_profile_decides_the_verdict_not_every_blank_field(self) -> None:
+        """An instructor at `establish` is not blocked by a later phase's field.
+
+        `Minimum viable fallback` is required at produce and handoff and not at
+        establish, so the same brief must clear establish and be held at the others.
+        Before this, any blank anywhere failed all three and `--profile` could not
+        change a verdict.
+        """
+        brief = (FIXTURES / "design_state" / "valid.md").read_text(encoding="utf-8")
+        blanked = re.sub(
+            r"^- Minimum viable fallback:.*$",
+            "- Minimum viable fallback:",
+            brief,
+            flags=re.MULTILINE,
+        )
+        self.assertNotEqual(brief, blanked, "fixture lacks the field this test needs")
+
+        establish = run_script("validate_design_state.py", blanked, ".md", "--profile", "establish")
+        produce = run_script("validate_design_state.py", blanked, ".md", "--profile", "produce")
+
+        self.assertEqual(establish.returncode, 0, establish.stdout + establish.stderr)
+        self.assertIn("NOTE:", establish.stdout)
+        self.assertEqual(produce.returncode, 2, produce.stdout + produce.stderr)
+        self.assertIn("minimum viable fallback", produce.stdout.lower())
+
+    def test_advisory_notes_never_change_the_exit_code(self) -> None:
+        sys.path.insert(0, str(SCRIPTS))
+        try:
+            from _tabular import emit_report
+        finally:
+            sys.path.pop(0)
+
+        code = emit_report(
+            "x.md", [], [], issue_label="INCOMPLETE", ok_message="fine",
+            notes=["Unanswered field on line 9: something later"],
+        )
+        self.assertEqual(code, 0)
+
     def test_unanswered_fields_are_reported_with_a_location(self) -> None:
         """A bare 'a field is unanswered' is unactionable in a 67-field template."""
         template = (
@@ -181,6 +219,53 @@ class DesignStateValidatorTests(unittest.TestCase):
         )
         result = run_script("validate_design_state.py", content)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+class MachineReadableReportTests(unittest.TestCase):
+    """A caller driving these in a loop should read findings, not parse prose."""
+
+    VALIDATORS = (
+        ("validate_alignment_map.py", "alignment"),
+        ("validate_assessment_blueprint.py", "assessment_blueprint"),
+        ("validate_artifact_manifest.py", "artifact_manifest"),
+        ("validate_course_curriculum_map.py", "course_curriculum_map"),
+        ("validate_design_state.py", "design_state"),
+    )
+
+    def test_every_validator_emits_json_matching_its_exit_code(self) -> None:
+        for script, fixture_dir in self.VALIDATORS:
+            for name, expected in (
+                ("valid", "pass"),
+                ("invalid", "incomplete"),
+                ("malformed", "fail"),
+            ):
+                path = FIXTURES / fixture_dir / f"{name}.md"
+                if not path.is_file():
+                    continue
+                with self.subTest(script=script, fixture=name):
+                    result = run_path(script, path, "--json")
+                    payload = json.loads(result.stdout)
+                    # The exit code and the reported status must never disagree.
+                    self.assertEqual(payload["exit_code"], result.returncode)
+                    self.assertEqual(payload["status"], expected)
+                    if expected != "pass":
+                        self.assertTrue(
+                            payload["findings"], "a failing run must report findings"
+                        )
+                        for finding in payload["findings"]:
+                            self.assertIn("level", finding)
+                            self.assertIn("message", finding)
+
+    def test_json_flag_does_not_change_the_verdict(self) -> None:
+        for script, fixture_dir in self.VALIDATORS:
+            path = FIXTURES / fixture_dir / "invalid.md"
+            if not path.is_file():
+                continue
+            with self.subTest(script=script):
+                self.assertEqual(
+                    run_path(script, path).returncode,
+                    run_path(script, path, "--json").returncode,
+                )
 
 
 class LookalikeCharacterTests(unittest.TestCase):

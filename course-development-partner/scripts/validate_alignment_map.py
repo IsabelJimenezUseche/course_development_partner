@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from _tabular import (
+    emit_report,
     cognitive_demand_vocabulary,
     load_table,
     normalize,
@@ -48,6 +49,11 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to alignment-map.md or a CSV equivalent")
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
+    )
     return parser.parse_args()
 
 
@@ -122,16 +128,14 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
 def main() -> int:
     args = parse_args()
     errors, issues = validate(args.path)
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in issues:
-        print(f"GAP: {item}")
-    if errors:
-        return 1
-    if issues:
-        return 2
-    print(f"OK: structurally complete alignment map; manual alignment review still required: {args.path}")
-    return 0
+    return emit_report(
+        args.path,
+        errors,
+        issues,
+        issue_label="GAP",
+        ok_message=f"structurally complete alignment map; manual alignment review still required: {args.path}",
+        as_json=args.json,
+    )
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ import validate_assessment_blueprint
 import validate_course_curriculum_map
 import validate_design_state
 from _tabular import (
+    emit_report,
     load_table,
     local_reference_path,
     normalize,
@@ -88,6 +89,11 @@ def parse_args() -> argparse.Namespace:
             "Report outcomes whose repeated practice is massed in a single module/week "
             "in the course curriculum map"
         ),
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit findings as JSON for programmatic callers",
     )
     return parser.parse_args()
 
@@ -454,18 +460,14 @@ def main() -> int:
         args.allow_formal_validation,
         args.check_practice_distribution,
     )
-    for item in errors:
-        print(f"ERROR: {item}")
-    for item in issues:
-        print(f"ISSUE: {item}")
-    if errors:
-        return 1
-    if issues:
-        return 2
-    print(
-        f"OK: indexed structural and cross-file checks passed; manual project review still required: {args.path}"
+    return emit_report(
+        args.path,
+        errors,
+        issues,
+        issue_label="ISSUE",
+        ok_message=f"indexed structural and cross-file checks passed; manual project review still required: {args.path}",
+        as_json=args.json,
     )
-    return 0
 
 
 if __name__ == "__main__":

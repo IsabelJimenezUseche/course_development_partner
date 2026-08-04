@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import math
 import re
 from collections import defaultdict
@@ -53,6 +54,68 @@ _LOOKALIKE_TABLE = str.maketrans(LOOKALIKE_CHARACTERS)
 def fold_lookalikes(value: str) -> str:
     """Map typographic look-alikes onto ASCII so matching compares meaning, not glyphs."""
     return value.translate(_LOOKALIKE_TABLE)
+
+
+# Shared across every validator: 0 clean, 1 hard errors, 2 gaps or incompleteness.
+# A gap is a design step not taken yet; an error is a file that could not be read as
+# claimed. Keeping them apart is the difference between "finish this" and "fix this".
+EXIT_PASS = 0
+EXIT_ERROR = 1
+EXIT_INCOMPLETE = 2
+
+
+def emit_report(
+    path: object,
+    errors: list[str],
+    issues: list[str],
+    *,
+    issue_label: str,
+    ok_message: str,
+    as_json: bool = False,
+    notes: list[str] | None = None,
+) -> int:
+    """Print one validator's findings and return its exit code.
+
+    The text form is unchanged. The JSON form exists because a caller driving these
+    scripts in a loop should not have to parse prose and infer the exit convention;
+    it reads the same findings as data.
+    """
+    # Notes are advisory and never change the verdict: they record work that belongs
+    # to a later phase, which is not the same as work left undone in this one.
+    notes = notes or []
+    code = EXIT_ERROR if errors else (EXIT_INCOMPLETE if issues else EXIT_PASS)
+    if as_json:
+        findings = [{"level": "error", "message": item} for item in errors]
+        findings += [
+            {"level": issue_label.lower(), "message": item} for item in issues
+        ]
+        findings += [{"level": "note", "message": item} for item in notes]
+        print(
+            json.dumps(
+                {
+                    "path": str(path),
+                    "status": {
+                        EXIT_PASS: "pass",
+                        EXIT_ERROR: "fail",
+                        EXIT_INCOMPLETE: "incomplete",
+                    }[code],
+                    "exit_code": code,
+                    "findings": findings,
+                    "summary": ok_message if code == EXIT_PASS else "",
+                },
+                indent=2,
+            )
+        )
+        return code
+    for item in errors:
+        print(f"ERROR: {item}")
+    for item in issues:
+        print(f"{issue_label}: {item}")
+    for item in notes:
+        print(f"NOTE: {item}")
+    if code == EXIT_PASS:
+        print(f"OK: {ok_message}")
+    return code
 
 
 def normalize(value: str) -> str:
