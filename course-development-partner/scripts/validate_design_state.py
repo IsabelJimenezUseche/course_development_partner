@@ -87,17 +87,36 @@ def section_body(text: str, heading: str, level: int) -> str:
     return match.group("body").strip() if match else ""
 
 
-def field_values(text: str) -> tuple[dict[str, str], set[str]]:
-    values: dict[str, str] = {}
+# Horizontal whitespace only. `\s` also matches a newline, and with MULTILINE `$`
+# closing at any line end, a blank field's trailing run crossed into the following
+# line and consumed it, so that field was never scanned. An empty field silently
+# swallowed the field beneath it.
+FIELD_LINE = re.compile(r"^[ \t]*-[ \t]+([^:\n]+):[ \t]*(.*?)[ \t]*$")
+
+
+def field_lines(text: str) -> tuple[dict[str, tuple[str, int]], set[str]]:
+    """Map each bullet field to its value and 1-based line number.
+
+    Scanned one line at a time so a match can never span lines, and so findings can
+    say where they came from. Told only that "a field is unanswered" in a 67-field
+    template, neither an instructor nor an agent can act on it.
+    """
+    values: dict[str, tuple[str, int]] = {}
     duplicates: set[str] = set()
-    for match in re.finditer(
-        r"^\s*-\s+([^:\n]+):\s*(.*?)\s*$", text, flags=re.MULTILINE
-    ):
+    for lineno, line in enumerate(text.splitlines(), 1):
+        match = FIELD_LINE.match(line)
+        if not match:
+            continue
         field = normalize_heading(match.group(1))
         if field in values:
             duplicates.add(field)
-        values[field] = match.group(2).strip()
+        values[field] = (match.group(2).strip(), lineno)
     return values, duplicates
+
+
+def field_values(text: str) -> tuple[dict[str, str], set[str]]:
+    located, duplicates = field_lines(text)
+    return {field: value for field, (value, _) in located.items()}, duplicates
 
 
 def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[str]]:
@@ -142,14 +161,32 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
                 errors.append(f"Status subsection is outside Status: {heading}")
 
     incomplete: list[str] = []
+    # Report each placeholder where it is, so the reader can go straight to it.
     placeholder_patterns = (
         (r"\b(?:TODO|TBD)\b", "Contains TODO/TBD marker"),
-        (r"^\s*-\s*$", "Contains an empty list item"),
-        (r"^\s*-\s+[^:\n]+:\s*$", "Contains an unanswered field"),
+        (r"^[ \t]*-[ \t]*$", "Contains an empty list item"),
     )
     for pattern, message in placeholder_patterns:
-        if re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE):
-            incomplete.append(message)
+        hits = [
+            lineno
+            for lineno, line in enumerate(text.splitlines(), 1)
+            if re.search(pattern, line, flags=re.IGNORECASE)
+        ]
+        if hits:
+            shown = ", ".join(str(n) for n in hits[:5])
+            more = f" (+{len(hits) - 5} more)" if len(hits) > 5 else ""
+            incomplete.append(f"{message} on line {shown}{more}")
+
+    located_fields, _ = field_lines(text)
+    unanswered = sorted(
+        (lineno, field)
+        for field, (value, lineno) in located_fields.items()
+        if not value
+    )
+    for lineno, field in unanswered[:8]:
+        incomplete.append(f"Unanswered field on line {lineno}: {field}")
+    if len(unanswered) > 8:
+        incomplete.append(f"{len(unanswered) - 8} further fields are unanswered")
 
     for heading in REQUIRED_H3:
         body = section_body(text, heading, 3)
@@ -169,11 +206,16 @@ def validate(path: Path, profile: str = "establish") -> tuple[list[str], list[st
     for field in sorted(duplicate_fields & tracked_fields):
         errors.append(f"Duplicate scalar field: {field}")
     for field in PROFILE_REQUIRED_FIELDS[profile]:
-        value = values.get(field, "")
+        value, lineno = located_fields.get(field, ("", 0))
+        where = f" on line {lineno}" if lineno else " (field is absent)"
         if not value:
-            incomplete.append(f"Required field is unanswered for {profile}: {field}")
+            incomplete.append(
+                f"Required field is unanswered for {profile}: {field}{where}"
+            )
         elif normalize_heading(value) in {"n/a", "na", "not applicable"}:
-            incomplete.append(f"Not-applicable field requires a rationale: {field}")
+            incomplete.append(
+                f"Not-applicable field requires a rationale: {field}{where}"
+            )
 
     engagement_tier = normalize_heading(values.get("engagement tier", ""))
     if engagement_tier and engagement_tier not in VALID_ENGAGEMENT_TIERS:

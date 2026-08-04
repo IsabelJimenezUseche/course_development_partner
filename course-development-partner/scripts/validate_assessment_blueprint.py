@@ -93,8 +93,10 @@ def load(path: Path) -> tuple[str, list[str], list[dict[str, str]]]:
 def evidence_level(
     text: str, rows: list[dict[str, str]], mapping: dict[str, str]
 ) -> str:
+    # Horizontal whitespace only: `\s*` would cross the newline and let a blank
+    # field capture the following line's text as its value.
     matches = re.findall(
-        r"^\s*-\s*Evidence level claimed:\s*(.+?)\s*$",
+        r"^[ \t]*-[ \t]*Evidence level claimed:[ \t]*(.+?)[ \t]*$",
         text,
         re.MULTILINE | re.I,
     )
@@ -122,7 +124,7 @@ def assessed_outcome_scope(
     mapping: dict[str, str],
 ) -> str:
     matches = re.findall(
-        r"^\s*-\s*Assessed outcome scope:\s*(.+?)\s*$",
+        r"^[ \t]*-[ \t]*Assessed outcome scope:[ \t]*(.+?)[ \t]*$",
         text,
         re.MULTILINE | re.I,
     )

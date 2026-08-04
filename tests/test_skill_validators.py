@@ -102,6 +102,53 @@ class DesignStateValidatorTests(unittest.TestCase):
         result = run_script("validate_design_state.py", content)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_blank_field_does_not_hide_the_field_below_it(self) -> None:
+        """A blank bullet used to swallow the next line, hiding a filled field.
+
+        `\\s` matches newlines and MULTILINE `$` closes at any line end, so the scan
+        ran past a blank field and never saw the one beneath it. Real briefs are
+        part-filled, so this misfired exactly when it mattered most.
+        """
+        content = (FIXTURES / "design_state" / "valid.md").read_text(encoding="utf-8")
+        # Blank the field directly above a profile-required one.
+        content = content.replace(
+            "- Engagement tier:", "- Last updated:\n- Engagement tier:"
+        )
+        result = run_script("validate_design_state.py", content)
+
+        # `Engagement tier` is filled and sits under a blank field; it must be seen.
+        self.assertNotIn(
+            "unanswered for establish: engagement tier", result.stdout.lower()
+        )
+
+    def test_unanswered_fields_are_reported_with_a_location(self) -> None:
+        """A bare 'a field is unanswered' is unactionable in a 67-field template."""
+        template = (
+            ROOT / "course-development-partner" / "assets" / "course-design-brief.md"
+        ).read_text()
+        result = run_script("validate_design_state.py", template)
+
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertRegex(result.stdout, r"Unanswered field on line \d+: \S")
+
+    def test_blank_scalar_does_not_capture_the_next_line_as_its_value(self) -> None:
+        """A blank `Evidence level claimed:` used to read the following bullet.
+
+        Asserted against the extractor directly. Driving it through the CLI proved
+        nothing: the validator reports other problems first, so the wrong value
+        never reached stdout and the test passed against the bug.
+        """
+        sys.path.insert(0, str(SCRIPTS))
+        try:
+            import validate_assessment_blueprint as blueprint_validator
+        finally:
+            sys.path.pop(0)
+
+        text = "- Evidence level claimed:\n- Known limitations: none\n"
+        value = blueprint_validator.evidence_level(text, [], {})
+
+        self.assertEqual(value, "", f"blank field captured {value!r} from the next line")
+
     def test_incomplete_design_state_returns_two(self) -> None:
         template = (
             ROOT / "course-development-partner" / "assets" / "course-design-brief.md"
