@@ -68,6 +68,16 @@ An assessment may sample below an outcome's demand deliberately — scaffolding 
 
 **Know what the check cannot see.** The ranks order *kinds* of cognition, not difficulty. A shallow item labeled `evaluate` outranks a demanding multi-step `apply` item, and the validator cannot tell them apart — it compares tokens. So a passing demand check is evidence that the sample is labeled at the outcome's level, not evidence that it is adequate. It cannot substitute for reading the items. Treat a token that is hard to choose as a signal that the outcome may be doing two jobs, and consider splitting it rather than forcing a rank.
 
+### Professional-skill, psychomotor, and affective outcomes
+
+The tokens describe cognitive performances, and some legitimate outcomes are not primarily cognitive. Do not force a token that misrepresents the target, and do not invent new tokens — handle these cases explicitly:
+
+- **Professional-skill outcomes** — teamwork, ethical reasoning, communication, self-directed learning — usually contain a cognitive component that tokenizes cleanly (*evaluate* an ethical tradeoff, *analyze* a team conflict, *create* a technical argument for a named audience) plus a behavioral component that does not. Write the outcome so the observable performance is explicit, record the token for the cognitive component, and evidence the behavioral component through the observable-behavior structures in `references/assessment-quality.md` (documented contributions, process evidence, structured observation) rather than through the demand check. An outcome supplied by an accreditation framework often bundles several of these; map it per `references/framework-crosswalk.md` and split it before tokenizing.
+- **Psychomotor outcomes** — instrument handling, fabrication technique, field technique, laboratory manipulation — are targets in their own right in laboratory, shop, and studio courses. Record them as outcomes with observable performance criteria (setup, execution, tolerance achieved, safe practice) and assess them by demonstration or checklist under `references/artifact-patterns.md`; the token, when one is recorded, describes the accompanying cognitive work (typically `apply`), not the manual skill itself. Never let a written item stand as evidence of a psychomotor outcome.
+- **Affective and dispositional aims** — curiosity, confidence, valuing safety culture — may be designed for (see `references/evidence-informed-design.md` §8) but are rarely appropriate graded outcomes. Keep them out of the alignment map unless the instructor explicitly decides to assess them, and then insist on observable evidence and the fairness review that any consequential assessment gets.
+
+The demand-coverage check applies only to the tokenized cognitive component. For every outcome of these kinds, state in the outcome text or design log which component the token covers, so a passing check is not misread as evidence about the untokenized part.
+
 ## 4. Record dates and applicability
 
 Use ISO dates. Keep these meanings separate:

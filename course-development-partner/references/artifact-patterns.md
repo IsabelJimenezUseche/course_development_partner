@@ -3,17 +3,18 @@
 ## Contents
 
 1. Common contract
-2. Lesson plans
-3. Active-learning worksheets
-4. Context-rich problems
-5. Laboratory and studio sessions
-6. Multi-week projects and capstones
-7. Assessments
-8. Rubrics and calibration
-9. Solution keys
-10. Slides and visuals
-11. Study guides
-12. Communications, surveys, and media
+2. Syllabi
+3. Lesson plans
+4. Active-learning worksheets
+5. Context-rich problems
+6. Laboratory and studio sessions
+7. Multi-week projects and capstones
+8. Assessments
+9. Rubrics and calibration
+10. Solution keys
+11. Slides and visuals
+12. Study guides
+13. Communications, surveys, and media
 
 ## 1. Common contract
 
@@ -34,11 +35,35 @@ For every artifact, identify:
 
 Keep related artifacts synchronized. Never allow the solution, rubric, or instructor guide to introduce an unstated requirement or assumption.
 
-For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. Approve the educational preview before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability. In Auto mode, select and record the strongest recommended preview internally as provisional and proceed without an approval checkpoint.
+For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. In interactive modes, present the educational preview and end the turn for the educator's response before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability. In Auto mode, select and record the strongest recommended preview internally as provisional and proceed without an approval checkpoint.
 
 When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and use `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
 
-## 2. Lesson plans
+## 2. Syllabi
+
+Preview: outcome list, schedule outline, grading-system summary, and policy inventory.
+
+The syllabus aggregates decisions with three different authorities. Keep them distinct while drafting:
+
+- **Institutional required language** — accommodation and disability statements, academic-integrity policy, safety notices, and any mandated text. Ask for the current authoritative wording and insert it verbatim with its version or date; do not draft, paraphrase, or update it. Record the source in `assets/source-register.md`.
+- **Course-owner decisions** — the grading system, late-work and revision policy, attendance, permitted collaboration and AI use. Ask rather than infer, per `references/assessment-quality.md` §8, and surface conflicts between stated policies and the assessment design instead of resolving them silently.
+- **Design content** — outcomes, schedule, workload, and help pathways, drafted from the alignment map, curriculum map, and implementation plan when they exist.
+
+Include:
+
+- course identity, modality, meeting pattern, and instructor/TA contact and response expectations;
+- observable learning outcomes in student-facing language;
+- a schedule consistent with the curriculum map, with assessment dates and the feedback-and-revision opportunities the grading system actually permits;
+- the assessment plan and grading system exactly as the owner supplied them;
+- an honest workload expectation consistent with the implementation-plan estimates;
+- permitted collaboration, resources, and AI use, including any required disclosure of AI assistance;
+- help pathways framed as normal practice, not remediation;
+- accessibility, accommodation, and basic-needs statements from authoritative text;
+- safety expectations and required training when the course has hazard-bearing sessions, routed per `references/stem-authenticity.md`.
+
+Validate that the syllabus agrees with the curriculum map and assessment blueprint (dates, weights, outcome coverage), that stated workload matches the estimates rather than aspiration, that deadlines do not silently cluster, and that the document itself meets the applicable accessibility target. The syllabus is also the first belonging and expectancy signal students receive; apply the tone and transparency guidance of `references/evidence-informed-design.md` §8 — visible success criteria, normalized help-seeking, and no policy language that reads as presumption of bad faith.
+
+## 3. Lesson plans
 
 Preview: alignment map and time-block outline.
 
@@ -58,7 +83,7 @@ Include:
 
 Validate that the plan is feasible for the stated class size, room, time, staffing, and technology.
 
-## 3. Active-learning worksheets
+## 4. Active-learning worksheets
 
 Preview: ordered reasoning/task sequence with the purpose of each step.
 
@@ -73,7 +98,7 @@ Create:
 
 Verify that directions are usable without excessive oral repair and that the key uses only information and assumptions available to students.
 
-## 4. Context-rich problems
+## 5. Context-rich problems
 
 Preview: context brief.
 
@@ -93,7 +118,7 @@ Remove irrelevant detail unless distinguishing signal from noise is an explicit 
 
 For STEM tasks, apply `references/stem-authenticity.md`. Make relevant standards, multiple constraints, safety, welfare, ethics, stakeholder perspectives, uncertainty, and lifecycle effects part of the decision rather than decorative context.
 
-## 5. Laboratory and studio sessions
+## 6. Laboratory and studio sessions
 
 Covers wet labs, instrumentation and measurement labs, computing labs, makerspace and fabrication sessions, field work, and studio-format sessions.
 
@@ -122,7 +147,7 @@ Design the session around the reasoning, not the procedure:
 
 Validate that the session fits the available stations, equipment, consumables, staffing, and scheduled time, and that the equipment count supports the group size without leaving students idle or passive. Verify that expected results are physically reasonable and reproducible with the specified equipment. Check accessibility of bench height, reach, handling, protective equipment fit, visual and auditory alarms, and software; record any barrier that requires an approved alternative.
 
-## 6. Multi-week projects and capstones
+## 7. Multi-week projects and capstones
 
 Covers design projects, build projects, research projects, computing projects, and capstone or senior design experiences.
 
@@ -152,7 +177,7 @@ For capstones, confirm which program-level outcomes the experience is expected t
 
 Apply `references/stem-authenticity.md` for the disciplinary profile, and `references/course-coherence-and-implementation.md` for mentoring and review workload, which is routinely underestimated.
 
-## 7. Assessments
+## 8. Assessments
 
 Preview: `assets/assessment-blueprint.md` with explicit assessed-outcome scope or `all-active`, item outcome, intended interpretation/use, evidence claim, cognitive demand, item type, dependency, points, time, and construct-irrelevant barriers.
 
@@ -173,20 +198,34 @@ Map every item to an outcome. Check:
 
 Independently solve quantitative items before use. Distinguish diagnostic, formative, and summative purposes. Apply `references/assessment-quality.md` for consequential use and state the evidence level accurately; do not call an assessment validated based only on classroom review.
 
-## 8. Rubrics and calibration
+### Write selected-response and auto-graded items deliberately
+
+Large courses run on selected-response and numeric-entry items, and their quality is decided at the item level:
+
+- Draft the stem as a complete question answerable before the options are read; options should confirm an answer, not define the question.
+- Build distractors from documented misconceptions and the course's own student-model evidence — prior-offering errors, misconception catalogs, diagnostic results — so each wrong answer is diagnostic. Record which error each distractor detects; a distractor no one should choose is wasted measurement.
+- Remove cueing: grammatical agreement between stem and one option, the longest-or-most-qualified option as the key, overlapping or non-exclusive options, and implausible throwaways. Avoid "all of the above" and "none of the above", which reward test-craft over the construct.
+- Keep options homogeneous in kind and length, ordered logically, with exactly one defensibly best answer — confirmed by solving the item independently, not by recalling the intended key.
+- For numeric-entry items, define tolerance, units handling, and significant-figure rules in advance, and check that the tolerance does not accept answers produced by the very error the item exists to detect.
+- To raise demand, use two-tier items (an answer plus a separate selection of the justification) or ask students to identify the error in a worked response. Record the demand the item actually elicits: recognizing a correct judgment is not producing one, so be sparing with `evaluate` labels on selected-response items.
+
+## 9. Rubrics and calibration
 
 ### Clarify rubric intent
 
-Ask the instructor:
+Stage the clarification; do not deliver it as one interrogation. In the first exchange, ask only what determines the rubric's architecture — at most three questions:
 
 1. Which educational objectives and evidence should the rubric evaluate?
 2. Is the use formative, summative, or both?
-3. Should the structure be analytic, holistic, single-point, checklist, or another form?
-4. What scale, thresholds, and required weights apply?
-5. Which scoring orientation should govern?
-6. How should conceptual, procedural, computational, communicative, and minor errors be treated?
-7. Should an early error propagate, be penalized once, or receive carry-forward credit?
-8. How should partial reasoning and alternative correct methods be treated?
+3. Which scoring orientation should govern? Explain the orientations when asking.
+
+Resolve the rest by proposing, not asking: present the structure, scale, weights, thresholds, error treatment, propagation and carry-forward rules, and alternative-method logic as recommended defaults in the criteria preview, each marked as a decision the instructor can change. Reacting to a concrete draft is easier than answering abstract questions, and calibration revisits the boundary rules against real responses anyway. Every item below must be resolved before consequential use; none of it needs to be asked up front:
+
+- structure: analytic, holistic, single-point, checklist, or another form;
+- scale, thresholds, and required weights;
+- treatment of conceptual, procedural, computational, communicative, and minor errors;
+- error propagation, single-penalty, and carry-forward credit;
+- partial reasoning and alternative correct methods.
 
 Explain the orientations:
 
@@ -254,7 +293,7 @@ Confirm:
 - scorer-consistency evidence and unresolved disagreements are represented accurately;
 - student expectations are clear without revealing answers or constraining valid approaches.
 
-## 9. Solution keys
+## 10. Solution keys
 
 Include:
 
@@ -268,11 +307,11 @@ Include:
 
 Verify the solution independently from the generated prompt. Do not silently repair an unsolvable or ambiguous student item only in the key.
 
-## 10. Slides and visuals
+## 11. Slides and visuals
 
 Preview a storyboard or visual specification.
 
-Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional neutral example palette with semantic color roles, contrast verification, and no implication of institutional brand approval.
+Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional example palette with semantic color roles, contrast verification, and no implication of institutional brand approval.
 
 Use visuals for relationships, mechanisms, comparisons, hierarchy, or change over time. Check:
 
@@ -285,7 +324,7 @@ Use visuals for relationships, mechanisms, comparisons, hierarchy, or change ove
 
 Keep text, diagrams, and tables editable where the format permits. Render and inspect final slides or images.
 
-## 11. Study guides
+## 12. Study guides
 
 Organize around what students should be able to do, not merely topic names. Include:
 
@@ -299,7 +338,7 @@ Organize around what students should be able to do, not merely topic names. Incl
 
 Do not reproduce an exam or disclose protected answers.
 
-## 12. Communications, surveys, and media
+## 13. Communications, surveys, and media
 
 ### Student communications
 

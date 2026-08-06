@@ -7,6 +7,10 @@ The skill is designed for skills-compatible agents and portable Markdown handoff
 ## What the skill supports
 
 - Course, module, lesson, and activity design
+- Syllabi that keep institutional required language, course-owner policy, and design content distinct
+- Mapping of supplied frameworks and named pedagogies — ABET-style outcome sets, Bloom's and other taxonomies, UDL, CDIO, peer instruction, POGIL, flipped, and similar — onto the internal workflow without assuming any framework governs
+- Course-level evidence packages for program-supplied accreditation indicators, with program-level judgments left to the program authority
+- Online, hybrid, and asynchronous delivery adaptation
 - Lecture-to-active-learning redesign
 - Context-rich disciplinary problems
 - Laboratory, studio, field, design-project, and capstone experiences, with safety routed to the responsible owner
@@ -31,7 +35,7 @@ The core design chain is:
 
 Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint validator reports an outcome whose entire active assessment sample falls below its aligned demand, while allowing lower-demand scaffolding items.
 
-Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval, and every teaching-ready artifact must declare a safety review in its manifest or state that none is required.
+Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Disciplines outside those profiles use the general workflow; no discipline-specific authenticity profile exists for them yet, and the skill does not claim one. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval, and every teaching-ready artifact must declare a safety review in its manifest or state that none is required.
 
 The skill also:
 
@@ -40,6 +44,7 @@ The skill also:
 - distributes and interleaves practice across the course sequence, and states the in-the-moment performance cost of doing so;
 - designs for motivation, self-efficacy, and belonging alongside the cognitive path;
 - records confirmed facts, working assumptions, and open decisions;
+- states the interactive default wherever an Auto-mode exception is written, so the non-interactive path is never the more repeated instruction;
 - previews small design structures before producing large artifacts;
 - makes authentic context affect student reasoning rather than merely decorating a problem;
 - keeps student, instructor, solution, and rubric artifacts synchronized;
@@ -61,7 +66,7 @@ The skill also:
 | **Rapid** | Produces the complete provisional draft in one pass without intermediate checkpoints, then requests one consolidated faculty review. |
 | **Auto** | Works without faculty checkpoints, selects the strongest recommended option, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
 
-Co-design is a non-blocking default rather than a required mode-selection exchange. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
+Co-design is the skill's defining experience and its non-blocking default: it works like a design partner beside the educator — one consequential decision at a time, small visible drafts, each answer shaping the next piece — rather than collecting requirements at intake and returning a finished product. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
 
 ## Educational-design workflow
 
@@ -127,7 +132,7 @@ The skill never infers an institution-specific accessibility rule from an instit
 
 ## Visual design
 
-When no authoritative template or visual system is supplied, the skill can suggest an optional unbranded example palette organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray (`#C4BFC0`), and white (`#FFFFFF`). It provides calculated high-contrast pairings, uses color only as a supplementary cue, requires final rendered inspection, and never implies institutional brand approval or adds protected marks or proprietary assets without authorization.
+When no authoritative template or visual system is supplied, the skill can suggest an optional example palette organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray (`#C4BFC0`), and white (`#FFFFFF`). These values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic roles with verified contrast pairs; the skill states that provenance when offering them, implies no endorsement by or affiliation with that institution, and recommends substituting the user's own institutionally authorized system. It provides calculated high-contrast pairings, uses color only as a supplementary cue, requires final rendered inspection, and never implies institutional brand approval or adds protected marks or proprietary assets without authorization.
 
 ## Privacy and responsible use
 
@@ -168,6 +173,8 @@ Common project-scoped locations include:
 - Claude Code: `.claude/skills/course-development-partner/`
 
 When using a client-specific installer, select the repository subpath `course-development-partner`.
+
+When copying the directory by hand or packaging it as an archive, exclude generated caches (`__pycache__/`, `*.pyc`); they are gitignored but present in a working checkout, and the approved package inventory in `tests/package-inventory.txt` does not include them.
 
 ## Invocation examples
 

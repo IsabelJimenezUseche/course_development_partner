@@ -1,4 +1,4 @@
 interface:
   display_name: "Course Development Partner"
-  short_description: "Design and validate higher-ed courses"
+  short_description: "Co-design and validate higher-ed courses"
   default_prompt: "Use $course-development-partner to design, review, validate, or produce an aligned, accessible, evidence-informed higher-education artifact."

@@ -84,7 +84,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - State the team formation basis, avoid isolating a single underrepresented student on a team, and confirm an early team agreement and a process checkpoint before the final deliverable.
 - Make purpose, success criteria, and help pathways visible to students, and sequence an attainable early success on the target construct.
 - Include checkpoints, feedback, debrief, and closure.
-- Fit the stated time, class size, room, staffing, and technology.
+- Fit the stated delivery mode, time, class size, room, staffing, and technology.
 - Provide a fallback for time or technology failure.
 - Check instructor and TA workload.
 
@@ -172,7 +172,7 @@ Run the applicable deterministic state, alignment, assessment, curriculum, manif
 
 - Estimate professor, TA, grader, student, technology-support, and accessibility-support workload.
 - Confirm teaching assistants and graders have the decision authority, facilitation guidance, disciplinary preparation, scoring calibration, and safety role the design assumes, with preparation time budgeted.
-- Confirm the design matches the stated enrollment, room, and staffing ratio, and treat a materially different class size as a redesign of participation, feedback, and assessment rather than a rescaling.
+- Confirm the design matches the stated enrollment, room, staffing ratio, and delivery mode, and treat a materially different class size or delivery mode as a redesign of participation, feedback, and assessment rather than a rescaling.
 - Check preparation, facilitation, grading, feedback, training, maintenance, and versioning—not only class time.
 - Verify room, laboratory, software, data, equipment, and support availability.
 - Provide a realistic fallback and minimum viable implementation.

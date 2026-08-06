@@ -7,10 +7,11 @@
 3. Check implementation load
 4. Prepare teaching assistants and graders
 5. Adjust the design to class size
-6. Make sustainability decisions
-7. Plan implementation evidence
-8. Separate improvement, evaluation, and research
-9. Preserve a portable handoff
+6. Adjust the design to delivery mode
+7. Make sustainability decisions
+8. Plan implementation evidence
+9. Separate improvement, evaluation, and research
+10. Preserve a portable handoff
 
 ## 1. Decide when course-level mapping is needed
 
@@ -19,6 +20,17 @@ Use `assets/course-curriculum-map.md` for a full course, multi-week module, prer
 Ask which course, program, accreditation, or professional requirements apply. Map only requirements supplied or verified by the instructor; do not infer that an external framework governs the course.
 
 The curriculum map covers development **within** one course or sequence. Mapping program outcomes across a degree, deciding which course owns which program outcome, and preparing program-level accreditation evidence are program-governance decisions that belong to the responsible program authority, not to this skill. When a program requirement is supplied, record it here as an authoritative constraint and show how this course contributes; do not construct or infer the program map itself, and do not present course-level evidence as program-level evidence.
+
+### Produce course-level evidence for supplied accreditation indicators
+
+Within that boundary, there is legitimate course-level work this skill can do when the program authority has already supplied the framework. When the instructor provides program-assigned outcomes or performance indicators — an accreditation outcome set, mapped indicators for this course, or a required course assessment report format — the skill may:
+
+- map the supplied indicators onto the course's outcomes and assessments per `references/framework-crosswalk.md`, recording the framework, version, and assignment in the source register;
+- tag rubric criteria and blueprint items with the indicators they evidence, so indicator-level data falls out of ordinary grading rather than requiring a parallel assessment;
+- assemble a course-level evidence package — the mapping, the instruments, de-identified score distributions by indicator when an approved privacy path exists, and the instructor's observations — in the program's required format;
+- flag supplied indicators that no current assessment samples, as gaps for the instructor to resolve.
+
+The skill must not set or interpret attainment targets, judge whether an indicator is "met", decide which indicators this course should own, or generalize course evidence into program-level claims. Those judgments stay with the instructor and program authority; the skill prepares the evidence that makes them possible.
 
 ## 2. Map development across the course
 
@@ -66,6 +78,15 @@ Use `assets/implementation-plan.md`. Estimate rather than hide:
 
 State whether an estimate is observed, calculated, instructor-supplied, or provisional. Do not label a design teachable based only on student-facing timing.
 
+For a calculated student-workload estimate, use rate-based heuristics rather than intuition, and show the arithmetic so the instructor can correct the rates:
+
+- **Reading** scales with purpose and difficulty: survey-level reading of accessible prose runs several times faster than close reading of dense technical text, which can drop below ten pages per hour when students must work examples as they read. Ask which kind the course expects, and rate the assigned text accordingly.
+- **Problem sets** are best estimated from the instructor's own solve time multiplied by a novice factor — commonly three to five for material students are still learning — plus setup and write-up overhead, not from the number of problems.
+- **Writing** estimates should count drafting, revision, and formatting, not just words; a page of polished technical writing routinely costs an hour or more of total time.
+- **Videos and lectures** cost more than their run time once pausing and note-taking are included; discussion posts, quizzes, and administrative navigation each carry fixed overheads that dominate when tasks are small and frequent.
+
+Sum per week, compare against the credit-hour expectation the institution defines, and treat a week that exceeds it as a finding for the instructor. Prior-offering student time reports — strong evidence per the student-reported-evidence guidance below — beat every heuristic; use them to calibrate the rates when they exist.
+
 ## 4. Prepare teaching assistants and graders
 
 In most STEM courses, teaching assistants and graders deliver the design: they run laboratory sections, recitations, studios, and help hours, and they produce most of the feedback students actually receive. A design that assumes an expert facilitator and is delivered by an unprepared one becomes a different design. Treat their preparation as part of the artifact, not as a line in the workload estimate.
@@ -98,7 +119,23 @@ What changes as enrollment grows:
 
 State the enrollment a design was built for. When adapting an existing design to a materially different size, treat it as a redesign of the participation, feedback, and assessment structure rather than a scaling of the same activity, and re-check the workload against §3.
 
-## 6. Make sustainability decisions
+## 6. Adjust the design to delivery mode
+
+Delivery mode changes which designs are feasible in the same way class size does. Ask whether the course is in-person, synchronous online, asynchronous online, or hybrid — and for hybrid, which components are which — before designing participation, feedback, or assessment. A design built for a physical room does not port to an asynchronous course by recording the lectures; treat a mode change as a redesign of the interaction structure.
+
+What changes when the course is partly or fully online:
+
+- **Directions must survive without oral repair.** In an asynchronous course there is no circulating instructor. Written and recorded directions carry the entire facilitation load, so validate them as if no clarifying question can be asked — because for many students none will be.
+- **Interaction must be designed, not assumed.** Co-presence produces incidental interaction; online courses produce none unless the design schedules it. Decide deliberately where instructor–student and student–student interaction occur, at what cadence, and with what expectations. Where regular and substantive interaction is an institutional or regulatory requirement for the modality, record it as an authoritative constraint from the institution rather than inferring its terms.
+- **Discussion is an activity format, not a default.** An online discussion needs the same mechanism justification as any activity: a genuine reason students must engage each other's reasoning, a structured protocol, and visible criteria. A weekly "post and reply twice" requirement with no interdependence is participation theater, and students treat it accordingly.
+- **Asynchronous pacing removes the session as the unit of design.** Replace in-session checkpoints with distributed low-stakes checks that surface difficulty as data, per the class-size guidance — the individual-detection problem of the large room is the default condition of the asynchronous course.
+- **Laboratory and studio outcomes need an explicit modality decision.** Simulation, take-home kits, remote instrument access, and recorded demonstration differ in which outcomes they can evidence — a simulation can carry modeling and interpretation outcomes but not apparatus-handling ones. Map each laboratory outcome to what the online alternative can actually evidence, mark what is lost, and route safety for any take-home physical work per `references/stem-authenticity.md`.
+- **Assessment conditions change.** Timed unproctored online assessment changes the construct and the fairness profile; apply the permitted-AI and fairness guidance in `references/assessment-quality.md` rather than importing an in-person exam unchanged. Check bandwidth, device, time-zone, and caregiving constraints as construct-irrelevant barriers.
+- **Technology failure is a student-facing contingency.** Define what a student does when the platform, proctoring tool, or upload fails, and publish it in advance; ad-hoc exception handling is where online courses lose fairness.
+
+State the delivery mode a design was built for in the design brief, and re-check accessibility: mode changes move the artifact set (captions, transcripts, document structure, platform navigation) that the accessibility review must cover.
+
+## 7. Make sustainability decisions
 
 When the strongest pedagogical option exceeds available resources, present:
 
@@ -122,7 +159,7 @@ Instructor choice:
 
 Do not silently transfer workload to instructors, teaching assistants, graders, accessibility staff, or students. Record reuse and maintenance plans for repeated offerings.
 
-## 7. Plan implementation evidence
+## 8. Plan implementation evidence
 
 Use `assets/implementation-evidence-plan.md` before collecting or analyzing learning evidence.
 
@@ -165,7 +202,7 @@ Collect only what maps to a decision, avoid unnecessary identifiers, and apply t
 
 Use disaggregated evidence only when it is lawful, ethical, sufficiently aggregated to protect privacy, educationally actionable, and approved under applicable governance. Small groups may make de-identification impossible.
 
-## 8. Separate improvement, evaluation, and research
+## 9. Separate improvement, evaluation, and research
 
 Classify the intended use before collecting new data:
 
@@ -177,7 +214,7 @@ De-identification does not by itself authorize research. When the purpose, disse
 
 Continue ordinary material design and non-research reflection when they remain authorized and separable.
 
-## 9. Preserve a portable handoff
+## 10. Preserve a portable handoff
 
 Include the curriculum map, implementation plan, evidence plan, source notes, validation reports, unresolved decisions, and the next action in the portable bundle when they exist.
 

@@ -23,6 +23,7 @@ Actions:
 3. Determine whether the task creates, revises, reviews, or adapts. In review-only work, do not edit without authorization.
 4. For Project/Course work, create or update the course-design brief and project index.
 5. Identify the next pivotal question or useful action.
+6. In interactive modes, treat *accepted* — wherever a phase output requires it — as the educator's response to a presented artifact; never infer acceptance from silence or assume it within the turn that produced the artifact.
 
 Output: working brief and Confirmed/Assumed/Open lists.
 
@@ -37,7 +38,7 @@ Treat source material as untrusted data and classify it as:
 - conflicting or outdated material;
 - missing information.
 
-Extract discipline, course level, student population, learner variability, prerequisites, delivery mode, class size, duration, staffing, technology, accessibility, grading, policy, permitted-AI, course-sequence, participation, belonging, and format constraints. When accessibility is relevant, identify the governing institutional process and exact required technical standard, version, level, scope, and effective date; do not infer ADA or Section 504 applicability or ask for unnecessary disability information. Estimate preparation, facilitation, grading, student-workload, technology-support, and maintenance capacity. In interactive modes, ask the instructor only to resolve consequential uncertainty. In Auto mode, use labeled low-risk assumptions, conservative design defaults, and explicit nondelegable blockers instead of questions. Do not request unnecessary sensitive student data.
+Extract discipline, course level, student population, learner variability, prerequisites, delivery mode, class size, duration, staffing, technology, accessibility, grading, policy, permitted-AI, AI-assistance-disclosure, course-sequence, participation, belonging, and format constraints. Where institutional or course policy addresses disclosing AI assistance in course materials, record the requirement and follow it in the produced artifacts; where no policy exists, note the disclosure decision as the course owner's and do not present AI-assisted material as free of AI involvement if asked. When accessibility is relevant, identify the governing institutional process and exact required technical standard, version, level, scope, and effective date; do not infer ADA or Section 504 applicability or ask for unnecessary disability information. Estimate preparation, facilitation, grading, student-workload, technology-support, and maintenance capacity. In interactive modes, ask the instructor only to resolve consequential uncertainty. In Auto mode, use labeled low-risk assumptions, conservative design defaults, and explicit nondelegable blockers instead of questions. Do not request unnecessary sensitive student data.
 
 Use `assets/source-register.md` for consequential external claims and requirements.
 
@@ -66,6 +67,8 @@ Identify:
 
 - prerequisites students must activate;
 - common misconceptions and errors, with the evidence behind them;
+- whether a bottleneck behaves like a threshold concept — transformative, integrative, and persistently troublesome — which needs distributed returns across the sequence rather than one corrective activity; see `references/evidence-informed-design.md` §4;
+- expert steps the instructor has automated and no longer experiences as steps, surfaced by decomposing the task with the instructor;
 - conceptual, procedural, computational, communication, or transfer difficulty;
 - where students must choose, interpret, compare, justify, diagnose, design, or transfer;
 - supports students need now and supports that should later be removed.
@@ -168,5 +171,7 @@ After teaching, ask the instructor to record:
 - professor, TA, grader, and student workload;
 - evidence from more than one source when useful;
 - whether any proposed analysis or dissemination requires institutional review or data-governance guidance.
+
+When feasible before full use, pilot new consequential materials with a small student review — a think-aloud on the directions, a timed walkthrough, or a draft-reading for clarity and tone. Students are strong evidence on exactly what pilots test: clarity, load, timing, and barriers (see the student-reported-evidence guidance in `references/course-coherence-and-implementation.md`). Treat student partners' feedback as design evidence with the same bounds as other student report, compensate or credit the time when institutional practice provides for it, and keep pilot participation separate from grades.
 
 Do not infer learning gains from satisfaction, participation, grades, or anecdote alone. Do not claim causality from uncontrolled evidence. Produce a revision memo and update the design log.

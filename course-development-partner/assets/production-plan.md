@@ -35,7 +35,7 @@
 
 - Document/deck/workbook/visual archetype or style authority:
 - Selected palette and contrast evidence:
-- Optional neutral example palette proposed: yes | no | not applicable
+- Optional example palette proposed: yes | no | not applicable
 - Required technical accessibility target: [standard, exact version, level, scope, effective date]
 - Institutional review or accommodation process:
 - Reading, navigation, keyboard, media, alternative, and assistive-technology needs:

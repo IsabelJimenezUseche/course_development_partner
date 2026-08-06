@@ -102,6 +102,14 @@ New case for re-test:
 Evidence of revised understanding:
 ```
 
+### Recognize threshold concepts and expert blind spots
+
+Not every stubborn bottleneck is an ordinary misconception, and misdiagnosing the kind of difficulty wastes the design.
+
+A **threshold concept** is transformative and integrative — entropy, reactive power, dynamic equilibrium, recursion, statistical inference as reasoning under uncertainty — and crossing it changes how students see the rest of the subject. Expect these differences from ordinary misconceptions: students occupy a prolonged in-between state in which they can execute procedures while the underlying idea remains troublesome; a single elicit-confront-resolve cycle rarely completes the change; and regression under load is normal, not evidence the teaching failed. Design for a threshold by distributing repeated returns to the concept across the curriculum map, in varied representations, with the in-between state treated as expected and named for students — rather than by scheduling one confrontation activity and recording the concept as resolved.
+
+A related failure sits with the expert, not the student: instructors reliably underestimate difficulty at the steps they themselves automated long ago — where they select a model, choose a coordinate system, decide what to neglect, or read a representation without noticing they are decoding it. When the instructor reports that students "just can't do" a task, walk the task with them step by step and ask at each step what an expert is deciding and what evidence a student would need to make the same decision. The bottleneck usually sits at a step the instructor did not think to teach because they no longer experience it as a step. Record the decomposed steps as the scaffold plan; they are the supports that later fade.
+
 ## 5. Use high-value learning patterns
 
 Use only the patterns that serve the objective.

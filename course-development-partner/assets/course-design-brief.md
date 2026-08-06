@@ -1,5 +1,7 @@
 # Course Design Brief
 
+Populate this brief from supplied sources and from decisions as they are made; it is a running record of the collaboration, not an intake questionnaire.
+
 - Schema version: 1.0
 - Last updated:
 - Engagement tier: Focused | Project | Course
@@ -57,6 +59,7 @@
 - Threshold, gateway, or minimum-competency requirement:
 - Late work, missed assessment, and excused-absence handling:
 - Permitted collaboration, resources, and AI use:
+- AI-assistance disclosure expectations for course materials:
 - Applicable program, professional, accreditation, code, or standard requirements:
 
 ## Team and collaborative work

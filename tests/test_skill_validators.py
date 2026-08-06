@@ -2119,18 +2119,94 @@ class PackageContentTests(unittest.TestCase):
             ),
         )
 
-    def test_visual_guidance_offers_optional_neutral_palette(self) -> None:
+    def test_visual_guidance_offers_optional_palette_with_provenance(self) -> None:
         skill_root = ROOT / "course-development-partner"
         visual_text = (skill_root / "references" / "visual-design.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("neutral example palette", visual_text)
+        self.assertIn("example palette", visual_text)
         self.assertIn("Primary dark", visual_text)
         self.assertIn("Primary accent", visual_text)
         self.assertIn("#CFB991", visual_text)
         self.assertIn("#DAAA00", visual_text)
         self.assertIn("optional", visual_text.lower())
-        self.assertIn("unbranded", visual_text.lower())
+        # The values match a real institution's published palette, so the
+        # guidance must state that provenance and must not label it neutral.
+        self.assertIn("provenance", visual_text.lower())
+        self.assertIn("Purdue University", visual_text)
+        self.assertIn("no endorsement", visual_text.lower())
+        self.assertNotIn("neutral example palette", visual_text)
+        self.assertNotIn("unbranded example palette", visual_text)
+
+    def test_codesign_cadence_rules_are_stated(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        interaction_text = (
+            skill_root / "references" / "interaction-protocol.md"
+        ).read_text(encoding="utf-8")
+        # Co-design must be defined as an ongoing partnership, not intake-then-deliver.
+        self.assertIn("defining experience", skill_text)
+        self.assertIn("stop at consequential checkpoints", skill_text)
+        self.assertIn("the cycle, not the artifact", interaction_text)
+        self.assertIn("end the turn", interaction_text)
+        self.assertIn("per exchange, not per engagement", interaction_text)
+        self.assertIn("decide for me", interaction_text)
+        self.assertIn("mode failure even when it is good", interaction_text)
+        self.assertIn(
+            "acceptance is the educator's response, never an inference from silence",
+            interaction_text,
+        )
+
+    def test_worked_example_shows_codesign_checkpoints(self) -> None:
+        example_text = (
+            ROOT / "course-development-partner" / "references" / "worked-example.md"
+        ).read_text(encoding="utf-8")
+        # The end-to-end example must demonstrate the conversation, not only its
+        # products; models imitate the example more than they follow the rules.
+        self.assertIn("Mode: **Co-design**", example_text)
+        self.assertGreaterEqual(example_text.count("> Checkpoint:"), 3)
+
+    def test_rubric_clarification_is_staged_not_interrogated(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        patterns_text = (
+            skill_root / "references" / "artifact-patterns.md"
+        ).read_text(encoding="utf-8")
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Stage the clarification", patterns_text)
+        self.assertIn("at most three questions", patterns_text)
+        self.assertIn("proposing, not asking", patterns_text)
+        self.assertIn("stage the clarification", skill_text)
+
+    def test_state_files_are_records_not_questionnaires(self) -> None:
+        skill_root = ROOT / "course-development-partner"
+        interaction_text = (
+            skill_root / "references" / "interaction-protocol.md"
+        ).read_text(encoding="utf-8")
+        brief_text = (
+            skill_root / "assets" / "course-design-brief.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("never interview the educator", interaction_text)
+        self.assertIn("not an intake questionnaire", brief_text)
+
+    def test_auto_mode_paragraphs_state_interactive_counterpart(self) -> None:
+        # Symmetry rule: outside the interaction protocol (which defines the
+        # modes), any paragraph stating Auto-mode behavior must state its
+        # interactive counterpart, so the non-interactive path is never the
+        # locally repeated instruction.
+        skill_root = ROOT / "course-development-partner"
+        counterpart = re.compile(r"interactiv|interaction|co-design", re.IGNORECASE)
+        paths = [skill_root / "SKILL.md"]
+        paths.extend(sorted((skill_root / "references").glob("*.md")))
+        for path in paths:
+            if path.name == "interaction-protocol.md":
+                continue
+            for paragraph in path.read_text(encoding="utf-8").split("\n\n"):
+                if "Auto mode" in paragraph:
+                    self.assertTrue(
+                        counterpart.search(paragraph),
+                        f"{path.name}: Auto-mode paragraph lacks an interactive "
+                        f"counterpart: {paragraph[:160]!r}",
+                    )
 
     def test_auto_mode_is_noninteractive_but_preserves_authority(self) -> None:
         skill_root = ROOT / "course-development-partner"

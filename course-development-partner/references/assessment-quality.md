@@ -175,6 +175,14 @@ Ask for, rather than infer, the following, because they change how an instrument
 
 The revision policy is load-bearing on a pedagogical claim this skill makes elsewhere: feedback should be followed by an opportunity to use it. If no resubmission or later reuse of the skill is possible, say so, and place the feedback where it can still affect a subsequent task instead of implying an opportunity that the grading system does not permit.
 
+When the owner names a mastery, specifications, or standards-based scheme, instrument design changes with it — do not port a points-scheme instrument unchanged:
+
+- **Specifications schemes** score work against a published pass/no-pass specification, so the specification must be complete enough to grade against without judgment calls the scheme claims not to make; a checklist/mastery orientation fits, and partial-credit ladders do not. The reassessment currency — tokens, limited resubmissions, scheduled retake windows — is part of the grading system: ask for it, and check that the reassessment load it implies survives the workload estimate.
+- **Standards-based schemes** index the gradebook by outcome rather than by assignment, which makes the alignment map load-bearing for grading, not just design: every assessed item must map to a reportable outcome, and an item evidencing several outcomes needs a declared split. Later evidence typically supersedes earlier evidence, so item scheduling decides what a student can still demonstrate.
+- In both, feedback-then-revision is structural rather than optional, which strengthens the feedback-use claim above — but only if the reassessment pathway is actually staffed. An alternative scheme whose regrade load was never estimated fails in week six; check it against the implementation plan.
+
+The evidence base for these schemes is promising rather than settled; recommend them as a design choice with tradeoffs, not as an evidence-mandated correction, and surface any conflict with program or institutional grading policy as a decision card.
+
 Do not propose a change to the grading system, apply a curve, set a passing threshold, or alter weights already approved without the course owner's decision. When an instrument's scoring logic conflicts with the grading system — for example, a mastery-oriented rubric feeding a weighted-average scheme — surface the conflict as a decision card rather than resolving it silently.
 
 ## 9. Apply high-stakes release gates

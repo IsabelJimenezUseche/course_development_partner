@@ -8,38 +8,72 @@
   "response_artifacts": "not retained",
   "initial_scenario_file_sha256": "b5bd441da35d355669ca89f895103af871f450efd2cd862acc89a65307979ed2",
   "initial_rubric_file_sha256": "2cfb9d22f19da8a4163534ddd4267c24b3030baef393a340669028f9fc21d41b",
-  "current_scenario_file_sha256": "0f57d84abdd3fcf4e4ba9b906db3e3e6f5a959737c7e7538eb50891672780c66",
-  "current_rubric_file_sha256": "4d80760fd144fd9538bdf60790432dcaafa5cb4bdf8a0e4bee75434b1a8dff61",
+  "current_scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
+  "current_rubric_file_sha256": "26d9aa2949ea65eee75a295dfefd40b573c296c78605d045b595eb829e194ef4",
   "results": [
     {
       "scenario_id": "focused-review-only",
       "prompt": "Review this single low-stakes discussion prompt for clarity and alignment. Do not rewrite it: ‘Describe what justice means in the reading and reply to two peers.’",
       "result": "historical-observed-pass-not-qualifying",
-      "rubric_ids": ["S1", "S2", "S3", "S4", "S6", "S8"],
+      "rubric_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S6",
+        "S8"
+      ],
       "observation": "Reviewed without rewriting, used minimal state, identified alignment gaps, and named the next owner decision."
     },
     {
       "scenario_id": "conflicting-accessibility-authorities",
       "result": "historical-observed-pass-not-qualifying",
-      "rubric_ids": ["S2", "S4", "S6", "S7", "scenario:conflicting-accessibility-authorities"],
+      "rubric_ids": [
+        "S2",
+        "S4",
+        "S6",
+        "S7",
+        "scenario:conflicting-accessibility-authorities"
+      ],
       "observation": "Rejected automated-pass and legal-compliance overclaims, separated authorities and dates, and routed the unresolved target to an authorized owner."
     },
     {
       "scenario_id": "optional-visual-palette",
-      "result": "historical-superseded-after-palette-neutralization",
-      "rubric_ids": ["S1", "S2", "S6", "scenario:optional-visual-palette"],
-      "observation": "The then-current retest used an institution-associated palette that has since been removed. A fresh unbranded-palette test is required."
+      "result": "historical-superseded-after-palette-provenance-relabel",
+      "rubric_ids": [
+        "S1",
+        "S2",
+        "S6",
+        "scenario:optional-visual-palette"
+      ],
+      "observation": "The then-current retest used an institution-associated palette presented without provenance; the palette guidance now states the institutional provenance explicitly and forbids the unbranded/neutral label. A fresh test of the provenance-stated palette behavior is required."
     },
     {
       "scenario_id": "auto-non-interactive-design",
       "result": "historical-observed-pass-not-qualifying",
-      "rubric_ids": ["S2", "S3", "S4", "S6", "S7", "S9", "scenario:auto-non-interactive-design"],
+      "rubric_ids": [
+        "S2",
+        "S3",
+        "S4",
+        "S6",
+        "S7",
+        "S9",
+        "scenario:auto-non-interactive-design"
+      ],
       "observation": "Produced a complete recommended lesson and instructor guide with assumptions, validation, and release boundaries; asked no questions and requested no approval or feedback."
     },
     {
       "scenario_id": "rapid-single-review-design",
       "result": "historical-observed-pass-not-qualifying",
-      "rubric_ids": ["S2", "S3", "S4", "S6", "S7", "S10", "scenario:rapid-single-review-design"],
+      "rubric_ids": [
+        "S2",
+        "S3",
+        "S4",
+        "S6",
+        "S7",
+        "S10",
+        "scenario:rapid-single-review-design"
+      ],
       "observation": "Produced the complete provisional lesson and instructor guide without intermediate checkpoints, then ended with one consolidated faculty-review section."
     }
   ],

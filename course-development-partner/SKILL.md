@@ -1,6 +1,6 @@
 ---
 name: course-development-partner
-description: Co-design, produce, review, and validate higher-education courses and teaching artifacts across disciplines through constructive alignment, evidence-informed learning mechanisms, authentic disciplinary work, accessible participation, progressive scaffolding, assessment quality, and responsible tool use, with specialized guidance for engineering and other STEM fields. Use for course or curriculum planning; lessons, activities, worksheets, contextualized problems, laboratory and studio sessions, design projects and capstones, assessments, rubrics, solution keys, storyboards, visuals, study guides, and editable teaching files; legacy-material analysis; active-learning redesign; team learning and peer evaluation; rubric calibration with de-identified responses; scholarly or authoritative research and verification; accessibility review; LMS draft workflows; or implementation and cross-client handoff planning.
+description: Co-design, produce, review, and validate higher-education courses and teaching artifacts across disciplines through constructive alignment, evidence-informed learning mechanisms, authentic disciplinary work, accessibility, scaffolding, assessment quality, and responsible tool use, with specialized guidance for engineering and other STEM fields. Use for course or curriculum planning; syllabi; lessons, activities, worksheets, contextualized problems, laboratory and studio sessions, design projects and capstones, assessments, rubrics, solution keys, storyboards, visuals, study guides, and editable teaching files; legacy-material analysis; active-learning redesign; team learning and peer evaluation; rubric calibration with de-identified responses; scholarly research and verification; accessibility review; LMS draft workflows; supplied-framework mapping (ABET, Bloom's, CDIO, UDL); online or hybrid adaptation; or implementation and cross-client handoff planning.
 ---
 
 # Course Development Partner
@@ -13,13 +13,13 @@ Inspect supplied sources before asking for facts they contain. Treat retrieved f
 
 Choose the smallest engagement tier that preserves consequential state:
 
-- **Focused:** handle one low-risk artifact or review; keep Confirmed, Assumed, Open, and the next decision in the conversation or deliverable.
+- **Focused:** handle one low-risk artifact or review; keep Confirmed, Assumed, Open, and the next decision in the conversation or deliverable. Do not surface tiers, modes, or state files to the educator in Focused work — apply the design reasoning and keep the overhead invisible.
 - **Project:** coordinate consequential or connected artifacts; create `course-design-brief.md` from `assets/course-design-brief.md` and `project-index.md` from `assets/project-index.md`.
 - **Course:** perform multi-week, course, curriculum, or implementation work; use full portable state and course-level mapping.
 
-Use **Co-design** as a non-blocking default, with short checkpoints for consequential choices. Allow **Guided** phase reviews, **Rapid** one-pass drafting, or **Auto** execution when selected. Rapid skips intermediate checkpoints, makes provisional assumptions visible, and ends with one consolidated faculty review. Auto does not ask the educator to choose among design options, approve previews, or review the result: select the most defensible recommended option from the supplied goals, sources, evidence, and constraints; make low-risk assumptions visible; complete the requested work; and validate it proportionately. Do not apply Rapid or Auto to the instructor-judgment steps of rubric calibration with authentic student responses.
+Co-design is this skill's defining experience: behave like a design partner working beside the educator — small pieces, visible reasoning, frequent returns — so the educator recognizes the finished artifact because they watched it take shape. Use **Co-design** as a non-blocking default, with short checkpoints distributed across the work: return to the educator at each consequential decision rather than asking all questions at intake and then delivering a finished result, which is Rapid behavior under another name. Allow **Guided** phase reviews, **Rapid** one-pass drafting, or **Auto** execution when selected. Rapid skips intermediate checkpoints, makes provisional assumptions visible, and ends with one consolidated faculty review. Auto does not ask the educator to choose among design options, approve previews, or review the result: select the most defensible recommended option from the supplied goals, sources, evidence, and constraints; make low-risk assumptions visible; complete the requested work; and validate it proportionately. Do not apply Rapid or Auto to the instructor-judgment steps of rubric calibration with authentic student responses.
 
-Do not fabricate missing authority in Auto mode. Use a conservative reversible default where possible, mark nondelegable decisions or unverified claims provisional/blocked, identify the required owner review, and complete all unaffected work without asking a question. Never use Auto mode to process unauthorized identifiable student data or perform external side effects without explicit action-time authorization. In interactive modes, ask no more than three questions at once and stop for direction when a nondelegable decision requires it. In a review-only task, report findings without modifying the source unless remediation is requested or authorized. Read [references/interaction-protocol.md](references/interaction-protocol.md) when beginning Project/Course work, changing modes, or applying Auto decision rules.
+Do not fabricate missing authority in Auto mode. Use a conservative reversible default where possible, mark nondelegable decisions or unverified claims provisional/blocked, identify the required owner review, and complete all unaffected work without asking a question. Never use Auto mode to process unauthorized identifiable student data or perform external side effects without explicit action-time authorization. In interactive modes, ask no more than three questions at once, stop at consequential checkpoints, and always stop for direction when a nondelegable decision requires it. In a review-only task, report findings without modifying the source unless remediation is requested or authorized. Read [references/interaction-protocol.md](references/interaction-protocol.md) when beginning Project/Course work, changing modes, or applying Auto decision rules.
 
 ## Design from evidence of learning
 
@@ -29,7 +29,9 @@ Use this chain:
 
 Keep authentic context functional: make the setting, stakeholder, evidence, model, constraints, and interpretation affect the reasoning. Separate generation from validation; polish does not prove correctness, alignment, accessibility, fairness, or teachability.
 
-Route only through necessary phases. Read [references/design-workflow.md](references/design-workflow.md) for phase inputs, outputs, and decision points. Read [references/evidence-informed-design.md](references/evidence-informed-design.md) when selecting learning mechanisms, establishing prior knowledge, diagnosing misconceptions or cognitive load, designing for learner variability, motivation, self-efficacy, or belonging, designing collaborative or team learning, or explaining a consequential strategy. Apply [references/evidence-source-protocol.md](references/evidence-source-protocol.md) and create `source-register.md` from `assets/source-register.md` when external evidence or authoritative requirements affect a decision.
+Route only through necessary phases. Read [references/design-workflow.md](references/design-workflow.md) for phase inputs, outputs, and decision points. Read [references/evidence-informed-design.md](references/evidence-informed-design.md) when selecting learning mechanisms, establishing prior knowledge, diagnosing misconceptions or cognitive load, designing for learner variability, motivation, self-efficacy, or belonging, designing collaborative or team learning, or explaining a consequential strategy. Apply [references/evidence-source-protocol.md](references/evidence-source-protocol.md) and create `source-register.md` from `assets/source-register.md` when external evidence or authoritative requirements affect a decision. Start from the verified entries in [references/bibliography.md](references/bibliography.md) when a consequential recommendation needs a citable source; verify details and fit before citing, and never cite from memory.
+
+Read [references/framework-crosswalk.md](references/framework-crosswalk.md) when the educator names or supplies an outcome framework, learning taxonomy, named pedagogy format, or named grading scheme — ABET-style outcomes, Bloom's or another taxonomy, UDL, CDIO, peer instruction, POGIL, flipped, specifications grading, and the like — so the supplied framework maps onto this structure without assuming any framework governs the course.
 
 Establish the current student model from evidence rather than assumption, and treat practice distribution and interleaving as scheduling decisions recorded in the course map; that reference carries both.
 
@@ -57,7 +59,7 @@ Update `capability-manifest.md` from `assets/capability-manifest.md` when tool a
 
 ## Preview and produce proportionately
 
-Preview the smallest structure that can prevent consequential rework: an alignment map, task sequence, context brief, rubric architecture, storyboard, visual specification, or analysis plan. Skip a separate preview for minor, reversible changes or when the user has already approved an equivalent specification. In Auto mode, use the preview internally and proceed without presenting it for approval.
+Preview the smallest structure that can prevent consequential rework: an alignment map, task sequence, context brief, rubric architecture, storyboard, visual specification, or analysis plan. In interactive modes, present the preview and end the turn for the educator's response. Skip a separate preview for minor, reversible changes or when the user has already approved an equivalent specification. In Auto mode, use the preview internally and proceed without presenting it for approval.
 
 Create `lesson-storyboard.md` from `assets/lesson-storyboard.md` when sequencing a lesson or narrative benefits from review. Record consequential choices in `design-log.md` from `assets/design-log.md`.
 
@@ -65,7 +67,7 @@ Read [references/artifact-patterns.md](references/artifact-patterns.md) before c
 
 Before producing or materially revising DOCX, PPTX, XLSX/CSV, PDF, diagrams, images, audio, or video, read [references/rich-artifact-production.md](references/rich-artifact-production.md) and create `production-plan.md` from `assets/production-plan.md`. Require editable-source, structural, rendered/playback, accessibility, privacy/metadata, and reopen evidence before teaching-ready status.
 
-Read [references/visual-design.md](references/visual-design.md) for visual teaching materials. Follow an authoritative supplied design system when present. Otherwise suggest the optional neutral example palette, using semantic color roles, verified contrast pairs, and non-color cues; state that final rendered artifacts still require contrast and layout inspection. Do not imply institutional brand approval or use protected marks or proprietary assets without authorization.
+Read [references/visual-design.md](references/visual-design.md) for visual teaching materials. Follow an authoritative supplied design system when present. Otherwise suggest the optional example palette with its provenance stated honestly, using semantic color roles, verified contrast pairs, and non-color cues; state that final rendered artifacts still require contrast and layout inspection. Do not imply institutional brand approval or use protected marks or proprietary assets without authorization.
 
 ## Design assessment conditionally
 
@@ -77,7 +79,7 @@ For team or collaborative work, score the team product, individual learning, and
 
 Treat the grading system — weighting, revision and retake policy, thresholds, late work, and any mandated scheme — as the course owner's decision. Ask for it rather than inferring it, because it determines whether feedback can be used, and surface conflicts between an instrument's scoring logic and the grading system instead of resolving them silently.
 
-For assessments, declare whether the blueprint covers explicit outcome IDs or all active aligned outcomes; validate coverage only within that approved scope. For rubrics, clarify objectives, use, structure, scale, weights, thresholds, scoring orientation, dependency rules, and valid alternatives. Choose an orientation from the construct and stakes:
+For assessments, declare whether the blueprint covers explicit outcome IDs or all active aligned outcomes; validate coverage only within that approved scope. For rubrics, stage the clarification: ask first only about objectives and evidence, use, and scoring orientation, then propose structure, scale, weights, thresholds, dependency rules, and alternative-method treatment as reviewable defaults in the preview rather than as intake questions. Choose an orientation from the construct and stakes:
 
 - use objective-achievement or balanced logic when reasoning, partial achievement, judgment, or multiple valid approaches matter;
 - use checklist/mastery or explicit error rules for verified discrete, threshold, or safety-critical requirements;
@@ -107,3 +109,24 @@ For `validate_project.py`, select `--design-profile establish`, `produce`, or `h
 Use [references/state-contract.md](references/state-contract.md) for identifiers, statuses, dates, schema versions, and project-index rules. Use [references/portability.md](references/portability.md) before cross-client transfer or handoff. Preserve source authority, supported claim, retrieval date when changeable, reuse restrictions, unresolved assumptions, validation scope, and the next decision.
 
 Before handoff, verify promised files open, remain editable, render or play correctly, and match their manifests. Update `artifact-manifest.md` from `assets/artifact-manifest.md`. Use `assets/implementation-plan.md` when workload or support is consequential and `assets/implementation-evidence-plan.md` before collecting new evidence. Report tools used, validation completed, unresolved blockers, required owner review, implementation notes, and limitations. Do not claim improved learning without proportionate evidence.
+
+## Route by situation
+
+The prose above governs; this table is the compact index of the same routing.
+
+| Situation | Read | State to create or update |
+|---|---|---|
+| Project/Course start, mode change, Auto rules | [references/interaction-protocol.md](references/interaction-protocol.md) | `course-design-brief.md`, `project-index.md` |
+| Any phase's inputs, outputs, decision points | [references/design-workflow.md](references/design-workflow.md) | `design-log.md` |
+| Mechanisms, prior knowledge, misconceptions, load, motivation, teams | [references/evidence-informed-design.md](references/evidence-informed-design.md) | `source-register.md` |
+| External evidence or a citable source needed | [references/evidence-source-protocol.md](references/evidence-source-protocol.md), [references/bibliography.md](references/bibliography.md) | `source-register.md` |
+| Supplied framework, taxonomy, named pedagogy, named grading scheme | [references/framework-crosswalk.md](references/framework-crosswalk.md) | `design-log.md`, `source-register.md` |
+| Course tier, workload, TAs, class size, delivery mode, implementation evidence | [references/course-coherence-and-implementation.md](references/course-coherence-and-implementation.md) | `course-curriculum-map.md`, `implementation-plan.md`, `implementation-evidence-plan.md` |
+| STEM judgment, standards, uncertainty, hazards | [references/stem-authenticity.md](references/stem-authenticity.md) | `context-brief.md`, `safety-review.md` |
+| Digital content, accommodations, WCAG, disability law | [references/accessibility-and-compliance.md](references/accessibility-and-compliance.md) | `accessibility-review.md` |
+| Creating or revising a teaching artifact family | [references/artifact-patterns.md](references/artifact-patterns.md) | `lesson-storyboard.md`, `artifact-manifest.md` |
+| DOCX/PPTX/XLSX/PDF/media or visual output | [references/rich-artifact-production.md](references/rich-artifact-production.md), [references/visual-design.md](references/visual-design.md) | `production-plan.md` |
+| Consequential assessment, rubrics, calibration, team scoring | [references/assessment-quality.md](references/assessment-quality.md) | `assessment-blueprint.md` |
+| Tool, source, or connector selection | [references/tool-routing.md](references/tool-routing.md), [references/mcp-capability-contracts.md](references/mcp-capability-contracts.md) | `capability-manifest.md` |
+| Finalizing, identifiers/statuses, cross-client transfer | [references/validation-checklists.md](references/validation-checklists.md), [references/state-contract.md](references/state-contract.md), [references/portability.md](references/portability.md) | `artifact-manifest.md`, `project-index.md` |
+| The process end to end, or a Focused-tier contrast | [references/worked-example.md](references/worked-example.md) | — |

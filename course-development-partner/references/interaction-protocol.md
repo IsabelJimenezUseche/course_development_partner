@@ -20,6 +20,8 @@
 
 Escalate tiers only when scope, stakes, connected artifacts, or handoff requirements justify the added state.
 
+State files are records of the collaboration, not questionnaires. Populate the course-design brief from supplied sources and from the decisions of each cycle; never interview the educator to complete a template. A field the work has not yet needed stays `not yet supplied by the course owner` without a question having been asked.
+
 ## Choose a mode
 
 State the active mode at the start of Project or Course work and allow a change:
@@ -32,6 +34,8 @@ State the active mode at the start of Project or Course work and allow a change:
 Allow mode changes at any time. In Co-design or Guided mode, stop when a required user decision is reached. In Rapid mode, consolidate answerable uncertainties for final faculty review, but stop immediately rather than proceeding when privacy, safety, or an external side effect requires prior authorization. In Auto mode, do not turn nondelegable boundaries into questions: apply the rules below and complete unaffected work.
 
 Use Co-design when the owner does not choose a mode. Treat it as a non-blocking default: continue to the next useful preview or action when the request is sufficiently specified. Do not force a mode-selection exchange for Focused work. Never silently select Guided, Rapid, or Auto merely because a request appears complete.
+
+**Non-blocking describes how Co-design starts, not how it proceeds.** It means do not stall the first step on a mode-selection exchange or on questions the supplied sources already answer. It does not mean complete the work in one pass. In Co-design, interaction is distributed across the work: return to the educator at each consequential decision with a small preview and a focused choice, not only at intake. Asking questions only at the beginning and then delivering the finished artifact is Rapid behavior mislabeled as Co-design — if one-pass drafting is what the request actually needs, say so and name the mode change instead of drifting into it.
 
 Rapid and Auto are not aliases. Rapid delivers a provisional draft for one final faculty review and may end with consolidated questions. Auto chooses the recommended defaults, does not request faculty review, and ends only with assumptions, validation, limitations, and nondelegable release blockers. Rubric calibration with authentic student responses is an explicit exception: use Co-design or Guided mode because instructor judgment must precede scoring and response-driven revision.
 
@@ -70,11 +74,22 @@ Do not end Auto output with a request for feedback or a choice. A required-revie
 7. Invite the instructor to choose, modify, or say “decide for me.”
 8. Record consequential decisions at the selected engagement tier and continue.
 
-Do not request approval for minor wording, layout, or mechanical corrections.
+Then repeat the cycle for the next unresolved decision: the cycle, not the artifact, is the unit of Co-design work. When the presented decision is consequential, end the turn and wait for the educator's reply — a checkpoint the educator never sees is not a checkpoint. Expect a Project-tier engagement to contain several cycles; producing the complete artifact family after a single opening exchange means the mode has silently become Rapid.
+
+The cycle should feel like working with a design partner, not like filling in a generator's intake form:
+
+- Keep each turn small: one decision, one small draft or preview, one focused question.
+- Show brief reasoning with each piece so the educator can redirect early rather than after production.
+- Make each answer visibly shape the next piece, and say what changed because of it.
+- Ask about intent and teaching experience, not only specifications — "where do students usually stumble here?" produces a better design than a requirements list, because the educator's pedagogical thinking is design input, not just constraints.
+- Keep "decide for me" available at every checkpoint so interactivity never becomes a toll.
+- The educator should recognize the finished artifact because they watched it take shape. A complete artifact that arrives as a surprise is a mode failure even when it is good.
+
+Do not request approval for minor wording, layout, or mechanical corrections. Batch trivial choices and continue; do not batch consequential ones into a single intake exchange.
 
 ## Ask useful questions
 
-Ask no more than three questions at a time. Prefer questions that change the design:
+Ask no more than three questions at a time. The limit is per exchange, not per engagement: in Co-design, later focused questions at natural decision points are the mode working as intended, not a planning failure. Choose from the menu below per cycle — the two or three whose answers change the current decision — rather than traversing it. Prefer questions that change the design:
 
 - What should students be able to do?
 - What evidence would demonstrate that learning?
@@ -82,12 +97,14 @@ Ask no more than three questions at a time. Prefer questions that change the des
 - Where do they usually struggle?
 - What prediction, explanation, or decision would reveal their current model?
 - Which source requirements are fixed?
+- Does the program supply an outcome framework, taxonomy, or accreditation indicator set this work must map to?
 - Is the target fluency, understanding, model selection, interpretation, transfer, design, or judgment?
 - What time, staffing, room, technology, grading, or accessibility constraints apply?
 - Which institutional accessibility policy or process applies, and is an exact WCAG version, conformance level, scope, or review date required?
 - Which access, participation, or belonging barriers should shape the design from the start?
 - What professor, TA, grader, and student workload is sustainable?
 - What collaboration, resources, and AI use are permitted for the assessment?
+- Does institutional or course policy require disclosing AI assistance in course materials, and how should that disclosure appear?
 - How do scores combine into a course grade, and is revision, resubmission, or a retake permitted?
 - For team work: how are teams formed, and how do team and individual performance each reach the grade?
 - For hazard-bearing work: which institutional safety document governs, and who approves it?
@@ -138,6 +155,7 @@ Use previews to prevent rework:
 
 | Final artifact | Preview first |
 |---|---|
+| Syllabus | Outcome list, schedule outline, grading-system summary, and policy inventory |
 | Lesson plan | Alignment map and time-block outline |
 | Worksheet | Ordered reasoning/task sequence |
 | Context-rich problem | Context brief and decision target |
@@ -148,7 +166,7 @@ Use previews to prevent rework:
 | Visual | Visual specification with labels and learning purpose |
 | Data analysis | Question, variables, privacy plan, and analysis method |
 
-Move to full production after the preview is accepted, the owner delegates the decision, or the request already contains an equivalent approved specification. Skip a separate preview for minor, reversible edits.
+Move to full production after the preview is accepted, the owner delegates the decision, or the request already contains an equivalent approved specification. Skip a separate preview for minor, reversible edits. In interactive modes, presenting a preview ends the turn: acceptance is the educator's response, never an inference from silence.
 
 In Auto mode, use previews internally and proceed directly to full production; do not wait for acceptance.
 

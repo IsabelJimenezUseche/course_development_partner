@@ -4,6 +4,8 @@ One module carried end to end, to show what the other references produce when th
 
 The example is deliberately ordinary: an introductory measurement topic that recurs across chemistry, physics, biology, and engineering. Adapt the disciplinary surface; the structure transfers.
 
+The mode is Co-design, so the example shows the conversation, not just its products. `> Checkpoint:` lines mark where a turn ended and the instructor answered; everything between two checkpoints happened in one turn. An engagement that produced these artifacts without these exchanges would be Rapid work mislabeled — the artifacts might be identical, but the mode failed.
+
 ## Contents
 
 1. The request
@@ -17,6 +19,7 @@ The example is deliberately ordinary: an introductory measurement topic that rec
 9. Draft the rubric
 10. Validate
 11. What was not produced
+12. The Focused-tier contrast
 
 ## 1. The request
 
@@ -54,6 +57,8 @@ The instructor's first phrasing is "understand measurement uncertainty." That is
 
 The demand is `evaluate`, not `apply`: the target performance is a judgment under uncertainty, not the computation feeding it. Per `references/state-contract.md`, the demand is recorded for the target performance, and the assessment must reach it somewhere.
 
+> Checkpoint: the reworded outcome went to the instructor with one sentence of reasoning — "understand" cannot be assessed, and the reports show the failure is the judgment, not the computation. The instructor approved the wording and the `evaluate` demand; the program measurement outcome stayed Open.
+
 ## 4. Reject the first design
 
 The obvious activity — give students two datasets, have them compute means and uncertainties, ask which is larger — is rejected under `references/evidence-informed-design.md` §2: *reject an engaging activity when students can complete it without the intended reasoning.* Students can produce every number and still compare digits at the end. It exercises `apply` while the outcome names `evaluate`.
@@ -65,6 +70,8 @@ The design that survives makes the judgment unavoidable:
 - The deliverable is a recommendation to a named decision-maker, not a number.
 
 This is the conceptual-change cycle of §4 — elicit, make evidence visible, examine the discrepancy, reconstruct, re-test, reflect — instantiated as a session.
+
+> Checkpoint: both designs went to the instructor as a decision card — the compute-and-compare version (familiar, low preparation, but assessable without the target reasoning) against the commit-first three-comparison design (targets the judgment, needs three new datasets). The instructor chose the second and asked that the arithmetic supports be fully droppable in session; §7's contingency row exists because of that answer.
 
 ## 5. Place it in the course
 
@@ -101,6 +108,8 @@ Instructor approval status: approved
 ```
 
 The context is doing work: it supplies a decision-maker, a consequence, and a reason that a bare numerical comparison is insufficient. Per `references/stem-authenticity.md`, a calculation becomes authentic only when its result informs a credible decision.
+
+> Checkpoint: the brief above was the entire preview for this turn — no storyboard yet, per the preview-smallest-structure rule. The instructor questioned whether second-year students know what a receiving inspection is, and the session now opens with two sentences establishing the role; the brief's approval line records the exchange.
 
 ## 7. Storyboard the session
 
@@ -141,7 +150,7 @@ That is the check earning its place: every number in the blueprint would still b
 
 ## 9. Draft the rubric
 
-Orientation: **balanced**, per `references/artifact-patterns.md` §8, because partial reasoning and more than one defensible recommendation exist. Criteria weighted toward the objective:
+Orientation: **balanced**, per `references/artifact-patterns.md` §9, because partial reasoning and more than one defensible recommendation exist. Criteria weighted toward the objective:
 
 | Criterion | Weight | Achieved | Developing | Not yet |
 |---|---|---|---|---|
@@ -153,6 +162,8 @@ Orientation: **balanced**, per `references/artifact-patterns.md` §8, because pa
 Two rules recorded with it: a computational slip that does not change the decision is penalized once, under the last criterion only — not again through the conclusion criteria, per the double-penalty check. And *either* recommendation on the marginal pair can earn full credit if the basis and limits are sound, because the outcome is the justification, not the verdict.
 
 The 10% weight on computation is the visible consequence of the alignment decision. It will surprise students, so the weighting is stated in advance.
+
+> Checkpoint: the criteria, weights, orientation, and the two scoring rules were presented before any descriptor was written — the rubric preview the artifact pattern prescribes. The instructor accepted the 10% computation weight after seeing the tradeoff stated plainly ("this grades the judgment; the arithmetic is a gate, not the target") and asked that the weighting be announced in advance — which is why the previous sentence exists. Consequential scoring remains provisional until the course owner approves it for operational use.
 
 ## 10. Validate
 
@@ -175,3 +186,13 @@ Findings raised: one **Important** — the lab-report deadline falls in the same
 - No effectiveness claim. The module is aligned, feasible, and reviewed. Whether it improves learning is a question for the implementation-evidence plan, and the answer is not yet available.
 
 That last omission is the pattern the rest of the package protects: the work is finished and honestly bounded, not finished and oversold.
+
+## 12. The Focused-tier contrast
+
+The machinery above is Project-tier machinery, justified because the artifact family feeds a graded report. Most requests are smaller, and the tier rules mean most requests never see any of it. For contrast, the same skill handling a Focused request:
+
+> "I need a practice worksheet on series-parallel resistor combinations for Friday's recitation. 50 minutes, students have had the lecture."
+
+No state files, no mode discussion, no tier announcement. The response asks at most the questions that change the design — here, two: what students should be able to do by the end (compute equivalent resistance, or *select* a reduction strategy and check the result?), and where they went wrong last year. Then it drafts the worksheet with a progression that ends above pure execution, produces the matching solution key with common errors, states inline the two checks performed (independent solution of every item; directions usable without oral repair) and the one thing not checked (timing is an estimate — no prior-offering data), and stops.
+
+The Confirmed/Assumed/Open record lives in two sentences of the reply, not in a file. The design reasoning is the same — outcome before activity, demand named, key verified independently — but the overhead is proportionate to a one-session, low-stakes artifact. If the instructor then says "actually, make this a graded quiz with a rubric," the work becomes consequential and the Project-tier structure starts earning its cost. The tier follows the stakes; it is never the deliverable.

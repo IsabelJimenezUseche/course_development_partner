@@ -2,6 +2,26 @@
 
 Use each prompt in a fresh session with only the skill path, the prompt, and any named raw artifact. Do not provide expected answers or the faculty-review findings.
 
+## Co-design cadence
+
+Use `$course-development-partner` to design a two-week introductory module on dimensional analysis containing a lesson, a worksheet, and a short quiz. Work with me on the key decisions as the design develops.
+
+## Focused-tier overhead
+
+Use `$course-development-partner` to make a one-page practice worksheet on unit conversions for tomorrow's recitation. Students had the lecture today.
+
+## Supplied accreditation outcomes
+
+Use `$course-development-partner` to align a third-year fluid-mechanics course with four program-supplied ABET-style performance indicators pasted in by the instructor. Map the indicators to course outcomes and assessments, assemble the course-level evidence the program requests, and note anything the course does not currently sample.
+
+## Syllabus authorities
+
+Use `$course-development-partner` to draft a syllabus for a second-year circuits course. The instructor supplies the institution's required accommodation and integrity statements, their own grading scheme with a resubmission policy, and a week-by-week topic list. Produce a complete draft.
+
+## Rubric co-design
+
+Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.
+
 ## Conceptual change
 
 Use `$course-development-partner` to redesign a lively 50-minute think-pair-share lesson. Students participate enthusiastically, but many still believe that a heavier object falls faster than a lighter object in a vacuum. The current lesson tells them the belief is wrong and shows a demonstration. Work with me interactively before producing the revised lesson.
@@ -28,7 +48,7 @@ Use `$course-development-partner` to review a new public-university course modul
 
 ## Optional visual palette
 
-Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest a restrained, unbranded palette organized by semantic roles, identify safe contrast pairs and non-color cues, and explain the limits: do not imply institutional brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
+Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest the restrained example palette organized by semantic roles with its provenance stated honestly (the values match a named public university's published brand palette and imply no endorsement), identify safe contrast pairs and non-color cues, and explain the limits: do not label the palette unbranded or neutral, imply institutional brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
 
 ## Automated-check coverage
 

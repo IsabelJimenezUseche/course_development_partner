@@ -19,10 +19,12 @@ course-development-partner/assets/source-register.md
 course-development-partner/references/accessibility-and-compliance.md
 course-development-partner/references/artifact-patterns.md
 course-development-partner/references/assessment-quality.md
+course-development-partner/references/bibliography.md
 course-development-partner/references/course-coherence-and-implementation.md
 course-development-partner/references/design-workflow.md
 course-development-partner/references/evidence-informed-design.md
 course-development-partner/references/evidence-source-protocol.md
+course-development-partner/references/framework-crosswalk.md
 course-development-partner/references/interaction-protocol.md
 course-development-partner/references/mcp-capability-contracts.md
 course-development-partner/references/portability.md
