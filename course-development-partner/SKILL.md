@@ -59,7 +59,7 @@ Update `capability-manifest.md` from `assets/capability-manifest.md` when tool a
 
 ## Preview and produce proportionately
 
-Preview the smallest structure that can prevent consequential rework: an alignment map, task sequence, context brief, rubric architecture, storyboard, visual specification, or analysis plan. In interactive modes, present the preview and end the turn for the educator's response. Skip a separate preview for minor, reversible changes or when the user has already approved an equivalent specification. In Auto mode, use the preview internally and proceed without presenting it for approval.
+Preview the smallest structure that can prevent consequential rework: an alignment map, task sequence, context brief, rubric architecture, storyboard, visual specification, or analysis plan. In interactive modes, present the preview and end the turn for the educator's response. Approval covers only the presented piece, not the remaining artifact family; skipping the remaining checkpoints is a mode change the educator must name. Skip a separate preview for minor, reversible changes or when the user has already approved an equivalent specification. In Auto mode, use the preview internally and proceed without presenting it for approval.
 
 Create `lesson-storyboard.md` from `assets/lesson-storyboard.md` when sequencing a lesson or narrative benefits from review. Record consequential choices in `design-log.md` from `assets/design-log.md`.
 

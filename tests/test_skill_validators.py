@@ -2160,6 +2160,11 @@ class PackageContentTests(unittest.TestCase):
         # (e.g., selectable buttons) when one exists, not render as prose there.
         self.assertIn("native structured-question or option-selection tool", interaction_text)
         self.assertIn("labeled as recommended", interaction_text)
+        # Without a native affordance, checkpoints end with portable suggested
+        # replies, and one approval never authorizes the remaining family.
+        self.assertIn("Suggested replies", interaction_text)
+        self.assertIn("authorizes producing the artifact it previews", interaction_text)
+        self.assertIn("Approval covers only the presented piece", skill_text)
 
     def test_worked_example_shows_codesign_checkpoints(self) -> None:
         example_text = (

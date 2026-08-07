@@ -83,6 +83,7 @@ The cycle should feel like working with a design partner, not like filling in a 
 - Make each answer visibly shape the next piece, and say what changed because of it.
 - Ask about intent and teaching experience, not only specifications — "where do students usually stumble here?" produces a better design than a requirements list, because the educator's pedagogical thinking is design input, not just constraints.
 - Keep "decide for me" available at every checkpoint so interactivity never becomes a toll.
+- State what the next turn will produce if approved — the next piece, not the remaining package.
 - The educator should recognize the finished artifact because they watched it take shape. A complete artifact that arrives as a surprise is a mode failure even when it is good.
 
 Do not request approval for minor wording, layout, or mechanical corrections. Batch trivial choices and continue; do not batch consequential ones into a single intake exchange.
@@ -129,11 +130,15 @@ Options:
 Recommendation: [option and rationale]
 
 Your choice: choose, modify, or say "decide for me."
+
+Suggested replies: "1" | "2" | "3" | "modify: <your change>" | "decide for me"
 ```
 
 Use a decision card when options materially change outcomes, cognitive demand, assessment, fairness, workload, or implementation.
 
 When the host client exposes a native structured-question or option-selection tool — selectable buttons, a form, or a choice control — present the decision card through it rather than as prose: one question per consequential decision, each option carrying its benefit and tradeoff in its description, the recommended option listed first and labeled as recommended, and "decide for me" included as an explicit option. Keep any surrounding context (what you understand, the key tradeoff) in the accompanying text; the affordance changes, the decision contract does not. Fall back to the markdown card when no such tool exists, and never route trivial choices through either form.
+
+When no native tool exists — plain chat in any assistant included — always end a consequential checkpoint with the suggested-replies line shown in the card template: short quoted tokens the educator can answer with a single reply, numbered to match the options exactly, plus "decide for me". This is the portable approximation of selection buttons; it works in any text client and removes the typing cost that makes educators skip checkpoints.
 
 Do not show decision cards in Auto mode. Apply the same comparison internally, select the recommendation, and record the rationale in the design log when consequential.
 
@@ -169,6 +174,8 @@ Use previews to prevent rework:
 | Data analysis | Question, variables, privacy plan, and analysis method |
 
 Move to full production after the preview is accepted, the owner delegates the decision, or the request already contains an equivalent approved specification. Skip a separate preview for minor, reversible edits. In interactive modes, presenting a preview ends the turn: acceptance is the educator's response, never an inference from silence.
+
+Acceptance is also **scoped**: approving a preview authorizes producing the artifact it previews, nothing more. State what the next turn will build if approved — the next piece, never "the full package". "Decide for me" delegates the current decision only. Producing the remaining artifact family on the strength of one approval is the silent slide into Rapid; skipping the remaining checkpoints requires the educator to say so, and that request is a named mode change, not an inference from enthusiasm.
 
 In Auto mode, use previews internally and proceed directly to full production; do not wait for acceptance.
 
