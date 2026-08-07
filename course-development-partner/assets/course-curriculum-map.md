@@ -22,7 +22,9 @@ Use developmental stages `introduce`, `practice`, `master`, or `assess`. Separat
 
 - Hidden, broken, or circular prerequisites:
 - Outcomes assessed before adequate practice:
+- Practice massed in the introducing module rather than distributed (`--check-practice-distribution` automates this):
 - Long gaps without retrieval or use:
+- Confusable methods or models practiced only in separate blocks, never interleaved:
 - Redundant assessment or missing feedback:
 - Breadth/depth concerns:
 - Bottleneck or deadline clusters:

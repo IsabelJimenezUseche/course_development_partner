@@ -37,3 +37,5 @@ Cognitive demand values, in ascending order: `remember`, `understand`, `apply`, 
 For CSV, add `Assessed outcome scope` and `Evidence level claimed` columns and repeat the same assessment-level values on every row. Use explicit semicolon-separated outcome IDs for an assessment that intentionally samples a subset. Use `all-active` only when every active outcome in the authoritative alignment map belongs to this blueprint.
 
 Use a nonnegative finite number for `Points`; use `0` for an ungraded diagnostic or formative item. Use a positive finite number for `Expected time (min)`.
+
+Accessibility/accommodation review and permitted collaboration, resources, and AI use are recorded once at assessment level by design, because they rarely vary by item. When an individual item differs from the assessment-level declaration, record the exception in that item's `Construct-irrelevant barriers` cell.
