@@ -198,6 +198,8 @@ python3 -m unittest discover -s tests -v
 python3 tests/check_repository.py
 ```
 
+The sibling `course_development_partner_app` project runs this repository's tests through its symlink as part of its own suite; treat it as a second consumer when renaming or restructuring anything under `tests/`.
+
 Live behavioral testing is available separately and is opt-in. `tests/run_behavioral_scenarios.py` drives the partner-experience forward-test scenarios against any OpenAI-compatible chat endpoint — by default the configuration in the sibling `course_development_partner_app/.env` — with the skill text as the system prompt, applies deterministic heuristics (question counts, turn size, closing return-to-educator, tier/mode invisibility), and retains full transcripts under `tests/behavioral-results/` for human rubric application. Use `--iterations 3`; model outputs vary. Heuristic passes are a screen, never a qualifying forward-test claim.
 
 The working directory matters. `unittest` resolves `-s tests` as a path only when that path exists relative to the current directory; otherwise it falls back to treating `tests` as a dotted module name. Some third-party packages install a top-level `tests` package into `site-packages`, so from any other directory that fallback silently discovers and runs *their* suite instead of this one — reporting unrelated errors that look like failures in this repository. To run from elsewhere, give an absolute path:

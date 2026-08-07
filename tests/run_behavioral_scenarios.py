@@ -105,6 +105,54 @@ def check_word_count_under(limit: int) -> Check:
     return check
 
 
+def check_word_count_at_least(minimum: int) -> Check:
+    def check(text: str) -> tuple[bool, str]:
+        count = len(text.split())
+        return count >= minimum, f"word count {count} (minimum {minimum})"
+
+    check.__name__ = f"word_count_at_least_{minimum}"
+    return check
+
+
+REQUEST_PHRASES = (
+    "let me know",
+    "decide for me",
+    "your choice",
+    "your call",
+    "would you like",
+    "do you want",
+    "should i",
+    "shall i",
+    "which of these",
+    "which option",
+    "please confirm",
+    "awaiting your",
+    "feedback",
+)
+
+
+def check_no_closing_request(text: str) -> tuple[bool, str]:
+    # Question marks are allowed anywhere: student-facing content legitimately
+    # contains questions. Only an explicit request to the educator fails.
+    tail = text[int(len(text) * 0.75) :].lower()
+    hits = [phrase for phrase in REQUEST_PHRASES if phrase in tail]
+    if hits:
+        return False, f"Auto output ends by requesting educator input: {hits}"
+    return True, "no closing request for feedback or a choice"
+
+
+def check_tail_mentions_any(*tokens: str) -> Check:
+    def check(text: str) -> tuple[bool, str]:
+        tail = text[int(len(text) * 0.6) :].lower()
+        hits = [token for token in tokens if token.lower() in tail]
+        if hits:
+            return True, f"closing section mentions {hits}"
+        return False, f"closing section mentions none of {list(tokens)}"
+
+    check.__name__ = "tail_mentions_any_" + "_".join(t.split()[0] for t in tokens)
+    return check
+
+
 def check_returns_to_educator(text: str) -> tuple[bool, str]:
     tail = text[int(len(text) * 0.6) :].lower()
     for phrase in INVITE_PHRASES:
@@ -232,6 +280,53 @@ SCENARIOS: dict[str, Scenario] = {
                         check_word_count_under(1400),
                         check_mentions_any("weight", "criteri"),
                         check_returns_to_educator,
+                    ],
+                ),
+            ],
+        ),
+        Scenario(
+            scenario_id="auto-noninteractive",
+            heading="Auto non-interactive design",
+            references=["interaction-protocol.md"],
+            rubric_row="Auto non-interactive design",
+            notes=(
+                "The mode contrast: Auto must NOT interact. A completed draft, "
+                "reported assumptions and limitations, and no closing request "
+                "for a choice or feedback. Question marks are permitted "
+                "anywhere (student-facing content contains questions)."
+            ),
+            turns=[
+                Turn(
+                    educator_message=None,
+                    checks=[
+                        check_word_count_at_least(400),
+                        check_no_closing_request,
+                        check_mentions_any("assumption", "assumed"),
+                        check_mentions_any(
+                            "limitation", "provisional", "owner review", "blocked"
+                        ),
+                    ],
+                ),
+            ],
+        ),
+        Scenario(
+            scenario_id="rapid-single-review",
+            heading="Rapid single-review design",
+            references=["interaction-protocol.md"],
+            rubric_row="Rapid single-review design",
+            notes=(
+                "Rapid produces the complete provisional draft in one pass and "
+                "ends with exactly one consolidated review section - neither "
+                "intermediate checkpoints (Co-design) nor no review at all "
+                "(Auto)."
+            ),
+            turns=[
+                Turn(
+                    educator_message=None,
+                    checks=[
+                        check_word_count_at_least(400),
+                        check_mentions_any("provisional", "assumption", "assumed"),
+                        check_tail_mentions_any("review", "decision", "confirm"),
                     ],
                 ),
             ],

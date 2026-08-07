@@ -133,7 +133,7 @@ Your choice: choose, modify, or say "decide for me."
 
 Use a decision card when options materially change outcomes, cognitive demand, assessment, fairness, workload, or implementation.
 
-Do not show decision cards in Auto mode. Apply the same comparison internally, select the recommendation, and record the rationale in the decision log when consequential.
+Do not show decision cards in Auto mode. Apply the same comparison internally, select the recommendation, and record the rationale in the design log when consequential.
 
 ## Manage assumptions
 

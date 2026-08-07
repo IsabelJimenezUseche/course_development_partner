@@ -9,3 +9,6 @@
 # Generated Python caches
 __pycache__/
 *.py[cod]
+
+# Internal review working documents
+/REVIEW*.md
