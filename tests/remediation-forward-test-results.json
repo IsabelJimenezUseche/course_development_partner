@@ -9,7 +9,7 @@
   "initial_scenario_file_sha256": "b5bd441da35d355669ca89f895103af871f450efd2cd862acc89a65307979ed2",
   "initial_rubric_file_sha256": "2cfb9d22f19da8a4163534ddd4267c24b3030baef393a340669028f9fc21d41b",
   "current_scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
-  "current_rubric_file_sha256": "26d9aa2949ea65eee75a295dfefd40b573c296c78605d045b595eb829e194ef4",
+  "current_rubric_file_sha256": "a9210f9a4106211cd122c52a211a1065f6257751d81c4150f186974bf7448e9b",
   "results": [
     {
       "scenario_id": "focused-review-only",

@@ -133,6 +133,8 @@ Your choice: choose, modify, or say "decide for me."
 
 Use a decision card when options materially change outcomes, cognitive demand, assessment, fairness, workload, or implementation.
 
+When the host client exposes a native structured-question or option-selection tool — selectable buttons, a form, or a choice control — present the decision card through it rather than as prose: one question per consequential decision, each option carrying its benefit and tradeoff in its description, the recommended option listed first and labeled as recommended, and "decide for me" included as an explicit option. Keep any surrounding context (what you understand, the key tradeoff) in the accompanying text; the affordance changes, the decision contract does not. Fall back to the markdown card when no such tool exists, and never route trivial choices through either form.
+
 Do not show decision cards in Auto mode. Apply the same comparison internally, select the recommendation, and record the rationale in the design log when consequential.
 
 ## Manage assumptions

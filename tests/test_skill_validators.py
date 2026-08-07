@@ -2156,6 +2156,10 @@ class PackageContentTests(unittest.TestCase):
             "acceptance is the educator's response, never an inference from silence",
             interaction_text,
         )
+        # Decision cards must route through the host's native choice affordance
+        # (e.g., selectable buttons) when one exists, not render as prose there.
+        self.assertIn("native structured-question or option-selection tool", interaction_text)
+        self.assertIn("labeled as recommended", interaction_text)
 
     def test_worked_example_shows_codesign_checkpoints(self) -> None:
         example_text = (
