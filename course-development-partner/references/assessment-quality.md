@@ -152,7 +152,7 @@ Watch for these failure modes and check for them in the collected data:
 - **Retaliation.** A student who reports a free-riding teammate may be penalized in return. Provide a route to raise a problem outside the instrument.
 - **Small-n instability.** In a team of three or four, one outlier rating moves an individual score substantially. Bound the effect.
 
-Bound the consequence: cap how much peer input can move an individual grade, define what happens when ratings conflict sharply, and define the escalation and appeal path. State that a validated published instrument is validated for its own population and use, and that a locally modified version does not inherit that claim.
+Bound the consequence, and treat the bound as the course owner's decision rather than a value to pick. This is a grading-system decision under §8, so do not set one by inference. In Co-design and Guided, ask how much peer input may move an individual grade, what happens when ratings conflict sharply, and what the escalation and appeal path is, recommending a defensible cap with its reasoning. In Auto mode, draft the strongest defensible bound, mark it provisional, and block it from operational use until the owner approves. State that a validated published instrument is validated for its own population and use, and that a locally modified version does not inherit that claim.
 
 Do not use AI to interpret peer-evaluation narratives into a consequential individual grade. It may organize, de-identify, or summarize them for the instructor's judgment.
 

@@ -92,7 +92,7 @@ Do not request approval for minor wording, layout, or mechanical corrections. Ba
 
 Ask no more than three questions at a time. The limit is per exchange, not per engagement: in Co-design, later focused questions at natural decision points are the mode working as intended, not a planning failure. Choose from the menu below per cycle — the two or three whose answers change the current decision — rather than traversing it. Prefer questions that change the design:
 
-- What should students be able to do?
+- What should students be able to do — and when the supplied wording is ambiguous, which reading is intended, given what each would change about the artifact?
 - What evidence would demonstrate that learning?
 - What do students already know, and what is the evidence for that — a diagnostic, an inventory, prior-offering work, or an impression?
 - Where do they usually struggle?
@@ -134,7 +134,7 @@ Your choice: choose, modify, or say "decide for me."
 Suggested replies: "1" | "2" | "3" | "modify: <your change>" | "decide for me"
 ```
 
-Use a decision card when options materially change outcomes, cognitive demand, assessment, fairness, workload, or implementation.
+Use a decision card when options materially change outcomes, cognitive demand, assessment, fairness, workload, implementation, visual identity, or how a grade is composed.
 
 When the host client exposes a native structured-question or option-selection tool — selectable buttons, a form, or a choice control — present the decision card through it rather than as prose: one question per consequential decision, each option carrying its benefit and tradeoff in its description, the recommended option listed first and labeled as recommended, and "decide for me" included as an explicit option. Keep any surrounding context (what you understand, the key tradeoff) in the accompanying text; the affordance changes, the decision contract does not. Fall back to the markdown card when no such tool exists, and never route trivial choices through either form.
 

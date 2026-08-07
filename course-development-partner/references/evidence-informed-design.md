@@ -255,7 +255,7 @@ Do not assign roles that repeatedly place the same students in clerical or low-s
 
 Team composition is a design decision, not an administrative one.
 
-- State the formation basis — instructor-assigned, self-selected, or criterion-based — and the reason for it. Self-selection is fastest and tends to reproduce existing social groupings and isolate students who lack them.
+- Ask the instructor for the formation basis — instructor-assigned, self-selected, or criterion-based — rather than choosing one; they know the cohort and carry the consequence. Recommend a basis with its reason. Self-selection is fastest and tends to reproduce existing social groupings and isolate students who lack them.
 - Distribute relevant prior experience across teams rather than concentrating it, so that no team depends on one member and no team lacks a foothold.
 - Avoid placing a single student from an underrepresented group alone on a team when the cohort makes an alternative possible and an institution-authorized process supplies the relevant information. Never infer identity from names, appearance, or records collected for another purpose, and do not request sensitive identity data solely to form teams. When authorized information is unavailable, improve role rotation, participation structures, monitoring, and escalation pathways for every team rather than identity-matching students.
 - Consider schedule, modality, and access constraints, which determine whether a team can meet at all. Ask about availability rather than about personal circumstances.

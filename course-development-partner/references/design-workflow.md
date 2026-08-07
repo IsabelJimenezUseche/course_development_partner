@@ -57,6 +57,29 @@ Output: source inventory and course-context summary.
 
 Use `assets/alignment-map.md`.
 
+### Clarify an ambiguous outcome before building on it
+
+Everything downstream aligns to the outcome, so a misread outcome invalidates the sequence, the assessment, and the rubric built on it — and the error usually surfaces only after production, when it is expensive to correct. Clarification costs one exchange here.
+
+This is not a licence to interview the educator. Extract outcomes from the syllabus, assignment, request, or supplied materials first, and never open with "what are your learning outcomes?" Raise a question only when a specific ambiguity would change what you build.
+
+Treat these as design-changing ambiguities:
+
+- **A verb that names no performance** — "understand", "know", "be familiar with", "appreciate". Which controlled demand token applies changes the activity, the assessment, and the demand check.
+- **Two outcomes in one** — "analyze and design", "derive and interpret". Each half implies different evidence; propose splitting rather than forcing one rank.
+- **Unstated scope** — which cases, models, systems, or range the outcome covers.
+- **Unstated conditions** — with or without references, tools, software, or a formula sheet; individually or in a team. This changes the assessment, not just the wording.
+- **Familiar case or novel transfer** — the most common silent mismatch, because the outcome implies transfer while the assessment samples a near-copy.
+- **No implied evidence** — you cannot name a student performance that would count as achieving it.
+
+Raise it as one focused choice, not a survey: state the two readings, say what each changes about the artifact, recommend one, and offer "decide for me."
+
+> Should students *compute* equivalent resistance for a given network, or *select* a reduction strategy and justify the choice? The first is `apply`, and a worksheet of networks samples it. The second is `analyze`, and it needs contrasting networks where the obvious strategy fails.
+
+In Co-design and Guided, raise the ambiguity at this step, before drafting the sequence, so the educator's answer shapes what gets built rather than what gets revised. In Rapid, choose the more defensible reading, label it provisional, and list it in the consolidated review. In Auto mode, choose the more defensible reading, record it as a labeled assumption, and do not ask. Never resolve an ambiguity silently in any mode: record the resolved wording and its demand token in the alignment map.
+
+When the outcome text is authoritative — program, accreditation, or department-supplied wording the educator cannot change — clarify the *interpretation* and leave the wording alone, and map it per `references/framework-crosswalk.md`.
+
 Output: accepted alignment map.
 
 ## 4. Diagnose the challenge

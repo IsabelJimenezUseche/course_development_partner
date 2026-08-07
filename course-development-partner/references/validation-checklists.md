@@ -53,6 +53,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 
 - Map each artifact and assessment item to an outcome.
 - Record cognitive demand as one controlled token — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — for the target performance, not the hardest sub-step.
+- Confirm that an ambiguous outcome was resolved with the educator or recorded as a labeled assumption, not settled silently. An outcome whose verb names no performance, that carries two outcomes in one, or whose scope, conditions, or transfer expectation is unstated is a finding until resolved.
 - Match cognitive demand across outcome, activity, and assessment. Scaffolding items below the outcome's demand are legitimate; an outcome whose entire active sample sits below its aligned demand is a gap.
 - Read the items rather than trusting the tokens. The ranks order kinds of cognition, not difficulty, so a passing automated demand check shows only that the sample is labeled at the outcome's level.
 - Ensure every important outcome has learning support and evidence.

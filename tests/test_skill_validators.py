@@ -2209,6 +2209,37 @@ class PackageContentTests(unittest.TestCase):
         self.assertIn("never interview the educator", interaction_text)
         self.assertIn("not an intake questionnaire", brief_text)
 
+    def test_ambiguous_outcomes_are_clarified_not_assumed(self) -> None:
+        # Outcomes drive every downstream artifact, so an ambiguity must reach the
+        # educator -- but the rule must not become an intake interview, which the
+        # state-file guidance forbids.
+        skill_root = ROOT / "course-development-partner"
+        workflow = (skill_root / "references" / "design-workflow.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Clarify an ambiguous outcome before building on it", workflow)
+        self.assertIn("not a licence to interview the educator", workflow)
+        self.assertIn('never open with "what are your learning outcomes?"', workflow)
+        self.assertIn("Never resolve an ambiguity silently in any mode", workflow)
+        # The ambiguity kinds that change the artifact.
+        for kind in (
+            "A verb that names no performance",
+            "Two outcomes in one",
+            "Unstated scope",
+            "Unstated conditions",
+            "Familiar case or novel transfer",
+            "No implied evidence",
+        ):
+            self.assertIn(kind, workflow, kind)
+        # Authoritative wording is interpreted, not rewritten.
+        self.assertIn("leave the wording alone", workflow)
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Extract outcomes from supplied sources rather than asking", skill_text)
+        checklists = (
+            skill_root / "references" / "validation-checklists.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("not settled silently", checklists)
+
     def test_auto_mode_paragraphs_state_interactive_counterpart(self) -> None:
         # Symmetry rule: outside the interaction protocol (which defines the
         # modes), any paragraph stating Auto-mode behavior must state its
