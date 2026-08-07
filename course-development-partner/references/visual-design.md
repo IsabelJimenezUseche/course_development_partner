@@ -4,7 +4,7 @@
 
 1. Start with the teaching job
 2. Apply an accessible design system
-3. Suggest an optional example palette
+3. Apply the example palette when no system is supplied
 4. Verify the rendered result
 
 ## 1. Start with the teaching job
@@ -23,9 +23,19 @@ Choose hierarchy, layout, typography, color, and imagery to help learners locate
 
 Apply the project's exact accessibility target. A palette recommendation is not evidence of WCAG conformance or institutional brand approval.
 
-## 3. Suggest an optional example palette
+## 3. Apply the example palette when no system is supplied
 
-When the instructor provides no visual system, offer this restrained example palette as a replaceable starting point. State its provenance honestly: these values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic color roles with verified contrast pairs — they are not institution-neutral, their presence implies no endorsement by or affiliation with that institution, and using any institution's palette in its own materials requires that institution's authorization and current brand guidance. Recommend that the instructor substitute their institution's authorized system, preserving the semantic roles when adapting colors so hierarchy and accessibility evidence remain explicit.
+Follow an instructor-supplied template, brand system, or color direction whenever one exists. When none exists, the visual system is a consequential choice, so it follows the active interaction mode:
+
+- **Co-design and Guided:** ask before producing. Name the choice — the institution's own brand system, this example palette, or another supplied direction — recommend the example palette, and state its provenance in the same breath. One short question, not a menu. Do not produce the artifact with improvised colors while waiting for the answer.
+- **Rapid:** apply the palette below, label the choice provisional, and raise it in the single consolidated faculty review.
+- **Auto:** apply the palette below and record the choice as a provisional assumption. Do not ask.
+
+Whichever mode applies, **use the palette's semantic roles and its verified contrast pairs as given** once it is selected.
+
+Do not improvise a different color scheme in any mode. An invented palette carries no contrast evidence and no rationale to record, which is why ad-hoc color is the one option this reference rules out. If a stated constraint forces a departure — a required medium, an accessibility target, a discipline convention, a supplied asset — name the palette actually applied and the reason in `production-plan.md`. Silence is not a deviation rationale.
+
+The palette is optional in the sense that the instructor may decline or replace it at any time, not in the sense that colors may be chosen arbitrarily instead. State its provenance honestly whenever it is applied: these values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic color roles with verified contrast pairs — they are not institution-neutral, their presence implies no endorsement by or affiliation with that institution, and using any institution's palette in its own materials requires that institution's authorization and current brand guidance. Recommend that the instructor substitute their institution's authorized system, preserving the semantic roles when adapting colors so hierarchy and accessibility evidence remain explicit.
 
 | Role | Color | Hex | Recommended use |
 |---|---|---|---|
@@ -44,4 +54,4 @@ Use accent colors as supplements rather than the only carrier of meaning. Do not
 
 ## 4. Verify the rendered result
 
-Inspect the final artifact for hierarchy, crowding, contrast, legibility, non-color cues, reading order, editable content, and consistency. Record the selected palette and contrast evidence in `production-plan.md` and the tested scope in `accessibility-review.md`.
+Inspect the final artifact for hierarchy, crowding, contrast, legibility, non-color cues, reading order, editable content, and consistency. Record which palette was actually applied, its contrast evidence, and the reason for any departure in `production-plan.md`, and the tested scope in `accessibility-review.md`. Do not record a palette as applied when the rendered artifact uses different colors.

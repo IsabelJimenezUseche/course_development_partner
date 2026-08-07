@@ -34,8 +34,9 @@
 ## Design and accessibility
 
 - Document/deck/workbook/visual archetype or style authority:
-- Selected palette and contrast evidence:
-- Optional example palette proposed: yes | no | not applicable
+- Palette applied: supplied system | example palette | other
+- Reason if not the supplied system or the example palette:
+- Contrast evidence for the applied palette:
 - Required technical accessibility target: [standard, exact version, level, scope, effective date]
 - Institutional review or accommodation process:
 - Reading, navigation, keyboard, media, alternative, and assistive-technology needs:

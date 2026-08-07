@@ -2130,6 +2130,18 @@ class PackageContentTests(unittest.TestCase):
         self.assertIn("#CFB991", visual_text)
         self.assertIn("#DAAA00", visual_text)
         self.assertIn("optional", visual_text.lower())
+        # The palette must be applied, not merely mentioned: "suggest"/"offer"
+        # wording let the model name the palette and then pick its own colors.
+        self.assertIn("Do not improvise a different color scheme", visual_text)
+        self.assertIn("**Co-design and Guided:** ask before producing", visual_text)
+        self.assertIn("**Auto:** apply the palette below", visual_text)
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Never improvise colors in any mode", skill_text)
+        for reference in ("artifact-patterns.md", "rich-artifact-production.md"):
+            routed = (skill_root / "references" / reference).read_text(encoding="utf-8")
+            self.assertNotIn("offer the optional example palette", routed, reference)
+        plan = (skill_root / "assets" / "production-plan.md").read_text(encoding="utf-8")
+        self.assertIn("Palette applied:", plan)
         # The values match a real institution's published palette, so the
         # guidance must state that provenance and must not label it neutral.
         self.assertIn("provenance", visual_text.lower())

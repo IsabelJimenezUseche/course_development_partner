@@ -311,7 +311,7 @@ Verify the solution independently from the generated prompt. Do not silently rep
 
 Preview a storyboard or visual specification.
 
-Apply `references/visual-design.md`. Follow an authoritative supplied design system; otherwise offer the optional example palette with semantic color roles, contrast verification, and no implication of institutional brand approval.
+Apply `references/visual-design.md`. Follow an authoritative supplied design system; when none is supplied, resolve the palette by the mode rule in `references/visual-design.md` §3 rather than improvising colors, with semantic color roles, contrast verification, stated provenance, and no implication of institutional brand approval.
 
 Use visuals for relationships, mechanisms, comparisons, hierarchy, or change over time. Check:
 

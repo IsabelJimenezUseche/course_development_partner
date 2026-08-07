@@ -170,7 +170,7 @@ Use previews to prevent rework:
 | Laboratory or studio session | Investigative question, hazard summary, time blocks, and the data students leave with |
 | Multi-week project or capstone | Outcome map, milestone schedule, deliverables, and team/assessment structure |
 | Presentation | Slide storyboard |
-| Visual | Visual specification with labels and learning purpose |
+| Visual | Visual specification with labels, learning purpose, and the palette to apply |
 | Data analysis | Question, variables, privacy plan, and analysis method |
 
 Move to full production after the preview is accepted, the owner delegates the decision, or the request already contains an equivalent approved specification. Skip a separate preview for minor, reversible edits. In interactive modes, presenting a preview ends the turn: acceptance is the educator's response, never an inference from silence.
