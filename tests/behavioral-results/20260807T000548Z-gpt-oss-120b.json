@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-08-07T00:05:48+00:00",
+  "client": "direct chat-completions (skill text as system prompt)",
+  "endpoint": "https://genai.rcac.purdue.edu",
+  "model": "gpt-oss:120b",
+  "max_tokens": 6000,
+  "evaluator": "automated heuristics (run_behavioral_scenarios.py)",
+  "scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
+  "skill_file_sha256": "7ee36aac68438ff4eeeeff33071a44880405251ef08be3ec323fb8c7e96ae0f3",
+  "results": [
+    {
+      "scenario_id": "rubric-codesign",
+      "rubric_row": "Rubric co-design",
+      "notes": "The interrogation anti-pattern fires the full clarification list at once; staged clarification asks at most three architecture questions, then proposes reviewable defaults.",
+      "references_in_context": [
+        "interaction-protocol.md",
+        "artifact-patterns.md"
+      ],
+      "heuristic_result": "heuristic-fail",
+      "turns": [
+        {
+          "turn": 1,
+          "educator_message": "Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.",
+          "model_response": "**Design mode:** Co‑design (default for a Focused‑tier artifact)\n\n---\n\n### What I understand\nYou need a **rubric** for a **second‑year laboratory report** whose primary learning outcome is **“perform uncertainty analysis of experimental data”**. You have grading opinions but they are not yet documented, so we need to shape those opinions into a concrete rubric.\n\n---\n\n## Decision Card 1 – Rubric architecture\n\n| What I understand |  \n|-------------------|  \n| The rubric must evaluate a written lab report that includes: (1) clear statement of the research question, (2) description of methods, (3) data collection, (4) quantitative uncertainty analysis (propagation, confidence intervals, sources of error), and (5) interpretation of results with respect to uncertainty.  \n\n**Options for rubric architecture**\n\n| Option | Scoring orientation | Why it might fit |\n|--------|--------------------|------------------|\n| **① Objective‑achievement (analytic) rubric** – separate criteria for each report component; each scored on a 0‑4 scale based on observable evidence. | *Objective‑achievement* (best when reasoning, interpretation, and multiple valid approaches matter). | Highlights the quality of the uncertainty analysis itself (e.g., correct propagation, proper citation of sources of error) rather than merely counting errors. |\n| **② Error‑deduction rubric** – start with full credit (e.g., 10 points) and subtract points for specific errors (e.g., missing uncertainty propagation, incorrect confidence interval, neglecting systematic error). | *Error‑deduction* (good for discrete, safety‑critical or strictly right‑or‑wrong tasks). | Makes it easy for graders to spot common mistakes and ensure consistency, especially if the instructor already thinks in “deduct‑for‑mistake” terms. |\n| **③ Balanced rubric** – analytic criteria + explicit error‑deduction sub‑weights (e.g., 60 % analytic criteria, 40 % error deductions). | *Balanced* (captures both achievement of complex reasoning and penalty for critical errors). | Aligns with many STEM courses where you want to reward good reasoning while still penalizing major mistakes in uncertainty calculations. |\n\n**Recommendation**  \nI recommend **Option ③ (Balanced rubric)** because it lets you assess the depth of students’ uncertainty analysis (analytic criteria) while still providing clear point deductions for fundamental quantitative errors, matching typical engineering lab grading practices.\n\n**Your choice** – please **choose**, **modify**, or say **“decide for me.”**\n\n---\n\n## Decision Card 2 – Core criteria & weight distribution (draft)\n\n| Criterion (observable evidence) | Max points | Weight % |\n|--------------------------------|------------|----------|\n| **1. Problem statement & objectives** – clear, measurable, linked to uncertainty goals | 4 | 10 % |\n| **2. Method description** – reproducible, includes discussion of measurement limitations | 4 | 10 % |\n| **3. Data presentation** – tables/figures, units, significant figures, raw data availability | 4 | 10 % |\n| **4. Uncertainty analysis – methodology** – appropriate propagation method, justification of assumptions | 8 | 20 % |\n| **5. Quantitative results** – correct calculation of uncertainties, confidence intervals, error bars | 8 | 20 % |\n| **6. Interpretation of results** – links conclusions to quantified uncertainty, discusses reliability, compares to expected values | 6 | 15 % |\n| **7. Professional writing & formatting** – grammar, citations, lab‑report style, accessibility of figures (alt‑text) | 4 | 10 % |\n| **8. Overall synthesis & reflection** – what was learned about measurement uncertainty, suggestions for improvement | 4 | 5 % |\n\n**Error‑deduction sub‑points (applied after analytic score)**  \n\n| Deduction category | Points to subtract (per instance) | Typical triggers |\n|--------------------|-----------------------------------|-------------------|\n| Missing uncertainty propagation | 2 | No propagation shown for any derived quantity |\n| Incorrect propagation formula | 3 | Mixing absolute & relative, ignoring covariance |\n| Confidence interval mis‑specified | 2 | Wrong confidence level, no justification |\n| Units or significant‑figure errors in uncertainty | 1 | Inconsistent or missing units |\n| No discussion of systematic error sources | 2 | All uncertainties treated as random |\n| Plot lacks error bars / labels | 1 | Figures do not display uncertainty |\n\n*Final score = sum of analytic points – sum of deductions (minimum 0).*\n\n**Next decision:** Do you agree with **the set of criteria and their relative weights**, or would you prefer to add, remove, or re‑weight any items?  \n\n---\n\n## Decision Card 3 – Grading scale & thresholds (draft)\n\n| Scale | Description |\n|-------|-------------|\n| **A (90‑100 %)** | All criteria met at a high level, any deductions ≤ 5 % of total points. |\n| **B (80‑89 %)** | Minor omissions or small calculation errors; deductions ≤ 10 %. |\n| **C (70‑79 % )** | Several moderate errors in uncertainty calculations; deductions 11‑20 %. |\n| **D (60‑69 % )** | Fundamental issues in methodology or interpretation; deductions 21‑30 %. |\n| **F (< 60 %)** | Major flaws across multiple criteria; deductions > 30 %. |\n\n**Next decision:** Does this **scale and the associated threshold logic** reflect your grading philosophy, or would you like a different mapping (e.g., curve, specifications grading, or a pass/fail option)?\n\n---\n\n## What we need from you (up to three questions)\n\n1. **Scoring orientation:** Do you prefer the Balanced rubric (analytic + deductions), pure Objective‑achievement, or pure Error‑deduction?  \n2. **Criteria & weights:** Are the eight draft criteria and their weight percentages acceptable, or should any be added, merged, or re‑weighted?  \n3. **Grade scale:** Does the proposed A‑F threshold scheme align with your grading policy, or do you use a different scale (e.g., specifications grading, pass/fail, or a custom point cutoff)?\n\nFeel free to answer any subset of these; we’ll incorporate your choices and iterate to a finished rubric.",
+          "checks": [
+            {
+              "check": "questions_between_1_4",
+              "ok": false,
+              "detail": "question marks 5 (expected 1..4)"
+            },
+            {
+              "check": "word_count_under_800",
+              "ok": false,
+              "detail": "word count 906 (limit 800)"
+            },
+            {
+              "check": "mentions_any_orientation_objective",
+              "ok": true,
+              "detail": "mentions ['orientation', 'objective']"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "educator_message": "The objective is that students justify whether two measured values differ using their uncertainties. Summative, scored as part of the lab report. Your balanced idea sounds right - go with that.",
+          "model_response": "**Design mode:** Co‑design (Focused tier) – we’ll iterate on the rubric until it matches your grading philosophy.\n\n---\n\n## Decision Card 1 – Confirmed rubric architecture  \n**Chosen:** **Balanced rubric** (analytic criteria + explicit error‑deduction).  \n\n*Why this fits:*  \n- Analytic criteria let students demonstrate *how* they justify the comparison of two measured values with uncertainties.  \n- Deductions capture the high‑stakes quantitative mistakes that would invalidate that justification (e.g., wrong propagation, missing confidence level).  \n\n---\n\n## Draft rubric – Laboratory Report (Uncertainty‑Analysis Outcome)  \n\n### 1. Analytic criteria (60 % of total score)  \n\n| # | Criterion (observable evidence) | Max pts | Weight % |\n|---|--------------------------------|--------|----------|\n| 1 | **Problem & comparison statement** – clearly states the two measured quantities to be compared and the hypothesis (do they differ?). | 4 | 6 % |\n| 2 | **Method & data description** – lists raw data, units, significant figures; explains how measurements were obtained. | 4 | 6 % |\n| 3 | **Uncertainty propagation method** – describes and justifies the propagation technique (e.g., root‑sum‑square, Monte‑Carlo) appropriate to the quantities. | 8 | 12 % |\n| 4 | **Quantitative uncertainty results** – provides combined uncertainties, confidence interval (e.g., 95 % CI) for each measured value. | 8 | 12 % |\n| 5 | **Statistical comparison** – computes the difference of the two values with its propagated uncertainty and states whether the difference is statistically significant (e.g., “Δ = 0.12 ± 0.05, 95 % CI does not include zero → values differ”). | 8 | 12 % |\n| 6 | **Interpretation & conclusion** – links the statistical outcome to the physical context, discusses implications of the uncertainty, and notes any limitations. | 6 | 9 % |\n| 7 | **Professional writing & accessibility** – clear prose, correct grammar, proper citations, figures with alt‑text and labeled error bars. | 4 | 6 % |\n| 8 | **Reflection on uncertainty practice** – brief discussion of what was learned about measuring and reporting uncertainty; suggestions for improvement. | 4 | 3 % |\n\n**Total analytic points:** **44** (maps to 60 % of the final grade).\n\n---\n\n### 2. Error‑deduction sub‑points (40 % of total score)  \n\n| Deduction category | Points to subtract (per occurrence) | Typical trigger |\n|--------------------|--------------------------------------|-----------------|\n| **A. Missing propagation** | 2 | No quantitative propagation shown for the difference. |\n| **B. Incorrect propagation** | 3 | Wrong formula (e.g., adding absolute uncertainties instead of quadrature) or neglecting covariance. |\n| **C. Confidence‑interval mis‑specification** | 2 | Stated confidence level differs from the one used in calculations or not justified. |\n| **D. Unit / significant‑figure errors in uncertainties** | 1 | Inconsistent or missing units; too many/few significant figures in reported uncertainties. |\n| **E. No discussion of systematic error sources** | 2 | All uncertainties treated as random with no mention of instrument bias, calibration, etc. |\n| **F. Figures lack error bars or proper labeling** | 1 | Plots of the two quantities do not display uncertainty bars or axis labels. |\n\n*Deduction total is capped at 40 % of the final grade (i.e., up to 20 points can be removed).*\n\n**Final score = Analytic points – Deduction points** (minimum 0).\n\n---\n\n### 3. Grading scale (mapping to course grade)  \n\n| Final % of total points | Letter grade |\n|--------------------------|--------------|\n| **90 – 100** | A |\n| **80 – 89**  | B |\n| **70 – 79**  | C |\n| **60 – 69**  | D |\n| **< 60**     | F |\n\n*The percentages are calculated from the combined analytic + deduction score (out of 44 + 20 = 64 “raw” points).*\n\n---\n\n## What we need next (up to three quick answers)\n\n1. **Point total & scaling** – Do you want the raw point totals (44 analytic + 20 deduction) as shown, or prefer a simpler total (e.g., 100 points) with proportional scaling?  \n2. **Deduction caps** – Is a maximum of 20 deduction points (40 % of the rubric) acceptable, or would you like a different ceiling?  \n3. **Any additional grading policy** – such as late‑work penalties, revision opportunities, or a specifications‑grading option that should be reflected in the rubric notes?\n\nYour answers can address any, all, or just the items you care about now. Once we have your preferences, I’ll finalize the rubric and provide a concise **rubric‑summary table** ready for insertion into the lab‑report grading sheet.",
+          "checks": [
+            {
+              "check": "word_count_under_1400",
+              "ok": true,
+              "detail": "word count 738 (limit 1400)"
+            },
+            {
+              "check": "mentions_any_weight_criteri",
+              "ok": true,
+              "detail": "mentions ['weight', 'criteri']"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Automated heuristics only; not qualifying evidence. A qualifying pass requires a human evaluator applying evaluator-rubric.md to the retained transcripts in this record.",
+    "Scripted educator replies; a live educator may behave differently.",
+    "Single run; model outputs vary across runs."
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-08-07T00:07:55+00:00",
+  "client": "direct chat-completions (skill text as system prompt)",
+  "endpoint": "https://genai.rcac.purdue.edu",
+  "model": "gpt-oss:120b",
+  "max_tokens": 6000,
+  "evaluator": "automated heuristics (run_behavioral_scenarios.py)",
+  "scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
+  "skill_file_sha256": "7ee36aac68438ff4eeeeff33071a44880405251ef08be3ec323fb8c7e96ae0f3",
+  "results": [
+    {
+      "scenario_id": "rubric-codesign",
+      "rubric_row": "Rubric co-design",
+      "notes": "The interrogation anti-pattern fires the full clarification list at once; staged clarification asks at most three architecture questions, then proposes reviewable defaults.",
+      "references_in_context": [
+        "interaction-protocol.md",
+        "artifact-patterns.md"
+      ],
+      "iterations_run": 3,
+      "iterations_passed": 2,
+      "heuristic_result": "heuristic-pass",
+      "runs": [
+        {
+          "iteration": 1,
+          "heuristic_result": "heuristic-pass",
+          "turns": [
+            {
+              "turn": 1,
+              "educator_message": "Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.",
+              "model_response": "**Co‑design checkpoint – building the rubric**\n\nTo draft a rubric that aligns with your uncertainty‑analysis outcome and reflects your grading philosophy, I need a few concrete details. I’ll keep the questions focused so we can move quickly to a first draft.\n\n---\n\n### Decision 1 – Rubric orientation & scoring model  \n**What I understand:** The rubric will evaluate a second‑year lab report whose primary learning outcome is “students can conduct, quantify, and communicate uncertainty analysis for experimental data.” I need to know how you prefer the credit structure.\n\n| Option | Description & trade‑off |\n|--------|--------------------------|\n| **A. Objective‑achievement (criterion‑based)** – award points for evidence that each rubric criterion is met (e.g., clear uncertainty propagation, correct interpretation). Best for reasoning, partial credit, and multiple valid approaches. | High flexibility; students can earn credit for partial success. |\n| **B. Error‑deduction (checklist/mastery)** – start with full credit for the report and subtract points for specific errors (e.g., missing units, wrong propagation formula). Good for safety‑critical or highly procedural expectations. | Simpler to grade but can over‑penalize minor slips and hide partial understanding. |\n| **C. Balanced (hybrid)** – combine A & B: assign weights to criteria, then apply deductions for serious errors (e.g., incorrect uncertainty propagation that invalidates conclusions). | Captures both achievement and error impact; a bit more complex to implement. |\n\n**Your choice:** (A, B, or C) – or “decide for me” if you prefer I pick the most defensible default.\n\n---\n\n### Decision 2 – Core rubric criteria  \n**What I understand:** The rubric should cover the essential components of a lab report that demonstrate uncertainty‑analysis competence.\n\n| Potential criteria (you can keep, drop, or modify) |\n|----------------------------------------------------|\n| 1. **Report structure & completeness** (title, abstract, methods, results, discussion, references) |\n| 2. **Data presentation** (tables/figures, proper units, significant figures) |\n| 3. **Uncertainty quantification** (identification of sources, propagation method, correct formulas) |\n| 4. **Interpretation of uncertainty** (how uncertainty influences conclusions, error bars, confidence) |\n| 5. **Critical reflection** (limitations, sources of systematic error, suggestions for improvement) |\n| 6. **Scientific communication** (clarity, logical flow, proper citations, grammar) |\n| 7. **Use of tools/software** (e.g., spreadsheet, Python, LabVIEW) – if applicable |\n\n**Which of these should be included as main rubric criteria?** Feel free to add any other dimension you consider important (e.g., ethical data handling, reproducibility).\n\n---\n\n### Decision 3 – Weighting & grading scale  \n**What I understand:** You have opinions about how much each part should count toward the final report grade, but they haven’t been documented yet.\n\n| Question | Rationale |\n|----------|-----------|\n| **A. Desired total points** (e.g., 100, 20, or a letter‑grade rubric)? | Sets the numeric scale for the rubric. |\n| **B. Approximate weight distribution** (e.g., 20 % structure, 30 % uncertainty quantification, 20 % interpretation, 15 % communication, 15 % reflection)? | Guides the relative importance of each criterion. |\n| **C. Any specific cut‑offs or thresholds** (e.g., “must earn ≥ 60 % on uncertainty quantification to pass”?). | Helps define pass/fail or tiered grading. |\n\n**Please provide your preferences** for the overall scale and any weighting ideas, or let me know if you’d like me to propose a sensible default based on typical second‑year lab reports.\n\n---\n\n### Next step  \nOnce I have your responses to the three decisions above, I will:\n\n1. **Draft a rubric preview** (criteria, weightings, scale, and sample descriptors).  \n2. Present the preview for your review (you can adjust wording, add examples, or change weights).  \n3. Produce the final rubric document (student‑facing version and instructor guide) together with a brief **rubric‑calibration plan** (how to use de‑identified examples for consistency).\n\nFeel free to **“decide for me”** on any decision if you’d prefer I select the most defensible option. Let me know which route you’d like to take!",
+              "checks": [
+                {
+                  "check": "questions_between_1_4",
+                  "ok": true,
+                  "detail": "question marks 4 (expected 1..4)"
+                },
+                {
+                  "check": "word_count_under_800",
+                  "ok": true,
+                  "detail": "word count 631 (limit 800)"
+                },
+                {
+                  "check": "mentions_any_orientation_objective",
+                  "ok": true,
+                  "detail": "mentions ['orientation', 'objective']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": true,
+                  "detail": "turn ends with a return to the educator ('?')"
+                }
+              ]
+            },
+            {
+              "turn": 2,
+              "educator_message": "The objective is that students justify whether two measured values differ using their uncertainties. Summative, scored as part of the lab report. Your balanced idea sounds right - go with that.",
+              "model_response": "**Rubric preview – “Do the two measured values differ?” (Balanced orientation)**  \n\n**Learning outcome**  \n*Students can evaluate whether two experimental measurements are statistically distinct by correctly propagating uncertainties, interpreting the result, and communicating the justification in a lab report.*\n\n---\n\n### 1. Rubric structure (balanced)\n\n| **Criterion** | **Weight** | **Scoring orientation** | **Key performance descriptors** |\n|---------------|------------|--------------------------|----------------------------------|\n| **A. Report organization & completeness** | 10 % | Objective‑achievement | • All required sections present and correctly ordered (title, abstract, methods, results, discussion, references). <br>• Minor omissions (e.g., missing abstract) → “Partial”. |\n| **B. Data presentation (tables/figures, units, significant figures)** | 15 % | Objective‑achievement | • Data shown with appropriate units, clear tables/figures, and consistent significant figures. <br>• Errors in units or inconsistent sig‑figs → “Partial”. |\n| **C. Uncertainty quantification** (identifying sources, propagation method, correct calculation) | 30 % | Balanced (achievement + deduction) | **Full credit** – All relevant uncertainty sources identified, propagation method (e.g., RMS, propagation‑of‑error formula) correctly applied, calculations show proper significant‑figure handling. <br>**Deduction** – If propagation formula is applied incorrectly **or** a major source of uncertainty is omitted, subtract 5 % (max 10 %). |\n| **D. Comparison & justification** (core outcome) | 30 % | Balanced (achievement + deduction) | **Full credit** – Student computes the difference, its combined uncertainty, and correctly interprets the result (e.g., “|Δ| ≤ k·σ → values agree” with proper confidence level). Provides a clear written justification linking the numeric result to the statistical conclusion. <br>**Deduction** – If interpretation uses the wrong confidence factor, or fails to state the decision rule, subtract 5 % (max 10 %). |\n| **E. Critical reflection & limitations** | 10 % | Objective‑achievement | • Discusses systematic errors, assumptions in uncertainty analysis, and how they could affect the comparison. <br>• Missing or superficial reflection → “Partial”. |\n| **F. Scientific communication (clarity, language, citations)** | 5 % | Objective‑achievement | • Writing is clear, logically flows, and citations are correctly formatted. Minor grammar issues → “Partial”. |\n\n**Scoring scale** (per criterion)  \n\n| Score | Meaning |\n|-------|---------|\n| **4 – Excellent** | Meets all descriptors; no deductions. |\n| **3 – Good** | Meets most descriptors; minor omissions that do **not** affect the core conclusion. |\n| **2 – Satisfactory** | Meets basic requirements but has one or more **deductions** (see columns C & D) or significant gaps in the descriptor. |\n| **1 – Needs improvement** | Major omissions or errors that prevent a defensible conclusion. |\n| **0 – Not demonstrated** | Criterion absent or completely incorrect. |\n\n**Total score** = Σ (criterion weight × achieved points).  \n*Example:* A student who earns 3/4 on all criteria, but incurs a 5 % deduction on **C** and a 5 % deduction on **D**, ends with:  \n\n- A (10 % × 3) = 3 %  \n- B (15 % × 3) = 4.5 %  \n- C (30 % × 3) – 5 % deduction = 8.5 %  \n- D (30 % × 3) – 5 % deduction = 8.5 %  \n- E (10 % × 3) = 3 %  \n- F (5 % × 3) = 1.5 %  \n\n**Total = 29 %** → **≈ 73 %** (rounded to nearest whole‑point grade).\n\n---\n\n### 2. Rubric‑calibration plan (brief)\n\n1. **Collect** 4–5 de‑identified lab reports (strong, borderline, weak, alternative‑method, unexpected).  \n2. **Instructor** indicates for each what the justification demonstrates (e.g., “correct comparison, but missed systematic error”).  \n3. **Apply** the draft rubric to the examples, note any score discrepancies.  \n4. **Discuss** with you any criteria that need clearer language or weighting adjustments.  \n5. **Finalize** instructor guide (including deduction list) and student‑facing rubric (without deduction details).\n\n---\n\n### 3. What I need from you now (the next decision)\n\n**Please review the preview and let me know**:\n\n1. **Any changes to the criteria** (add, remove, or merge).  \n2. **Weight adjustments** (do the 30 % weights for the two core criteria feel appropriate, or would you prefer a different split?).  \n3. **Scoring language** – does the 4‑point scale work for your grading style, or would you prefer a different scale (e.g., 0‑5, or a letter‑grade rubric)?\n\nYou can:\n\n- **Choose** “A”, “B”, or “C” for each item above,  \n- **“Decide for me”** and I will adopt the most defensible default (the current draft), or  \n- **Provide brief modifications** (e.g., “make criterion D 35 % and combine E + F into 5 %”).  \n\nOnce I have your direction, I’ll produce the final rubric files (student version and instructor guide) and the calibration checklist.",
+              "checks": [
+                {
+                  "check": "word_count_under_1400",
+                  "ok": true,
+                  "detail": "word count 752 (limit 1400)"
+                },
+                {
+                  "check": "mentions_any_weight_criteri",
+                  "ok": true,
+                  "detail": "mentions ['weight', 'criteri']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": true,
+                  "detail": "turn ends with a return to the educator ('?')"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "iteration": 2,
+          "heuristic_result": "heuristic-fail",
+          "turns": [
+            {
+              "turn": 1,
+              "educator_message": "Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.",
+              "model_response": "**Decision Card – Rubric Design for a Second‑Year Laboratory Report (Uncertainty‑Analysis Outcome)**  \n\n**What I understand**  \nYou want a rubric for a second‑year laboratory report that assesses students’ ability to conduct and communicate uncertainty analysis. The instructor has opinions about grading but they haven’t been documented yet, so we need to capture those preferences (e.g., what aspects matter most, how the rubric should be scored) before drafting the concrete rubric.\n\n**Key unresolved questions** (max 3 per turn, focused on decisions that will shape the rubric):\n\n1. **Evidence & Objectives** – Which specific evidence in the report should the rubric evaluate?  \n   - e.g., identification of uncertainty sources, quantitative propagation, interpretation of confidence intervals, discussion of assumptions, visual presentation of error bars, etc.  \n\n2. **Formative vs. Summative** – Will the rubric be used **formatively** (feedback for improvement), **summatively** (final grade), or both?  \n   - This influences the scoring orientation (objective‑achievement vs. error‑deduction) and the level of detail in descriptors.\n\n3. **Scoring orientation & weighting** – What overall scoring approach does the instructor prefer?  \n   - **Objective‑achievement** (credit for meeting each criterion, good for reasoning‑heavy work)  \n   - **Error‑deduction** (start from full credit then subtract for specific mistakes, good for discrete correctness)  \n   - **Balanced** (combine both).  \n   Additionally, are there any criteria that should carry higher weight (e.g., quantitative propagation vs. discussion of assumptions)?\n\nYour answers will let me draft the rubric structure (criteria, scale, weights, and orientation) and then we can iterate on the wording of each descriptor. Let me know your preferences, or feel free to say “decide for me” on any of the questions.",
+              "checks": [
+                {
+                  "check": "questions_between_1_4",
+                  "ok": true,
+                  "detail": "question marks 4 (expected 1..4)"
+                },
+                {
+                  "check": "word_count_under_800",
+                  "ok": true,
+                  "detail": "word count 259 (limit 800)"
+                },
+                {
+                  "check": "mentions_any_orientation_objective",
+                  "ok": true,
+                  "detail": "mentions ['orientation', 'objective']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": true,
+                  "detail": "turn ends with a return to the educator ('?')"
+                }
+              ]
+            },
+            {
+              "turn": 2,
+              "educator_message": "The objective is that students justify whether two measured values differ using their uncertainties. Summative, scored as part of the lab report. Your balanced idea sounds right - go with that.",
+              "model_response": "### Rubric Preview – 2nd‑Year Lab Report: **Uncertainty‑Analysis Outcome**  \n*Summative – part of the final lab‑report grade*  \n**Scoring orientation:** **Balanced** (objective‑achievement base score with targeted error‑deduction).  \n\n| Criterion (observable evidence) | Weight (%) | Scale (0 – 4) | Descriptor – 4 pts (full credit) | Descriptor – 0 pts (no credit) |\n|---|---|---|---|---|\n| **1. Identify all relevant sources of uncertainty** | 20 | 0‑4 | Lists every significant source (instrument precision, reading bias, environmental variation, procedural steps, etc.) and explains why each matters for the two measured values. | Provides none or only trivial source(s); omissions of obvious contributors. |\n| **2. Quantitatively propagate uncertainties** | 30 | 0‑4 | Performs correct propagation (e.g., using standard‑uncertainty rules or Monte‑Carlo) for each measured value, shows intermediate calculations, and reports combined uncertainty with appropriate significant figures. | Propagation method is missing, mathematically incorrect, or final uncertainty clearly inconsistent with the calculations shown. |\n| **3. Compare the two values with uncertainty** | 25 | 0‑4 | Uses the combined uncertainties to apply a statistically sound test (e.g., overlap of confidence intervals, t‑test, Z‑score) and states explicitly whether the values differ or not, with a justified conclusion. | Comparison is absent, uses a non‑quantitative “eyeball” judgement, or draws a conclusion that conflicts with the calculated uncertainties. |\n| **4. Discuss assumptions & limitations** | 15 | 0‑4 | Articulates assumptions made in the uncertainty model (e.g., normality, independence), identifies limitations of the measurements, and suggests how they could affect the comparison outcome. | No discussion of assumptions/limitations, or discussion is unrelated to the uncertainty analysis. |\n| **5. Presentation & visual communication** | 10 | 0‑4 | Includes clear tables/figures showing measured values with error bars, labels units, provides a legend, and reports uncertainties in a consistent format (e.g., “x ± σ”). Visuals aid the reader’s interpretation of the comparison. | Tables/figures missing, error bars absent or mislabeled, inconsistent units, or presentation hinders interpretation. |\n\n#### Scoring Procedure (Balanced)\n\n1. **Base score** = sum of criterion scores × weight.  \n2. **Error deductions** are applied only for **critical failures** (e.g., mathematically wrong propagation, missing comparison). Deductions are sub‑point reductions (0.5 pt per critical error) *after* the base score is computed.  \n3. **Final score** = (Base score – Deductions) rounded to the nearest whole point out of **100**.\n\n#### Example Calculation  \n\n- Criterion scores: 4, 3, 2, 3, 4 → weighted subtotal = (4×20)+(3×30)+(2×25)+(3×15)+(4×10)= 80 pts.  \n- Critical error detected in Criterion 3 (incorrect statistical test) → deduction = 0.5 pt.  \n- Final score = 80 – 0.5 ≈ 79 pts → **B‑** (depending on the course’s grade‑scale).\n\n---\n\n### Confirmed / Drafted / Open\n\n**Confirmed**  \n- Objective: justify whether two measured values differ using their uncertainties.  \n- Summative use, part of lab‑report grade.  \n- Balanced scoring orientation (objective base + error deductions).  \n\n**Drafted**  \n- Full rubric preview above (criteria, weights, scale, descriptors, scoring procedure).  \n\n**Open**  \n- None at this stage. (All needed design decisions have been resolved.)\n\n---\n\n### Next Step  \n\nIf the rubric preview meets your expectations, I will:\n\n1. Produce the **final rubric document** (markdown format ready for inclusion in the lab‑report grading sheet).  \n2. Create a **rubric‑calibration guide** that outlines how graders should apply the error‑deduction rules and provides a couple of de‑identified example excerpts (synthetic) for practice.  \n\nPlease confirm, request any tweaks, or say “go ahead” to finalize.",
+              "checks": [
+                {
+                  "check": "word_count_under_1400",
+                  "ok": true,
+                  "detail": "word count 560 (limit 1400)"
+                },
+                {
+                  "check": "mentions_any_weight_criteri",
+                  "ok": true,
+                  "detail": "mentions ['weight', 'criteri']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": false,
+                  "detail": "no question or invitation in the closing part of the turn"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "iteration": 3,
+          "heuristic_result": "heuristic-pass",
+          "turns": [
+            {
+              "turn": 1,
+              "educator_message": "Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.",
+              "model_response": "**Design stage: Rubric for a second‑year laboratory report (Uncertainty‑analysis outcome)**  \n\nI’m ready to draft the rubric, but I need a few details that will shape the final design. I’ll keep the questions to three – each one will directly affect a consequential decision.\n\n---\n\n### Decision 1 – Rubric orientation (scoring logic)\n\n| Option | What it delivers | Trade‑off |\n|--------|------------------|-----------|\n| **A. Objective‑achievement** – credit is awarded for evidence that the student has performed a correct uncertainty analysis (e.g., identified sources, propagated uncertainties, interpreted results). | Aligns with reasoning‑focused outcomes; rewards correct judgment even if minor arithmetic slips occur. | Requires clear descriptors of “evidence of achievement.” |\n| **B. Error‑deduction** – start with full credit and subtract points for specific mistakes (e.g., omitted uncertainty source, incorrect propagation formula, misinterpreted confidence interval). | Makes it easy to map common misconceptions to point penalties; familiar to many instructors. | Can over‑penalize a single error and may obscure partial understanding. |\n| **C. Balanced (hybrid)** – combine the two: award baseline credit for meeting core components, then deduct for significant errors; also allow partial credit for correct reasoning despite minor calculation errors. | Gives nuance for the mixed‐nature of uncertainty work (conceptual + procedural). | Slightly more complex to communicate and apply. |\n\n**Your choice (or “decide for me”):**  \n\n---\n\n### Decision 2 – Core rubric criteria (what to evaluate)\n\nWhich of the following criteria should appear in the rubric? (Select all that apply; you can add others.)\n\n1. **Identification of uncertainty sources** – listing and justification of all relevant sources of measurement error.  \n2. **Quantitative uncertainty propagation** – correct use of formulas/Monte‑Carlo, proper handling of correlated variables.  \n3. **Uncertainty reporting** – appropriate significant figures, confidence level, and clear presentation (tables/graphs).  \n4. **Interpretation of uncertainty** – explanation of how uncertainty affects conclusions, comparison to theoretical expectations.  \n5. **Scientific communication** – logical flow, correct terminology, proper citations, and overall report quality.  \n\n*(If you need a different set, please specify.)*  \n\n---\n\n### Decision 3 – Weighting & grading system\n\nTo align the rubric with your grading opinions, please tell me:\n\n- **Relative weight** of the rubric (as a percentage of the total lab‑report grade).  \n- **Weight distribution** among the chosen criteria (e.g., 30 % Identification, 25 % Propagation, 20 % Reporting, 15 % Interpretation, 10 % Communication).  \n- **Any special grading policies** that must be reflected (e.g., allowance for resubmission, penalty for late submission, policy on AI‑assisted calculations, or accommodation considerations).  \n\n---\n\n### Next step\n\nOnce I have your answers, I will:\n\n1. Pick the rubric orientation (or follow your “decide for me”).  \n2. Draft a **rubric preview** showing the criteria, weightings, and a three‑tier performance scale (e.g., Excellent/Meets Expectations/Needs Improvement) with concise descriptors.  \n3. Record any assumptions or open items in a decision log.\n\n*Feel free to answer the three questions above, add any extra constraints, or say “decide for me” for any decision.*",
+              "checks": [
+                {
+                  "check": "questions_between_1_4",
+                  "ok": true,
+                  "detail": "question marks 1 (expected 1..4)"
+                },
+                {
+                  "check": "word_count_under_800",
+                  "ok": true,
+                  "detail": "word count 483 (limit 800)"
+                },
+                {
+                  "check": "mentions_any_orientation_objective",
+                  "ok": true,
+                  "detail": "mentions ['orientation', 'objective']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": true,
+                  "detail": "turn ends with a return to the educator ('decide for me')"
+                }
+              ]
+            },
+            {
+              "turn": 2,
+              "educator_message": "The objective is that students justify whether two measured values differ using their uncertainties. Summative, scored as part of the lab report. Your balanced idea sounds right - go with that.",
+              "model_response": "**Great – we’ll use a balanced (hybrid) orientation.**  \n\nBelow is a draft set of rubric criteria that match the learning goal *“students justify whether two measured values differ using their uncertainties”* and the fact that the rubric will be used **summatively** as part of the full lab‑report grade.\n\n| # | Proposed criterion (what we’ll evaluate) | Why it matters for the outcome |\n|---|-------------------------------------------|--------------------------------|\n| 1 | **Uncertainty identification & quantification** – list all relevant sources of error for each measurement and assign a numeric uncertainty (standard deviation, confidence interval, etc.). | Students must know *what* contributes to the uncertainty before they can compare values. |\n| 2 | **Propagation & combination of uncertainties** – correctly combine the individual uncertainties to obtain the uncertainty of the difference between the two measurements (e.g., root‑sum‑square, correlated‑error handling). | Accurate propagation is required to judge if the difference is statistically meaningful. |\n| 3 | **Statistical comparison** – apply an appropriate test (e.g., overlap of confidence intervals, t‑test, z‑score) and state whether the values are *significantly different* or *indistinguishable* given the combined uncertainty. | Directly addresses the core task of justifying the difference. |\n| 4 | **Interpretation of result** – explain what the statistical outcome means for the physical hypothesis or engineering decision, and discuss any assumptions or limitations. | Shows higher‑order reasoning (evaluate) beyond the mechanical calculation. |\n| 5 | **Scientific communication** – clarity, logical flow, correct terminology, proper citation of methods, and presentation of data/uncertainty (tables/figures) that a reader can follow without extra explanation. | Ensures the report is a usable scientific artefact. |\n\n---\n\n### Quick check on the rubric’s weight distribution  \n\nA typical balanced weighting that reflects the relative importance of each component might be:\n\n| Criterion | Suggested weight (of the rubric) |\n|-----------|----------------------------------|\n| 1 – Uncertainty identification | 15 % |\n| 2 – Propagation & combination | 25 % |\n| 3 – Statistical comparison | 30 % |\n| 4 – Interpretation of result | 20 % |\n| 5 – Scientific communication | 10 % |\n| **Total (rubric)** | **100 %** |\n\nThe rubric itself would then be **X % of the overall lab‑report grade** (please tell me the value you want, e.g., 40 % of the report grade).\n\n---\n\n### What I need from you now (max 3 questions)\n\n1. **Do the five criteria above capture everything you expect to assess?**  \n   - If you want to add, remove, or modify any, let me know.  \n2. **Do the suggested weight percentages work for you, or would you prefer a different distribution?**  \n3. **What overall percentage of the total lab‑report grade should this rubric count for, and are there any special grading policies to embed (e.g., late‑submission penalty, allowance for resubmission, AI‑assisted calculations, accommodation adjustments)?**  \n\nAnswer these three points (or say “decide for me” for any) and I’ll produce the rubric preview with the three‑tier performance descriptors and a brief justification of each weight.",
+              "checks": [
+                {
+                  "check": "word_count_under_1400",
+                  "ok": true,
+                  "detail": "word count 494 (limit 1400)"
+                },
+                {
+                  "check": "mentions_any_weight_criteri",
+                  "ok": true,
+                  "detail": "mentions ['weight', 'criteri']"
+                },
+                {
+                  "check": "check_returns_to_educator",
+                  "ok": true,
+                  "detail": "turn ends with a return to the educator ('?')"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Automated heuristics only; not qualifying evidence. A qualifying pass requires a human evaluator applying evaluator-rubric.md to the retained transcripts in this record.",
+    "Scripted educator replies; a live educator may behave differently.",
+    "Single run; model outputs vary across runs."
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-08-07T00:04:45+00:00",
+  "client": "direct chat-completions (skill text as system prompt)",
+  "endpoint": "https://genai.rcac.purdue.edu",
+  "model": "gpt-oss:120b",
+  "max_tokens": 6000,
+  "evaluator": "automated heuristics (run_behavioral_scenarios.py)",
+  "scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
+  "skill_file_sha256": "7ee36aac68438ff4eeeeff33071a44880405251ef08be3ec323fb8c7e96ae0f3",
+  "results": [
+    {
+      "scenario_id": "codesign-cadence",
+      "rubric_row": "Co-design cadence",
+      "notes": "Owner-reported failure mode: questions only at intake, then a one-pass module. Heuristics check that each turn stays small and returns to the educator.",
+      "references_in_context": [
+        "interaction-protocol.md"
+      ],
+      "heuristic_result": "heuristic-pass",
+      "turns": [
+        {
+          "turn": 1,
+          "educator_message": "Use `$course-development-partner` to design a two-week introductory module on dimensional analysis containing a lesson, a worksheet, and a short quiz. Work with me on the key decisions as the design develops.",
+          "model_response": "**Great – let’s co‑design a two‑week introductory module on dimensional analysis.**  \nWe’ll move step‑by‑step, previewing each piece (outcome list, activity sketch, worksheet draft, quiz outline) and asking you to make the key decisions. I’ll keep each turn focused on one unresolved decision and limit the questions to three at a time.\n\n---\n\n### Decision 1 – Learning outcomes & cognitive demand  \n\n**What I understand**  \nWe need clear, observable outcomes that guide the lesson, worksheet, and quiz. They should map to a taxonomy (e.g., Bloom’s) so we can verify alignment and choose appropriate assessment items.\n\n**Options**  \n1. **Basic‑level outcomes** – “Students *remember* SI base units and *apply* dimensional analysis to check simple algebraic expressions.” (Lower cognitive demand, good for a first‑year intro.)  \n2. **Intermediate‑level outcomes** – “Students *understand* the principle of dimensional homogeneity and *apply* it to formulate and solve simple physics problems.” (Adds interpretation, still manageable.)  \n3. **Advanced‑level outcomes** – “Students *analyze* multi‑step problems, *evaluate* alternative formulations, and *create* a dimensionally consistent model for a real‑world scenario.” (Higher demand; may need more scaffolding.)\n\n**Your choice** (pick one, modify, or say “decide for me”):  \n\n1. Basic  \n2. Intermediate  \n3. Advanced  \n\n---\n\n### Decision 2 – Evidence of learning (core activities)  \n\n**What I understand**  \nThe module should include a lesson (lecture + guided practice), a worksheet for independent practice, and a short quiz for summative check. We need to decide which types of activities will generate the strongest evidence for the chosen outcomes.\n\n**Options**  \n1. **Mini‑lecture + worked examples** → students watch a concise video/lecture, then replicate steps on the board.  \n2. **Inquiry‑based “guess‑the‑units” card game** → small groups predict units for given expressions, discuss, then record reasoning.  \n3. **Real‑world modeling task** → students pick a simple physical system (e.g., falling object) and derive a dimensionally consistent equation from scratch.\n\n**Your choice** (pick one, modify, or say “decide for me”):  \n\n1. Mini‑lecture + worked examples  \n2. Inquiry‑based card game  \n3. Real‑world modeling task  \n\n---\n\n### Decision 3 – Practical constraints & grading  \n\n**What I understand**  \nWe need to know any limits that will shape the design (class length, technology, accessibility, grading policy).\n\n**Questions** (answer any or all that apply):  \n\n1. How many contact hours per week are available for the lesson (e.g., 75 min, 90 min)?  \n2. Will students have access to a digital platform for the worksheet (Google Docs, LMS) or should it be printable only?  \n3. What is the grading weight of the short quiz (e.g., 5 % of the course grade) and are retakes allowed?\n\n---\n\n**Next step**  \nPlease provide your selections/answers for the three decisions above. Once we have those, I’ll draft a concise **alignment map preview** (outcomes → activities → assessment) for your review before we flesh out the lesson storyboard, worksheet, and quiz.",
+          "checks": [
+            {
+              "check": "questions_between_1_4",
+              "ok": true,
+              "detail": "question marks 3 (expected 1..4)"
+            },
+            {
+              "check": "word_count_under_700",
+              "ok": true,
+              "detail": "word count 457 (limit 700)"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "educator_message": "Second-year mechanical engineering students, about 40 of them. They can execute single conversions but fall apart with mixed unit systems under time pressure. The module runs in two 75-minute sessions per week. Your recommendation is fine on everything else.",
+          "model_response": "**Status update – decisions made (based on the student/context information you provided).**  \n\n| Decision | What I understood | Chosen option (provisional) | Reasoning |\n|----------|-------------------|----------------------------|-----------|\n| **1 – Learning outcomes & cognitive demand** | Second‑year mechanical‑engineering students; can do single‑unit conversions but struggle with mixed‑unit problems under time pressure. | **Intermediate‑level outcomes** (Option 2) | “*Understand* the principle of dimensional homogeneity and *apply* it to solve simple mixed‑unit physics problems.” This matches their existing knowledge and pushes them to the next step without over‑loading. |\n| **2 – Core evidence activities** | Need a clear, low‑risk way to practice mixed‑unit work; two 75‑min class periods per week; 40 students. | **Mini‑lecture + worked examples** (Option 1) | A focused short lecture (≈20 min) followed by guided, step‑by‑step worked examples lets us model the thinking process, then let students practice in‑class before the worksheet. |\n| **3 – Practical constraints & grading** | • Two 75‑minute sessions per week  <br>• Class size ≈ 40  <br>• Students have LMS access (standard university platform)  <br>• No explicit grading policy given. | **Assumptions** (see below) | These constraints are recorded as **Assumed** unless you correct them. |\n\n### Assumptions (working)\n\n- **Class time**: Two 75‑minute meetings (Session 1: lecture + guided practice; Session 2: independent worksheet work + quiz).  \n- **Worksheet delivery**: Digital version posted on the LMS (e.g., Canvas) plus printable copy for anyone who prefers paper.  \n- **Quiz grading**: 5 % of the overall course grade, single‑attempt, no retakes (standard for short check‑ins).  \n- **Technology**: All students have reliable internet and can view PDFs/Google Docs during class.\n\n> **If any of the above assumptions are wrong, please let me know and we’ll adjust before proceeding.**  \n\n---\n\n## Alignment‑map preview (first deliverable)\n\n| Module component | Aligned outcome (Bloom level) | Evidence of learning | Instructional support | Assessment |\n|------------------|--------------------------------|----------------------|----------------------|-----------|\n| **Lesson (Session 1)** – 20 min mini‑lecture + 30 min guided worked examples | *Understand* dimensional homogeneity (cognitive demand: **understand**) | Student verbalizes why units must match; completes “fill‑in‑the‑blank” step on board. | Slide deck (visual contrast ≥ 4.5:1, WCAG 2.1 AA), live annotation, optional captioned video of examples. | Formative check: “quick‑fire” 2‑question poll (clicker/ LMS) at end of examples. |\n| **Worksheet (Session 2 – 45 min)** – 6 problems: (a) single‑unit conversion, (b) mixed‑unit conversion, (c) dimensional check of a given formula, (d) identify missing unit, (e) re‑write expression in consistent units, (f) short modeling (e.g., time‑of‑flight) | *Apply* dimensional analysis to mixed‑unit problems (cognitive demand: **apply**) | Completed worksheet problems scored for correctness and reasoning. | Step‑by‑step scaffold (hints, unit‑conversion table, colour‑coded unit symbols). | Teacher grades worksheet (10 % of module grade) and returns feedback. |\n| **Short quiz (Session 2 – last 10 min)** – 4 multiple‑choice items (2 conceptual, 2 calculation) | *Apply* & *Analyze* (choose appropriate units, spot inconsistency) | Quiz responses recorded in LMS. | Quick reference sheet (allowed) – reinforces procedural fluency. | Weighted 5 % of course grade; automatic LMS grading for MC items, manual review for any calculation item. |\n\n### What’s next?\n1. **Lesson storyboard** – outline of slide titles, key talking points, and guided‑practice steps.  \n2. **Worksheet draft** – full problem statements, scaffolding hints, answer key.  \n3. **Quiz draft** – questions, correct answers, rubric for any open‑ended scoring.  \n\nI’ll present each of those as a **preview** in the next turn, then ask any focused questions that arise (e.g., wording of a specific problem, inclusion of a real‑world example, accessibility checks).  \n\n---\n\n**Please confirm**:\n\n- The intermediate‑level outcomes and mini‑lecture + worked‑example approach are acceptable.  \n- The assumptions listed above (class time, delivery mode, quiz weight, technology) are correct, or tell me which need to change.  \n\nOnce I have your go‑ahead (or any tweaks), I’ll generate the **Lesson storyboard preview**.",
+          "checks": [
+            {
+              "check": "word_count_under_900",
+              "ok": true,
+              "detail": "word count 633 (limit 900)"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "educator_message": "Yes, that sequence works for me. Start with the lesson outline.",
+          "model_response": "### Lesson Storyboard – 2‑Week Introductory Module on Dimensional Analysis  \n**Target audience:** 2nd‑year Mechanical‑Engineering students (≈ 40)  \n**Session schedule:** Two 75‑minute meetings per week (total 4 class meetings)  \n**Cognitive demand:** *Understand* → *Apply* (Bloom)\n\n---\n\n#### Session 1 – Mini‑lecture + Guided Worked Examples (75 min)\n\n| Time | Slide / Activity | Learning goal (outcome) | Instructor actions | Student actions | Accessibility / UDL notes |\n|------|------------------|--------------------------|-------------------|----------------|----------------------------|\n| 0‑5 min | **Title & “Why Units Matter”** (visual of a mismatched‑unit failure) | *Understand* the necessity of dimensional consistency | Pose an opening question (“What happens if units don’t match?”) | Share quick think‑pair‑share (2 min) | Captioned image; high‑contrast colors (≥ 4.5:1) |\n| 5‑15 min | **Slide 2 – SI base units & derived units refresher** | Recall base‑unit knowledge | Short review, highlight common derived units used in mechanics (N, J, Pa) | Listen, note key symbols | Text size ≥ 12 pt; alternative text for symbols |\n| 15‑20 min | **Slide 3 – Dimensional Homogeneity principle** | *Understand* the principle that each term in an equation must share the same dimensions | State definition, give real‑world example (e.g., speed = distance/time) | Write definition in own words (one‑sentence response in LMS chat) | Provide transcript for captioning |\n| 20‑30 min | **Guided Example 1 – Simple conversion** (single‑unit) | *Apply* unit conversion correctly | Walk through conversion of 5 ft → m, ask students to fill in blank on slide | Complete blanks on shared Google Slide (editable) | Keyboard‑accessible Google Slide |\n| 30‑45 min | **Guided Example 2 – Mixed‑unit expression** (e.g., force = mass × acceleration, units: slug · ft/s² → N) | *Apply* dimensional analysis to a mixed‑unit formula | Show step‑by‑step table: list each variable, unit, dimension, convert to SI | Follow along, suggest missing conversions in breakout rooms (4 groups) | Breakout rooms have captioned video feed; transcripts uploaded |\n| 45‑55 min | **Guided Example 3 – Spot the error** (present a flawed equation with mismatched units) | *Analyze* why the equation fails | Prompt students: “What’s wrong? How would you fix it?” | Write a brief justification in the chat; instructor polls results | Poll is accessible via keyboard; alternative text for equation images |\n| 55‑70 min | **In‑class practice – “Quick‑fire” 2‑question poll** (LMS) | *Apply* dimensional checking under time pressure | Display two short problems; students answer within 2 min each | Click answer; discuss as a class | Poll includes alt‑text and high‑contrast colors |\n| 70‑75 min | **Wrap‑up & preview of worksheet** | Connect lecture to upcoming independent work | Summarize key takeaways; hand out worksheet link & printable PDF | Note questions for next session | PDF follows WCAG 2.1 AA (tagged headings, accessible table structures) |\n\n**Materials to be prepared (preview):**  \n- Slide deck (PowerPoint → PDF) with labeled headings, alt‑text for all graphics, colour‑contrast checked.  \n- Google Slide for live fill‑in‑the‑blank activity (editable by students).  \n- LMS poll (two items) with accessible layout.  \n- Worksheet link (Google Doc) and printable PDF.  \n\n---\n\n#### Session 2 – Independent Worksheet & Short Quiz (75 min)\n\n| Time | Activity | Learning goal | Instructor actions | Student actions | Accessibility notes |\n|------|----------|----------------|-------------------|----------------|---------------------|\n| 0‑5 min | **Quiz instructions & logistics** | Set expectations | Explain timing, allowed reference sheet, how to submit | Review quiz sheet | All instructions available as text & audio |\n| 5‑15 min | **Quiz (4 items) – timed** | *Apply* & *Analyze* dimensional reasoning | Launch LMS quiz (auto‑grade for MC; manual for calculation) | Complete quiz | Quiz supports screen‑reader navigation |\n| 15‑20 min | **Collect & brief debrief** | Immediate feedback | Show overall class performance (aggregate only) | Discuss any surprising errors | Visuals include colour‑blind safe palette |\n| 20‑65 min | **Worksheet work (individual)** | *Apply* dimensional analysis in varied contexts | Circulate, answer questions, point to hints in PDF | Solve 6 problems, use hint table as needed | PDF is tagged for accessibility; alternative text for diagrams |\n| 65‑75 min | **Reflection & close** | Consolidate learning | Prompt “One thing that clicked, one thing still fuzzy” (written in LMS) | Submit reflections | Text‑to‑speech option available |\n\n---\n\n### Quick check – any adjustments needed?\n\n1. **Timing:** Does the 70‑minute split for Session 1 feel realistic for your class pace? (We have 5 min buffer.)  \n2. **Technology:** Will you use a specific LMS (Canvas, Blackboard, etc.) that might affect poll or quiz format?  \n3. **Accessibility:** Any institutional accessibility service requirements (e.g., mandated caption provider) that we should embed now?\n\nIf everything looks good, I’ll move on to the **Worksheet draft** (full problem statements, scaffolding hints, and answer key). Let me know if you’d like any tweaks before we proceed.",
+          "checks": [
+            {
+              "check": "word_count_under_1100",
+              "ok": true,
+              "detail": "word count 808 (limit 1100)"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "focused-overhead",
+      "rubric_row": "Focused-tier overhead",
+      "notes": "A small request should get the artifact (or one brief clarification) with the tier/mode/state machinery invisible. Producing the worksheet in a single turn is correct here, so no word cap applies.",
+      "references_in_context": [
+        "interaction-protocol.md"
+      ],
+      "heuristic_result": "heuristic-pass",
+      "turns": [
+        {
+          "turn": 1,
+          "educator_message": "Use `$course-development-partner` to make a one-page practice worksheet on unit conversions for tomorrow's recitation. Students had the lecture today.",
+          "model_response": "Here’s a quick preview of the worksheet structure I’m planning. Let me know if this fits your needs or if anything should change before I flesh it out.\n\n---\n\n### Practice Worksheet – Unit Conversions (One‑page)\n\n**Purpose:** Reinforce today’s lecture on converting between common metric and US customary units; give students quick, low‑stakes practice before the next homework set.\n\n| Section | Content (preview) |\n|---------|-------------------|\n| **Header** | Course name, Recitation date, “Unit‑Conversion Practice” (2 pts each) |\n| **Instructions** | Brief reminder of steps (choose target unit, set up conversion factor, cancel units, compute). |\n| **Problem 1** | Convert a length: 3.5 mi → km (use 1 mi = 1.609 km). |\n| **Problem 2** | Convert a mass: 250 g → lb (use 1 lb = 453.6 g). |\n| **Problem 3** | Convert a volume: 2 L → qt (use 1 qt = 0.946 L). |\n| **Problem 4** | Mixed‑unit physics: A car travels 60 km/h; express speed in mph (use 1 mi = 1.609 km). |\n| **Problem 5** | Chemistry‑style molar‑mass conversion: 0.75 mol NaCl (58.44 g/mol) → grams. |\n| **Scaffold** | A small “conversion‑factor table” on the right side for quick reference. |\n| **Answer key (back of page)** | Numerical answers with a short worked‑example for each problem. |\n| **Accessibility** | Large, sans‑serif font (12 pt), high‑contrast black‑on‑white, alt‑text description of the table for screen‑reader users. |\n| **Footer** | Space for student name, recitation section, and a reminder: “Show all work – partial credit given.” |\n\n---\n\n**Key design decisions awaiting your input**\n\n1. **Scope of units** – Do you want any additional unit families (e.g., temperature, pressure) or is the above list sufficient?\n2. **Number of problems** – Is five problems the right amount for a one‑page sheet, or would you prefer more/fewer?\n3. **Answer key placement** – Should the answer key be on the same page (back side) or in a separate instructor‑only document?\n\nYour answers (or a “decide for me”) will let me finalize the worksheet and generate the ready‑to‑print file.",
+          "checks": [
+            {
+              "check": "check_no_tier_mode_talk",
+              "ok": true,
+              "detail": "tiers, modes, and state files stayed invisible"
+            },
+            {
+              "check": "questions_between_0_3",
+              "ok": true,
+              "detail": "question marks 3 (expected 0..3)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "rubric-codesign",
+      "rubric_row": "Rubric co-design",
+      "notes": "The interrogation anti-pattern fires the full clarification list at once; staged clarification asks at most three architecture questions, then proposes reviewable defaults.",
+      "references_in_context": [
+        "interaction-protocol.md",
+        "artifact-patterns.md"
+      ],
+      "heuristic_result": "heuristic-fail",
+      "turns": [
+        {
+          "turn": 1,
+          "educator_message": "Use `$course-development-partner` to build a rubric for a second-year laboratory report tied to an uncertainty-analysis outcome. The instructor has opinions about grading but has not written them down.",
+          "model_response": "**Next step – clarify the design parameters**\n\nTo draft a rubric that reflects the instructor’s grading philosophy and aligns tightly with the uncertainty‑analysis outcome, I need a few concrete details. Below are the three highest‑value questions that will shape the rubric architecture.\n\n---\n\n### Decision‑making questions\n\n1. **Learning outcome (exact wording)**\n   - *What is the precise, student‑facing statement for the “uncertainty‑analysis” outcome?*  \n     Example: “Students will be able to quantify and communicate measurement uncertainty using propagation of error and confidence‑interval analysis.”  \n\n2. **Report components & evidence**\n   - *Which sections of the laboratory report should be evaluated, and what evidence in each section demonstrates competence?*  \n     Typical components might include:  \n     - Introduction / research question  \n     - Methodology & data collection description  \n     - Uncertainty calculations (propagation, standard deviation, confidence intervals)  \n     - Interpretation of results with uncertainty bounds  \n     - Discussion of error sources & mitigation strategies  \n     - Presentation / formatting  \n\n3. **Grading philosophy & weighting**\n   - *How does the instructor prefer to translate performance into a grade?*  \n     - **Objective‑achievement** (credit for meeting each criterion)  \n     - **Error‑deduction** (start with full credit, subtract for specific mistakes)  \n     - **Balanced** (combine both approaches)  \n   - *What relative weight should each report component carry (e.g., 25 % calculations, 20 % interpretation, 15 % discussion, etc.)?*  \n\n---\n\n**Your turn:**  \nPlease provide the outcome wording, list the report sections you want assessed (and any particular evidence you expect), and describe your preferred grading orientation and rough weight distribution. Once I have those details, I’ll draft a **rubric preview** (criteria, scale, weights, and boundary logic) and present it for your review before we move to the full rubric.  \n\n*(If you’d rather I decide for you on any of these points, just let me know and I’ll make a defensible recommendation.)*",
+          "checks": [
+            {
+              "check": "questions_between_1_4",
+              "ok": true,
+              "detail": "question marks 4 (expected 1..4)"
+            },
+            {
+              "check": "word_count_under_800",
+              "ok": true,
+              "detail": "word count 286 (limit 800)"
+            },
+            {
+              "check": "mentions_any_orientation_objective",
+              "ok": true,
+              "detail": "mentions ['orientation', 'objective']"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "educator_message": "The objective is that students justify whether two measured values differ using their uncertainties. Summative, scored as part of the lab report. Your balanced idea sounds right - go with that.",
+          "model_response": "### Rubric Preview – Uncertainty‑Analysis Lab Report  \n**Outcome (student‑facing)**  \n*“Students will be able to justify whether two measured values differ by correctly quantifying and communicating their uncertainties.”*  \n\n**Assessment type** – Summative, embedded in the full laboratory report.  \n\n**Grading orientation** – **Balanced** (objective‑achievement + error‑deduction).  \n- The rubric starts each criterion with full credit.  \n- Specific, documented errors trigger point deductions (see “Error‑deduction rules”).  \n- The final score is the sum of the weighted criterion totals after deductions.\n\n---\n\n#### 1. Criteria & Weighting (proposed)\n\n| # | Criterion (what we evaluate) | Weight % | Full‑credit points* |\n|---|------------------------------|----------|----------------------|\n| 1 | **Problem definition & hypothesis** – clear statement of the two quantities being compared and a testable hypothesis. | 10 % | 4 |\n| 2 | **Data presentation** – raw data table, units, significant figures, and any required calibration information. | 15 % | 6 |\n| 3 | **Uncertainty calculation** – correct propagation or combination of uncertainties for each measured value (including standard deviations, instrument‑specified errors, confidence intervals). | 25 % | 10 |\n| 4 | **Statistical comparison** – quantitative justification (e.g., overlap of confidence intervals, t‑test, difference‑of‑means) that answers “Do the values differ?” | 30 % | 12 |\n| 5 | **Interpretation & discussion of result** – explains what the comparison means in the experimental context, acknowledges limitations, and relates back to the hypothesis. | 15 % | 6 |\n| 6 | **Error‑source analysis & mitigation** – identifies dominant sources of uncertainty, evaluates their impact, and suggests realistic improvements. | 5 % | 2 |\n| 7 | **Report presentation & accessibility** – logical flow, proper labeling of figures/tables, adherence to the lab‑report template, and compliance with accessibility basics (e.g., alt‑text for figures, readable fonts). | 5 % | 2 |\n\n\\*Points are on a **0‑4** scale for each criterion (4 = full credit). The weighted contribution of each criterion = (Weight % × Points / 4). Total possible points = **40**; the weighted sum yields a **0‑100 %** course grade for this lab report.\n\n---\n\n#### 2. Scale & Descriptors (0‑4)\n\n| Score | Descriptor (what the student’s work looks like) |\n|-------|-------------------------------------------------|\n| **4 – Exceeds** | All required elements are present, mathematically correct, and presented with exemplary clarity; the comparison is quantitatively justified and the discussion shows deep insight. |\n| **3 – Meets** | All required elements are present and correct; minor slips in formatting, rounding, or explanation do not affect the overall justification. |\n| **2 – Approaches** | Most elements are present, but there are noticeable errors (e.g., a propagation mistake, incomplete uncertainty propagation, or a vague justification). The conclusion is still defensible after reasonable interpretation. |\n| **1 – Partial** | Significant portions are missing or incorrect (e.g., no uncertainty calculation, or the comparison is purely qualitative). The student attempts a justification but it is not supported by the data. |\n| **0 – Does not meet** | The criterion is absent or fundamentally flawed; no evidence of the required analysis. |\n\n---\n\n#### 3. Error‑Deduction Rules (balanced layer)\n\nWhen a **specific, documented error** occurs, the following deductions apply *per criterion* (capped at the maximum deduction for that criterion so the score never falls below 0):\n\n| Error type | Deduction (points) | Example |\n|------------|-------------------|---------|\n| **Incorrect propagation formula** | –1 (per distinct misuse) | Using addition instead of root‑sum‑square for independent uncertainties. |\n| **Missing units or inconsistent significant figures** | –0.5 | Reporting an uncertainty in % while the value is in mm. |\n| **Failure to state confidence level** | –0.5 | Giving a ± value without specifying 95 % CI. |\n| **Incorrect statistical test for comparison** | –1 | Applying a t‑test when data are clearly non‑normal and a non‑parametric test is required. |\n| **No reference to hypothesis in discussion** | –0.5 | Interpreting the result without linking back to the original hypothesis. |\n| **Figures/tables not labeled or lacking alt‑text** | –0.5 | Missing captions or descriptive alt‑text for a plotted uncertainty band. |\n| **Evidence of plagiarism or improper citation** | –2 (or per policy) | Direct copying of another report’s analysis without attribution. |\n\n*All deductions are **subtractive only**; they do not stack beyond the total points for the criterion.*\n\n---\n\n#### 4. Scoring Procedure (balanced)\n\n1. **Start** each criterion at the maximum points (4).  \n2. **Apply deductions** based on the error‑deduction table.  \n3. **Convert** the remaining points to a percentage using the weight column.  \n4. **Sum** the weighted percentages across all criteria → final lab‑report score (0‑100 %).  \n\n---\n\n#### 5. Review checklist for you (the instructor)\n\n- **Weight distribution** – Does the proposed 10 / 15 / 25 / 30 / 15 / 5 / 5 % reflect the relative importance you envision?  \n- **Criteria list** – Are any additional sections (e.g., “Literature context” or “Safety discussion”) needed, or should any be removed?  \n- **Error‑deduction catalog** – Does the set of example errors capture the most common mistakes you observe? Feel free to add or remove items.  \n- **Maximum points & scale** – 40‑point total on a 0‑4 per‑criterion scale; is this granularity suitable for your grading workflow?  \n- **Accessibility expectations** – The brief includes basic accessibility checks; let me know if you have institution‑specific guidelines to embed.  \n\n---\n\n### Decision Card\n\n```markdown\nDecision: Rubric weighting & error‑deduction design\n\nWhat I understand:\n- Outcome: justify difference between two measured values using uncertainties.\n- Summative, part of the full lab report.\n- Instructor prefers a balanced grading orientation.\n\nOptions:\n1. **Adopt the proposed weighting** (10 % – 15 % – 25 % – 30 % – 15 % – 5 % – 5 %).  \n   *Benefit*: Mirrors typical emphasis on calculation and statistical comparison while still rewarding interpretation and presentation.  \n   *Trade‑off*: Slightly less granularity for error‑source analysis.\n\n2. **Shift more weight to uncertainty calculation** (e.g., 35 % for criterion 3, reduce others).  \n   *Benefit*: Highlights the technical skill you may deem most critical.  \n   *Trade‑off*: Reduces emphasis on higher‑order interpretation and discussion.\n\n3. **Simplify the rubric to fewer criteria** (e.g., combine data presentation & uncertainty calculation).  \n   *Benefit*: Faster to grade, fewer deduction entries.  \n   *Trade‑off*: Less diagnostic feedback for students; may hide specific misconceptions.\n\nRecommendation: **Option 1** – the balanced distribution aligns with typical second‑year lab expectations and preserves diagnostic granularity.\n\nYour choice: choose, modify, or say “decide for me.”\n```\n\n---\n\n#### Next step  \n\nPlease let me know:\n\n1. **Whether the weighting (Option 1) is acceptable** or if you’d like a different distribution.  \n2. **If any criteria should be added, removed, or merged**.  \n3. **Any additional error‑deduction items** you want captured (or any you’d remove).  \n\nOnce I have your confirmations or adjustments, I will produce the **final rubric document** (markdown table, scoring guide, and grader notes) ready for integration into the lab‑report template.  \n\n*(If you’d rather I decide for you on any of the above, just say “decide for me.”)*",
+          "checks": [
+            {
+              "check": "word_count_under_1000",
+              "ok": false,
+              "detail": "word count 1152 (limit 1000)"
+            },
+            {
+              "check": "mentions_any_weight_criteri",
+              "ok": true,
+              "detail": "mentions ['weight', 'criteri']"
+            },
+            {
+              "check": "check_returns_to_educator",
+              "ok": true,
+              "detail": "turn ends with a return to the educator ('?')"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Automated heuristics only; not qualifying evidence. A qualifying pass requires a human evaluator applying evaluator-rubric.md to the retained transcripts in this record.",
+    "Scripted educator replies; a live educator may behave differently.",
+    "Single run; model outputs vary across runs."
+  ]
+}
