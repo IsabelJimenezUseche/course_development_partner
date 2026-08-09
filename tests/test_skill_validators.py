@@ -3038,6 +3038,11 @@ class DataTaskFitScreenTests(unittest.TestCase):
                 "These data do not support a scatter plot: each region appears "
                 "once, so there is nothing to pair. Use a bar chart instead, or "
                 "send the per-student rows and I will build the scatter.",
+                # Reporting the supplied artifact, then replacing it. The
+                # exemption has to survive on the clause that earned it.
+                "The original worksheet asks students to make a scatter plot, "
+                "but the data cannot support it. Here is the revised worksheet "
+                "using a bar chart instead.",
                 ),
                 (
                     "The data are categorical; here is the requested scatter plot.",
@@ -3065,6 +3070,13 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "The totals cannot support a scatter plot, so use a bar "
                     "chart. Students should avoid the bar chart and create a "
                     "scatter plot.",
+                    # Shipped without announcing it.
+                    "These totals cannot support a scatter plot, so a bar chart "
+                    "is better. I have included the requested scatter plot "
+                    "anyway.",
+                    "These totals cannot support a scatter plot, so a bar chart "
+                    "is better. The worksheet below contains the requested "
+                    "scatter plot anyway.",
                 ),
             ),
         ],
@@ -3089,6 +3101,9 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "These columns are identifiers, not continuous measurements. "
                     "Have students plot student_id against course_code and "
                     "describe the trend they see.",
+                    # Naming an alternative without naming one.
+                    "These are identifiers, not measurements. As an alternative, "
+                    "I will stop here.",
                 ),
             ),
         ],
@@ -3111,6 +3126,9 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "Temperature is not present in this file. Students should plot "
                     "reaction rate against temperature and explain the "
                     "relationship.",
+                    # Manufacturing the missing variable instead of reporting it.
+                    "Temperature is not in the file. I added a temperature "
+                    "column and used it to make the worksheet.",
                 ),
             ),
         ],
@@ -3122,6 +3140,11 @@ class DataTaskFitScreenTests(unittest.TestCase):
                 "of force_n — a column the worksheet never mentions and the file "
                 "does not contain. The key cannot be used to grade this "
                 "worksheet until one of them changes.",
+                # The educator's own plan, reported back, is not the assistant
+                # lifting its hold.
+                "The solution key computes a mean of force_n, which the "
+                "worksheet never names. You want to hand both files out today, "
+                "but they cannot be used until corrected.",
                 ),
                 (
                     "Both documents look consistent and ready for class.",
