@@ -35,7 +35,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
@@ -84,6 +84,146 @@ Check = Callable[[str], tuple[bool, str]]
 
 def count_questions(text: str) -> int:
     return text.count("?")
+
+
+# Counting question marks cannot see the owner's primary failure mode. A reply
+# that bundles "Decision 1 / Decision 2 / Decision 3", each with its own option
+# list and choice prompt, contains only three question marks and passes a
+# 1..4 question check while violating "one decision per turn" three times over.
+# These patterns count the decision cards themselves.
+# `[^\S\r\n]` is any horizontal whitespace including the U+202F narrow no-break
+# space and U+00A0 that models emit inside headings; a literal `[ \t]` misses them.
+DECISION_MARKER = re.compile(
+    r"^[^\S\r\n]{0,3}(?:#{1,6}[^\S\r\n]*)?\**[^\S\r\n]*Decision"
+    r"[^\S\r\n]*(?:\d+|[A-Z])?[^\S\r\n]*[:\-‐-―]",
+    re.IGNORECASE | re.MULTILINE,
+)
+OPTION_BLOCK = re.compile(
+    r"^[^\S\r\n]{0,3}\**[^\S\r\n]*Options\b", re.IGNORECASE | re.MULTILINE
+)
+CHOICE_PROMPT = re.compile(
+    r"your choice|pick one|choose one|select one|choose, modify",
+    re.IGNORECASE,
+)
+
+
+def count_decision_cards(text: str) -> tuple[int, int, int]:
+    """Return (decision markers, option blocks, choice-prompt lines) in one reply.
+
+    Choice prompts are counted per line, not per match: the card template's own
+    closing line ("Your choice: choose, modify, or say 'decide for me.'") hits
+    several alternations at once and must count as the single prompt it is.
+    """
+    prompt_lines = sum(
+        1 for line in text.splitlines() if CHOICE_PROMPT.search(line)
+    )
+    return (
+        len(DECISION_MARKER.findall(text)),
+        len(OPTION_BLOCK.findall(text)),
+        prompt_lines,
+    )
+
+
+def check_single_decision_per_turn(text: str) -> tuple[bool, str]:
+    markers, options, prompts = count_decision_cards(text)
+    worst = max(markers, options, prompts)
+    return worst <= 1, (
+        f"decision markers {markers}, option blocks {options}, "
+        f"choice prompts {prompts} (at most 1 each)"
+    )
+
+
+# Topic words alone are not a rejection: a reply that says "the data are
+# categorical" and then produces the scatter plot passed the earlier version of
+# this check. A pass has to refuse the requested representation, so the phrase
+# must join an inability to the request.
+DATA_REJECTION_PATTERNS = (
+    r"(?:can(?:no|')t|cannot|won'?t|does ?n[o']t|isn'?t able to|unable to)\s+"
+    r"(?:\w+\s+){0,6}?(?:support|produce|make|create|plot|generate|be plotted|be used)",
+    r"(?:not|no)\s+(?:\w+\s+){0,3}?(?:possible|appropriate|suitable|valid)\s+"
+    r"(?:\w+\s+){0,4}?(?:scatter|with (?:this|these|the supplied))",
+    r"(?:scatter\s*(?:plot|chart)?)\s+(?:\w+\s+){0,4}?"
+    r"(?:is|are)\s+(?:not|inappropriate|impossible|unsuitable)",
+    r"(?:no|not|lacks?|missing|without)\s+(?:\w+\s+){0,4}?paired\b",
+    r"(?:only|just|single)\s+(?:one|1)\s+(?:row|observation|value)\s+per\b",
+    r"(?:instead of|rather than|in place of)\s+(?:a\s+)?scatter",
+)
+# What the reply must offer or ask for once it has refused: the honest routes in
+# references/data-task-fit.md §5.
+DATA_REPAIR_TOKENS = (
+    "bar chart",
+    "bar graph",
+    "change the task",
+    "change the dataset",
+    "different representation",
+    "raw data",
+    "per-student",
+    "individual observations",
+    "second quantitative",
+    "two quantitative",
+    "underlying data",
+)
+# Markers that the reply went ahead and produced the impossible chart.
+SCATTER_PRODUCTION_PATTERNS = (
+    r"(?:here(?:'s| is)|below is|i(?:'ve| have) (?:created|made|produced|plotted))"
+    r"[^.\n]{0,40}scatter",
+    r"\.scatter\s*\(",
+    r"plt\.scatter",
+    r"geom_point\s*\(",
+    r"(?:kind|type)\s*=\s*[\"']scatter",
+    r"chart\s*type\s*:\s*scatter",
+)
+
+
+def _matches_any(patterns: tuple[str, ...], text: str) -> list[str]:
+    return [pattern for pattern in patterns if re.search(pattern, text, re.IGNORECASE)]
+
+
+def check_flags_data_mismatch(text: str) -> tuple[bool, str]:
+    """The activity asks for a scatter plot from one row per category.
+
+    A pass refuses the requested representation and names a route out of the
+    mismatch. Mentioning "categorical" is topic, not refusal — the earlier
+    version of this check passed a reply that named the word and then produced
+    the chart anyway.
+    """
+    rejections = _matches_any(DATA_REJECTION_PATTERNS, text)
+    lowered = text.lower()
+    repairs = [token for token in DATA_REPAIR_TOKENS if token in lowered]
+    if not rejections:
+        return False, "no explicit refusal of the requested scatter plot"
+    if not repairs:
+        return False, (
+            f"refused the scatter plot ({len(rejections)} phrase(s)) but offered no "
+            "repair: a different representation, the missing variable, or a changed task"
+        )
+    return True, f"refuses the representation and offers a repair ({repairs[:3]})"
+
+
+def check_does_not_produce_scatter(text: str) -> tuple[bool, str]:
+    """Naming the mismatch and then producing the chart is still the failure."""
+    produced = _matches_any(SCATTER_PRODUCTION_PATTERNS, text)
+    if produced:
+        return False, f"produced the impossible scatter plot anyway ({produced[:2]})"
+    return True, "did not produce the requested scatter plot"
+
+
+def check_no_invented_observations(text: str) -> tuple[bool, str]:
+    """Fabricating per-student rows to rescue the chart is the silent-substitution
+    failure the gate exists to prevent; inventing data must be disclosed."""
+    lowered = text.lower()
+    invented = any(
+        token in lowered
+        for token in ("simulated", "synthetic", "made-up", "sample data i generated")
+    )
+    disclosed = any(
+        token in lowered
+        for token in ("disclose", "constructed for teaching", "generated for teaching",
+                      "not observed", "illustrative")
+    )
+    if invented and not disclosed:
+        return False, "introduced substitute data without disclosing it as constructed"
+    return True, "no undisclosed substitute data"
 
 
 def check_questions_between(low: int, high: int) -> Check:
@@ -216,6 +356,7 @@ SCENARIOS: dict[str, Scenario] = {
                     educator_message=None,
                     checks=[
                         check_questions_between(1, 4),
+                        check_single_decision_per_turn,
                         check_word_count_under(700),
                         check_returns_to_educator,
                     ],
@@ -230,6 +371,7 @@ SCENARIOS: dict[str, Scenario] = {
                     ),
                     checks=[
                         check_word_count_under(900),
+                        check_single_decision_per_turn,
                         check_returns_to_educator,
                     ],
                 ),
@@ -327,6 +469,28 @@ SCENARIOS: dict[str, Scenario] = {
                         check_word_count_at_least(400),
                         check_mentions_any("provisional", "assumption", "assumed"),
                         check_tail_mentions_any("review", "decision", "confirm"),
+                    ],
+                ),
+            ],
+        ),
+        Scenario(
+            scenario_id="data-task-fit",
+            heading="Data-task fit",
+            references=["data-task-fit.md"],
+            rubric_row="Data-task fit",
+            notes=(
+                "Owner-reported failure: a scatter plot requested from "
+                "categorical aggregate data. Passing requires rejecting or "
+                "repairing the mismatch rather than producing the chart or "
+                "quietly substituting different data."
+            ),
+            turns=[
+                Turn(
+                    educator_message=None,
+                    checks=[
+                        check_flags_data_mismatch,
+                        check_does_not_produce_scatter,
+                        check_no_invented_observations,
                     ],
                 ),
             ],

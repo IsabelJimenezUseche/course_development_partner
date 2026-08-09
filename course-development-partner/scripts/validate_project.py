@@ -19,7 +19,9 @@ import validate_alignment_map
 import validate_artifact_manifest
 import validate_assessment_blueprint
 import validate_course_curriculum_map
+import validate_data_task_record
 import validate_design_state
+import validate_handoff_state
 from _tabular import (
     emit_report,
     load_table,
@@ -143,6 +145,68 @@ def table_identifiers(
         except ValueError as exc:
             issues.append(f"{path.name} row {row_number}: {exc}")
     return identifiers, issues
+
+
+def manifest_artifact_ids(path: Path) -> tuple[set[str], set[str]]:
+    """Return (active artifact IDs, IDs whose row claims the data-task-fit token)."""
+    required = validate_artifact_manifest.REQUIRED
+    _, headers, rows = load_table(path, required)
+    mapping = normalized_mapping(headers, required)
+    active: set[str] = set()
+    claimed: set[str] = set()
+    for raw in rows:
+        row = normalized_row(raw, mapping)
+        if normalize(row["status"]) == "retired":
+            continue
+        try:
+            identifiers = parse_identifier_list(row["artifact id"], field_name="artifact")
+        except ValueError:
+            continue
+        active.update(identifiers)
+        tokens = {
+            normalize(token)
+            for token in re.split(r"[;,]", row["validation completed"])
+            if token.strip()
+        }
+        if "data-task-fit" in tokens:
+            claimed.update(identifiers)
+    return active, claimed
+
+
+def check_data_task_fit(
+    manifest_path: Path | None, record_path: Path | None
+) -> tuple[list[str], list[str]]:
+    """A fit claim in the manifest must point at a record that can be re-run."""
+    if manifest_path is None:
+        return [], []
+    try:
+        active_ids, claimed_ids = manifest_artifact_ids(manifest_path)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return [f"artifact-manifest.md: {exc}"], []
+    if not claimed_ids and record_path is None:
+        return [], []
+    if record_path is None:
+        return [], [
+            f"artifact-manifest.md: {identifier} claims the data-task-fit token but "
+            "the project has no active data-task-record.md, so the claim cannot be "
+            "re-executed"
+            for identifier in sorted(claimed_ids)
+        ]
+    try:
+        recorded_ids = validate_data_task_record.artifact_ids(record_path)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return [f"data-task-record.md: {exc}"], []
+    issues = [
+        f"artifact-manifest.md: {identifier} claims the data-task-fit token but has "
+        "no row in data-task-record.md"
+        for identifier in sorted(claimed_ids - recorded_ids)
+    ]
+    issues.extend(
+        f"data-task-record.md: artifact is not active in artifact-manifest.md: "
+        f"{identifier}"
+        for identifier in sorted(recorded_ids - active_ids)
+    )
+    return [], issues
 
 
 def validate_index(
@@ -351,6 +415,16 @@ def validate_project(
         "assessment-blueprint.md": lambda path: validate_assessment_blueprint.validate(
             path, [], allow_formal_validation, alignment_path
         ),
+        "data-task-record.md": validate_data_task_record.validate,
+        "design-log.md": lambda path: validate_handoff_state.validate(
+            path, "design-log", design_profile == "handoff"
+        ),
+        "source-register.md": lambda path: validate_handoff_state.validate(
+            path, "source-register", design_profile == "handoff"
+        ),
+        "capability-manifest.md": lambda path: validate_handoff_state.validate(
+            path, "capability-manifest", design_profile == "handoff"
+        ),
         "course-curriculum-map.md": lambda path: validate_course_curriculum_map.validate(
             path,
             max_hours,
@@ -365,6 +439,12 @@ def validate_project(
         component_errors, component_issues = call(path)
         errors.extend(f"{name}: {item}" for item in component_errors)
         issues.extend(f"{name}: {item}" for item in component_issues)
+
+    fit_errors, fit_issues = check_data_task_fit(
+        active.get("artifact-manifest.md"), active.get("data-task-record.md")
+    )
+    errors.extend(fit_errors)
+    issues.extend(fit_issues)
 
     if errors or alignment_path is None:
         return errors, issues

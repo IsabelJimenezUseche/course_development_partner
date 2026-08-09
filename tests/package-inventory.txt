@@ -8,6 +8,7 @@ course-development-partner/assets/capability-manifest.md
 course-development-partner/assets/context-brief.md
 course-development-partner/assets/course-curriculum-map.md
 course-development-partner/assets/course-design-brief.md
+course-development-partner/assets/data-task-record.md
 course-development-partner/assets/design-log.md
 course-development-partner/assets/implementation-evidence-plan.md
 course-development-partner/assets/implementation-plan.md
@@ -21,6 +22,7 @@ course-development-partner/references/artifact-patterns.md
 course-development-partner/references/assessment-quality.md
 course-development-partner/references/bibliography.md
 course-development-partner/references/course-coherence-and-implementation.md
+course-development-partner/references/data-task-fit.md
 course-development-partner/references/design-workflow.md
 course-development-partner/references/evidence-informed-design.md
 course-development-partner/references/evidence-source-protocol.md
@@ -40,5 +42,8 @@ course-development-partner/scripts/validate_alignment_map.py
 course-development-partner/scripts/validate_artifact_manifest.py
 course-development-partner/scripts/validate_assessment_blueprint.py
 course-development-partner/scripts/validate_course_curriculum_map.py
+course-development-partner/scripts/validate_data_task_record.py
+course-development-partner/scripts/validate_dataset.py
 course-development-partner/scripts/validate_design_state.py
+course-development-partner/scripts/validate_handoff_state.py
 course-development-partner/scripts/validate_project.py

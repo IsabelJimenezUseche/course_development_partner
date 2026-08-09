@@ -44,6 +44,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - State assumptions, initial/boundary conditions, and simplifications.
 - Confirm that the selected model or method fits the scenario.
 - Check that provided data yield a valid, meaningful result.
+- For any data-based activity, execute the requested operation on the exact supplied dataset and verify the full chain in `references/data-task-fit.md`: named columns exist, types and pairing support the representation, observations suffice, the key uses the same data, and generated or corrected data is disclosed. Record the executed check in `data-task-record.md` and link it from the manifest; an unrecorded check cannot be re-run and does not count as one. A mismatch between data and task is a Blocker.
 - Independently reproduce quantitative solutions.
 - Recognize alternative valid approaches.
 - Verify technical accuracy of diagrams, images, graphs, labels, and scales.
@@ -112,7 +113,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Offer multiple means of engagement, representation, or expression only when they preserve the target construct.
 - Combine automated, keyboard, rendered, assistive-technology, and human-content checks in proportion to the artifact and stakes; record untested scope.
 - Do not claim WCAG conformance from an automated scan alone or make an ADA/Section 504 compliance or exception determination.
-- Record unresolved barriers, responsible owners, interim access, remediation dates, and required institutional approvals in `assets/accessibility-review.md`.
+- Record unresolved barriers, responsible owners, interim access, remediation dates, and required institutional approvals in the project's `accessibility-review.md`.
 
 ## 7. Assessment integrity and fairness
 
@@ -166,7 +167,7 @@ Run the applicable deterministic state, alignment, assessment, curriculum, manif
 - Allow multiple defensible alternatives when evidence and reasoning support them.
 - Require qualified instructor review of consequential technical, safety, ethical, or standards claims.
 - Say plainly whether a laboratory activity is confirmatory, structured, guided, or open inquiry; do not describe a known-answer procedure as inquiry.
-- For any hazard-bearing element, confirm verification against the authoritative institutional, manufacturer, or safety-data source with its date, and approval by the named responsible safety owner, recorded in `assets/safety-review.md`. Treat an unverified or unreviewed element as a blocker in every mode.
+- For any hazard-bearing element, confirm verification against the authoritative institutional, manufacturer, or safety-data source with its date, and approval by the named responsible safety owner, recorded in the project's `safety-review.md`. Treat an unverified or unreviewed element as a blocker in every mode.
 - Confirm every teaching-ready artifact declares `Safety review` in the manifest — a linked review, or `not required` when no physical hazard exists. A blank declaration is an undeclared release decision, not an absent hazard.
 - Check accessibility of the physical environment — reach, handling, protective equipment fit, alarms, and software — and record barriers requiring an approved alternative.
 

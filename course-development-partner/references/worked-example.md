@@ -170,6 +170,7 @@ The 10% weight on computation is the visible consequence of the alignment decisi
 Passes run per `references/validation-checklists.md`:
 
 - **Disciplinary correctness** — instructor independently confirmed the three datasets produce the intended overlap, separation, and marginal cases. Blocker if the "marginal" pair is not actually marginal.
+- **Data–task fit** — the mean-and-uncertainty computation was executed on each of the three delivered files, not on a description of them: `scripts/validate_dataset.py` against `--representation uncertainty` for each, then the comparison by hand. One file failed the first pass — its replicate column had been exported with a units row that made every value text — and was re-exported before the row was written. Each check is a row in `data-task-record.md`, linked from the manifest's `Data-task-fit evidence` column; the `data-task-fit` token was added only after that. A token with no record behind it would have said the same thing while proving nothing.
 - **Alignment** — demand match confirmed by the blueprint validator against the alignment map.
 - **Scaffolding** — arithmetic support present and explicitly droppable; the module-11 assessment removes the template.
 - **Feasibility** — 110 minutes with two TAs for 60 students; contingency defined for the most likely overrun.

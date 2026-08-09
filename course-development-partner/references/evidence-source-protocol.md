@@ -27,7 +27,7 @@ Do not treat source rank as sufficient. Examine population, prior knowledge, dis
 
 ## 3. Record transferable claims
 
-Use `assets/source-register.md`. For each consequential recommendation, record:
+Create `source-register.md` in the project from `assets/source-register.md`. For each consequential recommendation, record:
 
 - the exact claim supported;
 - source authority and study type;
@@ -67,7 +67,7 @@ When the question is what students already believe, where they reliably fail, or
 3. Check the **fit** before transferring a finding: course level, prior curriculum, national or institutional context, and whether the notation and representation match this course.
 4. Prefer the instructor's own prior-offering evidence when it exists; it has the highest fit of any source.
 
-Record the result in `assets/source-register.md` with the population it describes. When nothing is found, say that the expected student model is provisional and state what would confirm it.
+Record the result in the project's `source-register.md` with the population it describes. When nothing is found, say that the expected student model is provisional and state what would confirm it.
 
 Do not cite a source solely from a search snippet or secondary paraphrase when the original is available. Do not use citation count, venue prestige, or confident wording as a substitute for fit and quality.
 

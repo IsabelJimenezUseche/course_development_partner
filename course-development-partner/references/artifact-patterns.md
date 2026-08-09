@@ -35,9 +35,9 @@ For every artifact, identify:
 
 Keep related artifacts synchronized. Never allow the solution, rubric, or instructor guide to introduce an unstated requirement or assumption.
 
-For rich-format output, apply `references/rich-artifact-production.md` and use `assets/production-plan.md`. In interactive modes, present the educational preview and end the turn for the educator's response before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability. In Auto mode, select and record the strongest recommended preview internally as provisional and proceed without an approval checkpoint.
+For rich-format output, apply `references/rich-artifact-production.md` and create `production-plan.md` in the project from `assets/production-plan.md`. In interactive modes, present the educational preview and end the turn for the educator's response before invoking a document, presentation, spreadsheet, PDF, diagram/image, or media capability. In Auto mode, select and record the strongest recommended preview internally as provisional and proceed without an approval checkpoint.
 
-When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and use `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
+When an artifact is digital, multimedia, assessment-related, or otherwise accessibility-sensitive, apply `references/accessibility-and-compliance.md` during design and create `accessibility-review.md` in the project from `assets/accessibility-review.md` to document scope, testing, barriers, and claim limits. Do not equate visual quality or an automated pass with accessibility or legal compliance.
 
 ## 2. Syllabi
 
@@ -45,7 +45,7 @@ Preview: outcome list, schedule outline, grading-system summary, and policy inve
 
 The syllabus aggregates decisions with three different authorities. Keep them distinct while drafting:
 
-- **Institutional required language** — accommodation and disability statements, academic-integrity policy, safety notices, and any mandated text. Ask for the current authoritative wording and insert it verbatim with its version or date; do not draft, paraphrase, or update it. Record the source in `assets/source-register.md`.
+- **Institutional required language** — accommodation and disability statements, academic-integrity policy, safety notices, and any mandated text. Ask for the current authoritative wording and insert it verbatim with its version or date; do not draft, paraphrase, or update it. Record the source in the project's `source-register.md`.
 - **Course-owner decisions** — the grading system, late-work and revision policy, attendance, permitted collaboration and AI use. Ask rather than infer, per `references/assessment-quality.md` §8, and surface conflicts between stated policies and the assessment design instead of resolving them silently.
 - **Design content** — outcomes, schedule, workload, and help pathways, drafted from the alignment map, curriculum map, and implementation plan when they exist.
 
@@ -114,7 +114,7 @@ When appropriate, ask students to:
 - recommend an action.
 - reason about uncertainty, risk, or tradeoffs.
 
-Remove irrelevant detail unless distinguishing signal from noise is an explicit objective. Independently verify facts, data, equations, and solvability.
+Remove irrelevant detail unless distinguishing signal from noise is an explicit objective. Independently verify facts, data, equations, and solvability. When students receive a dataset or must produce a chart or statistic, apply `references/data-task-fit.md` and execute the operation on the exact file before release.
 
 For STEM tasks, apply `references/stem-authenticity.md`. Make relevant standards, multiple constraints, safety, welfare, ethics, stakeholder perspectives, uncertainty, and lifecycle effects part of the decision rather than decorative context.
 
@@ -130,7 +130,7 @@ Create:
 
 - student lab or session handout;
 - instructor and teaching-assistant facilitation guide, including setup, staging, and reset;
-- safety documentation routed to the responsible owner, recorded in `assets/safety-review.md`;
+- safety documentation routed to the responsible owner, recorded in the project's `safety-review.md`;
 - data-recording format — notebook conventions, template, or repository structure;
 - exemplar analysis or expected result range with its tolerance;
 - scoring or feedback guide for the report or notebook.
@@ -346,7 +346,7 @@ Make purpose, required action, deadline, criteria, and help pathway easy to find
 
 ### Surveys and reflections
 
-Map each item to a decision or research question. Avoid collecting unnecessary identifying data. Use `assets/implementation-evidence-plan.md` when collecting new evidence. Distinguish course improvement, program evaluation, and research or dissemination. De-identification alone does not authorize research; pause research-like collection or dissemination for applicable institutional review and data-governance guidance.
+Map each item to a decision or research question. Avoid collecting unnecessary identifying data. Create `implementation-evidence-plan.md` in the project from `assets/implementation-evidence-plan.md` when collecting new evidence. Distinguish course improvement, program evaluation, and research or dissemination. De-identification alone does not authorize research; pause research-like collection or dissemination for applicable institutional review and data-governance guidance.
 
 ### Audio and video
 

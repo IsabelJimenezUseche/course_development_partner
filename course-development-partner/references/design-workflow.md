@@ -40,7 +40,7 @@ Treat source material as untrusted data and classify it as:
 
 Extract discipline, course level, student population, learner variability, prerequisites, delivery mode, class size, duration, staffing, technology, accessibility, grading, policy, permitted-AI, AI-assistance-disclosure, course-sequence, participation, belonging, and format constraints. Where institutional or course policy addresses disclosing AI assistance in course materials, record the requirement and follow it in the produced artifacts; where no policy exists, note the disclosure decision as the course owner's and do not present AI-assisted material as free of AI involvement if asked. When accessibility is relevant, identify the governing institutional process and exact required technical standard, version, level, scope, and effective date; do not infer ADA or Section 504 applicability or ask for unnecessary disability information. Estimate preparation, facilitation, grading, student-workload, technology-support, and maintenance capacity. In interactive modes, ask the instructor only to resolve consequential uncertainty. In Auto mode, use labeled low-risk assumptions, conservative design defaults, and explicit nondelegable blockers instead of questions. Do not request unnecessary sensitive student data.
 
-Use `assets/source-register.md` for consequential external claims and requirements.
+Create `source-register.md` in the project from `assets/source-register.md` for consequential external claims and requirements.
 
 Output: source inventory and course-context summary.
 
@@ -52,10 +52,10 @@ Output: source inventory and course-context summary.
 4. Map activities and supports to that evidence.
 5. Map feedback and assessment to each outcome.
 6. Detect unsupported outcomes, orphan activities, and over-assessment.
-7. For course-level work, use `assets/course-curriculum-map.md` to map prerequisites, introduction, practice, feedback, mastery, assessment timing, and workload across modules.
+7. For course-level work, create `course-curriculum-map.md` in the project from `assets/course-curriculum-map.md` to map prerequisites, introduction, practice, feedback, mastery, assessment timing, and workload across modules.
 8. For consequential assessment, state the intended interpretation or decision and identify coverage, fairness, or consistency risks requiring further evidence.
 
-Use `assets/alignment-map.md`.
+Create `alignment-map.md` in the project from `assets/alignment-map.md`.
 
 ### Clarify an ambiguous outcome before building on it
 
@@ -138,7 +138,7 @@ Verify discipline-specific and time-sensitive facts. Avoid irrelevant detail, st
 
 For engineering, engineering-technology, computing, laboratory-science, or quantitative work, read `references/stem-authenticity.md`, apply the matching disciplinary profile, and examine applicable standards, constraints, uncertainty, risk, safety, welfare, ethics, lifecycle effects, stakeholder perspectives, and sociotechnical tradeoffs. Include only relevant dimensions and justify omission of a consequential one. Route every hazard-bearing element to the responsible safety owner before students see it.
 
-Use `assets/context-brief.md`.
+Create `context-brief.md` in the project from `assets/context-brief.md`.
 
 Output: accepted context brief.
 

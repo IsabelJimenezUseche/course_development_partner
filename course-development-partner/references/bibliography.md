@@ -1,6 +1,6 @@
 # Anchor Bibliography
 
-A curated starting bibliography for the evidence obligations in `references/evidence-informed-design.md` and `references/evidence-source-protocol.md`. Use it when a consequential recommendation needs a citable source: start here before searching, and record the chosen source in `assets/source-register.md` with the population and limits it actually covers.
+A curated starting bibliography for the evidence obligations in `references/evidence-informed-design.md` and `references/evidence-source-protocol.md`. Use it when a consequential recommendation needs a citable source: start here before searching, and record the chosen source in the project's `source-register.md` with the population and limits it actually covers.
 
 Last verified: 2026-08-06.
 

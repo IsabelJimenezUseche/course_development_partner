@@ -31,6 +31,17 @@
 - Action-time authorization required:
 - Markdown or neutral-data fallback:
 
+## Dataset and requested representation
+
+Complete when the artifact supplies a dataset or asks students to produce a chart or statistic. The executed check itself belongs in `data-task-record.md` from `assets/data-task-record.md`, which is re-runnable; record here only what production needs and what that table has no column for. See `references/data-task-fit.md`.
+
+- Data-task record row: [artifact ID in `data-task-record.md`]
+- Dataset provenance and permission to distribute:
+- Schema as actually read: [column name — type — units]
+- Observation count and missing-value handling:
+- Mismatch found and how it was resolved:
+- Generated, simulated, or corrected data disclosed: yes | no | not applicable
+
 ## Design and accessibility
 
 - Document/deck/workbook/visual archetype or style authority:

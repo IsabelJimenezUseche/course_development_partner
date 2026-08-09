@@ -29,7 +29,7 @@ Do not call an assessment or rubric “validated” when only a classroom review
 
 ## 2. Build an assessment blueprint
 
-Use `assets/assessment-blueprint.md` before drafting a consequential assessment.
+Create `assessment-blueprint.md` in the project from `assets/assessment-blueprint.md` before drafting a consequential assessment.
 
 Declare the blueprint's assessed outcome scope before checking coverage. List explicit outcome IDs when one assessment intentionally samples a subset of the project or course alignment map. Use `all-active` only for a blueprint intended to sample every active aligned outcome. Confirm the scope with the responsible educator; do not treat unrelated course outcomes as missing from a narrower assessment.
 

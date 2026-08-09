@@ -18,7 +18,7 @@
 
 Do not call a recommendation “evidence-based” without identifying the evidence and its limits. Match the effort to the consequence of the decision.
 
-Apply that standard to this reference too. The guidance in the sections below is synthesized practice guidance, not a citation. Its support is uneven: some patterns rest on large, repeatedly replicated bodies of work, others on smaller or more context-bound literatures, and the effect of any of them depends on the population, discipline, prior knowledge, and implementation conditions. Reading a rule here does not discharge the obligation to identify evidence for a consequential recommendation — record it in `assets/source-register.md` with the population it describes. Where a section states a direction of effect, treat that as a mechanism to check locally rather than a magnitude to promise.
+Apply that standard to this reference too. The guidance in the sections below is synthesized practice guidance, not a citation. Its support is uneven: some patterns rest on large, repeatedly replicated bodies of work, others on smaller or more context-bound literatures, and the effect of any of them depends on the population, discipline, prior knowledge, and implementation conditions. Reading a rule here does not discharge the obligation to identify evidence for a consequential recommendation — record it in the project's `source-register.md` with the population it describes. Where a section states a direction of effect, treat that as a mechanism to check locally rather than a magnitude to promise.
 
 Use this authority order:
 
@@ -29,7 +29,7 @@ Use this authority order:
 5. credible practice guidance with a clear context;
 6. illustrative or generated ideas, labeled as provisional.
 
-Apply `references/evidence-source-protocol.md` and use `assets/source-register.md` for consequential recommendations. Record:
+Apply `references/evidence-source-protocol.md` and create `source-register.md` in the project from `assets/source-register.md` for consequential recommendations. Record:
 
 - the design claim;
 - the source or professor-approved rationale;
@@ -64,7 +64,7 @@ The conceptual-change cycle, scaffold depth, and cognitive-load decisions all de
 Use the cheapest source that answers the question:
 
 1. **An existing validated instrument.** Most STEM disciplines have published concept inventories and diagnostic instruments — force and motion, electricity and magnetism, statics, thermodynamics, fluid mechanics, signals and systems, chemical bonding and equilibrium, genetics, natural selection, statistical reasoning, and introductory computing among them. Before writing a diagnostic from scratch, check whether a validated instrument covers the concept. Ask the instructor whether one is already used in the course or program.
-2. **Discipline-based education research on the specific concept.** Documented misconception catalogs exist for many core STEM topics and are more reliable than generated guesses. Apply `references/evidence-source-protocol.md` and record what you find in `assets/source-register.md`.
+2. **Discipline-based education research on the specific concept.** Documented misconception catalogs exist for many core STEM topics and are more reliable than generated guesses. Apply `references/evidence-source-protocol.md` and record what you find in the project's `source-register.md`.
 3. **The instructor's own observation.** Prior-offering exam responses, recurring office-hour questions, and known failure points are legitimate, high-fit evidence. Ask for them directly.
 4. **A short purpose-built diagnostic.** Use when no instrument or record exists. Ask for a prediction, explanation, sketch, ranking, or classification that distinguishes competing models — not a recall quiz.
 

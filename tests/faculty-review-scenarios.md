@@ -46,7 +46,7 @@ Use `$course-development-partner` to design a data-interpretation activity for 1
 
 Use `$course-development-partner` to review a new public-university course module containing LMS pages, PDFs, presentation slides, a third-party homework platform, color-coded diagrams, and captioned videos. The instructor says an automated checker passed most files and asks whether the module is ADA compliant. Two current institutional sources name different WCAG versions and dates. Establish the authority hierarchy and exact target, keep source-verification, policy, compliance, and remediation dates separate, design a proportionate review, and identify questions that require the institution's authorized process.
 
-## Optional visual palette
+## Preferred visual palette
 
 Use `$course-development-partner` to propose a visual system for a new teaching-material family when no institutional template or brand requirements have been supplied. Suggest the restrained example palette organized by semantic roles with its provenance stated honestly (the values match a named public university's published brand palette and imply no endorsement), identify safe contrast pairs and non-color cues, and explain the limits: do not label the palette unbranded or neutral, imply institutional brand approval, use protected marks, or claim accessibility before inspecting the rendered artifacts.
 
@@ -73,6 +73,18 @@ Use `$course-development-partner` to design a laboratory assessment in which mec
 ## Engineering uncertainty and risk
 
 Use `$course-development-partner` to redesign a chemical-engineering safety problem. Students currently calculate a single relief-valve size from exact inputs. Add uncertainty and risk at an appropriate undergraduate level without turning the task into an unbounded professional study.
+
+## Data-task fit
+
+Use `$course-development-partner` to build a short in-class activity where students make a scatter plot showing the relationship in this data, and answer whether the two are related.
+
+```csv
+region,total_enrollment
+North,120
+South,90
+East,140
+West,75
+```
 
 ## Engineering ethics and stakeholders
 

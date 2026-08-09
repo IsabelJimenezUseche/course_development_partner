@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import re
 import subprocess
@@ -8,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import NamedTuple
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -452,17 +454,17 @@ class AlignmentValidatorTests(unittest.TestCase):
 
 class ArtifactManifestValidatorTests(unittest.TestCase):
     def test_teaching_ready_manifest_passes(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws-1 | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | none | 2026-07-31 | not required | https://example.edu/ws-1-accessibility | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws-1 | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | none | 2026-07-31 | not required | https://example.edu/ws-1-accessibility | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_teaching_ready_with_blocker_returns_two(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | worksheet.md | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | solution not verified | 2026-07-31 | not required | accessibility-review.md | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | worksheet.md | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | solution not verified | 2026-07-31 | not required | accessibility-review.md | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -487,9 +489,9 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_check_paths_detects_missing_local_reference(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | missing.md | student | LO-1 | draft | manual | none | 2026-07-31 | https://example.edu/not-required | https://example.edu/pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | missing.md | student | LO-1 | draft | manual | none | 2026-07-31 | https://example.edu/not-required | https://example.edu/pending | not required | not applicable — no dataset |
 """
         result = run_script(
             "validate_artifact_manifest.py", content, ".md", "--check-paths"
@@ -503,9 +505,9 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
             (directory / "loop.md").symlink_to("loop.md")
             manifest = directory / "artifact-manifest.md"
             manifest.write_text(
-                """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | loop.md | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required |
+                """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | loop.md | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required | not applicable — no dataset |
 """,
                 encoding="utf-8",
             )
@@ -521,10 +523,10 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
     def test_missing_fields_validation_evidence_and_family_context_are_reported(
         self,
     ) -> None:
-        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|  |  | student | student; instructor | markdown |  |  |  |  |  | none |  | not required | pending | not required |
-| A-2 |  |  |  | markdown | https://example.edu/a-2 | instructor | LO-1 | validated |  | none | 2026-07-31 | not required | pending | not required |
+        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|  |  | student | student; instructor | markdown |  |  |  |  |  | none |  | not required | pending | not required | not applicable — no dataset |
+| A-2 |  |  |  | markdown | https://example.edu/a-2 | instructor | LO-1 | validated |  | none | 2026-07-31 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -540,9 +542,9 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
             self.assertIn(expected, result.stdout)
 
     def test_ready_manifest_rejects_none_evidence_and_invalid_date(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | validated | none | none | 2026-13-40 | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | validated | none | none | 2026-13-40 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -550,18 +552,18 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertIn("last reviewed must use YYYY-MM-DD", result.stdout)
 
     def test_calendar_invalid_iso_date_is_rejected(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | validated | technical; alignment | none | 2026-02-31 | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | validated | technical; alignment | none | 2026-02-31 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("last reviewed must use YYYY-MM-DD", result.stdout)
 
     def test_draft_manifest_rejects_a_non_iso_review_date(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | not-a-date | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | not-a-date | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -570,9 +572,9 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
     def test_pending_non_file_evidence_is_not_treated_as_a_path_for_drafts(
         self,
     ) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not applicable — plain Markdown | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not applicable — plain Markdown | pending | not required | not applicable — no dataset |
 """
         result = run_script(
             "validate_artifact_manifest.py", content, ".md", "--check-paths"
@@ -580,19 +582,19 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_every_declared_variant_is_required(self) -> None:
-        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | family-1 | student | student; instructor; solution | markdown | https://example.edu/student | student | LO-1 | draft | manual | none | 2026-07-31 | not required | pending | not required |
-| WS-2 | family-1 | instructor | student; instructor; solution | markdown | https://example.edu/instructor | instructor | LO-1 | draft | manual | none | 2026-07-31 | not required | pending | not required |
+        content = """| Artifact ID | Artifact family | Variant | Required variants | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | family-1 | student | student; instructor; solution | markdown | https://example.edu/student | student | LO-1 | draft | manual | none | 2026-07-31 | not required | pending | not required | not applicable — no dataset |
+| WS-2 | family-1 | instructor | student; instructor; solution | markdown | https://example.edu/instructor | instructor | LO-1 | draft | manual | none | 2026-07-31 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("required solution variant is not represented", result.stdout)
 
     def test_manifest_requires_artifact_family_schema_columns(self) -> None:
-        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
@@ -601,16 +603,23 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
     MANIFEST_HEADER = (
         "| Artifact ID | Artifact type | Artifact family | Variant | Required variants "
         "| File or reference | Audience | Outcome(s) | Status | Validation completed "
-        "| Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |\n"
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n"
+        "| Blockers/open issues | Last reviewed | Production plan | Accessibility review "
+        "| Safety review | Data-task-fit evidence |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n"
     )
 
-    def _teaching_ready_row(self, safety: str) -> str:
+    def _teaching_ready_row(
+        self,
+        safety: str,
+        fit_evidence: str = "not applicable — no dataset",
+        tokens: str = "technical; alignment; accessibility; reopen",
+    ) -> str:
         return (
             self.MANIFEST_HEADER
             + "| WS-1 | markdown |  |  |  | https://example.edu/ws-1 | student | LO-1 "
-            "| teaching-ready | technical; alignment; accessibility; reopen | none "
-            f"| 2026-07-31 | not required | https://example.edu/a11y | {safety} |\n"
+            f"| teaching-ready | {tokens} | none "
+            f"| 2026-07-31 | not required | https://example.edu/a11y | {safety} "
+            f"| {fit_evidence} |\n"
         )
 
     def test_teaching_ready_without_safety_declaration_is_reported(self) -> None:
@@ -682,17 +691,65 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         content = (
             self.MANIFEST_HEADER
             + "| WS-1 | markdown |  |  |  | https://example.edu/ws-1 | student | LO-1 "
-            "| draft | manual | none | 2026-07-31 | not required | pending |  |\n"
+            "| draft | manual | none | 2026-07-31 | not required | pending |  |  |\n"
         )
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    READY_TOKENS = "technical; alignment; accessibility; reopen"
+    FIT_TOKENS = f"{READY_TOKENS}; data-task-fit"
+
+    def test_data_task_fit_token_without_a_record_is_rejected(self) -> None:
+        """The token asserts executed work; alone it is unverifiable.
+
+        This is the self-attestation hole: the earlier schema let a row carry
+        the token with nothing behind it, so a row that did the work and a row
+        that typed the word were indistinguishable.
+        """
+        content = self._teaching_ready_row(
+            "not required", "not applicable — no dataset", self.FIT_TOKENS
+        )
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("without referencing the record", result.stdout)
+
+    def test_linked_record_without_the_token_is_rejected(self) -> None:
+        content = self._teaching_ready_row("not required", "data-task-record.md")
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("missing the data-task-fit validation token", result.stdout)
+
+    def test_linked_record_with_the_token_passes(self) -> None:
+        content = self._teaching_ready_row(
+            "not required", "data-task-record.md", self.FIT_TOKENS
+        )
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_undeclared_data_task_fit_is_reported(self) -> None:
+        content = self._teaching_ready_row("not required", "")
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("no data-task-fit declaration", result.stdout)
+
+    def test_pending_data_task_fit_cannot_support_teaching_ready(self) -> None:
+        content = self._teaching_ready_row("not required", "pending")
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unresolved data-task-fit evidence state", result.stdout)
+
+    def test_prose_is_not_a_data_task_fit_record(self) -> None:
+        content = self._teaching_ready_row("not required", "I checked the columns")
+        result = run_script("validate_artifact_manifest.py", content)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("must reference the record", result.stdout)
+
     def test_retired_variant_does_not_satisfy_active_family_requirement(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-S | markdown | worksheet | student | student; instructor; solution | https://example.edu/student | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required |
-| WS-I | markdown | worksheet | instructor |  | https://example.edu/instructor | instructor | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required |
-| WS-K | markdown | worksheet | solution |  | old-solution.md | instructor | LO-1 | retired | manual | none | 2026-07-01 | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-S | markdown | worksheet | student | student; instructor; solution | https://example.edu/student | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required | not applicable — no dataset |
+| WS-I | markdown | worksheet | instructor |  | https://example.edu/instructor | instructor | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required | not applicable — no dataset |
+| WS-K | markdown | worksheet | solution |  | old-solution.md | instructor | LO-1 | retired | manual | none | 2026-07-01 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script(
             "validate_artifact_manifest.py",
@@ -705,9 +762,9 @@ class ArtifactManifestValidatorTests(unittest.TestCase):
         self.assertNotIn("old-solution.md", result.stdout)
 
     def test_retired_only_manifest_reports_no_active_artifacts(self) -> None:
-        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| OLD-1 | markdown |  |  |  | old.md | instructor | LO-1 | retired | manual | none | 2026-07-01 | not required | pending | not required |
+        content = """| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| OLD-1 | markdown |  |  |  | old.md | instructor | LO-1 | retired | manual | none | 2026-07-01 | not required | pending | not required | not applicable — no dataset |
 """
         result = run_script("validate_artifact_manifest.py", content)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -1498,7 +1555,7 @@ class ValidatorFixtureAndCliTests(unittest.TestCase):
             ),
             (
                 "validate_artifact_manifest.py",
-                "| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n",
+                "| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n",
             ),
             (
                 "validate_assessment_blueprint.py",
@@ -1581,9 +1638,9 @@ class ProjectValidatorTests(unittest.TestCase):
 """
         manifest = """# Artifact Manifest
 - Schema version: 1.0
-| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-9 | draft | manual | none | 2026-08-01 | https://example.edu/plan | https://example.edu/access | not required |
+| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-9 | draft | manual | none | 2026-08-01 | https://example.edu/plan | https://example.edu/access | not required | not applicable — no dataset |
 """
         result = run_project(
             {
@@ -1595,6 +1652,90 @@ class ProjectValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("outcome is not defined in alignment-map.md: lo-9", result.stdout)
+
+    DATA_INDEX = """# Project Index
+- Schema version: 1.0
+- Engagement tier: Project
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| course-design-brief.md | design authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| alignment-map.md | alignment authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| artifact-manifest.md | artifact authority | course owner | 1.0 | review | 2026-08-01 | current |
+"""
+    DATA_MANIFEST = """# Artifact Manifest
+- Schema version: 1.0
+| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual; data-task-fit | none | 2026-08-01 | https://example.edu/plan | https://example.edu/access | not required | data-task-record.md |
+"""
+    DATA_RECORD = """# Data–Task Fit Record
+- Schema version: 1.0
+| Artifact ID | Dataset file | Dataset version or date | Representation | Column roles | Expected student output | Intended interpretation | Execution method | Executed on | Result |
+|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | lab.csv | 2026-08-01 | scatter | x=mass_kg; y=extension_mm | Fitted line | Extension rises with mass | validator | 2026-08-01 | Produced |
+"""
+    LAB_CSV = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+
+    def _data_index_with_record(self) -> str:
+        return self.DATA_INDEX + (
+            "| data-task-record.md | data-task fit | course owner | 1.0 | approved "
+            "| 2026-08-01 | current |\n"
+        )
+
+    def test_fit_claim_without_a_record_cannot_be_re_executed(self) -> None:
+        """A token pointing at nothing the project indexes is unverifiable."""
+        result = run_project(
+            {
+                "project-index.md": self.DATA_INDEX,
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": self.DATA_MANIFEST,
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("no active data-task-record.md", result.stdout)
+
+    def test_fit_claim_with_a_re_executable_record_passes(self) -> None:
+        result = run_project(
+            {
+                "project-index.md": self._data_index_with_record(),
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": self.DATA_MANIFEST,
+                "data-task-record.md": self.DATA_RECORD,
+                "lab.csv": self.LAB_CSV,
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_project_re_executes_the_recorded_claim(self) -> None:
+        """A record that no longer matches its dataset fails at project level."""
+        result = run_project(
+            {
+                "project-index.md": self._data_index_with_record(),
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": self.DATA_MANIFEST,
+                "data-task-record.md": self.DATA_RECORD,
+                "lab.csv": "mass_kg,extension_mm\nlight,2.1\nheavy,4.3\nmid,6.0\n",
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("re-executing the recorded claim failed", result.stdout)
+
+    def test_record_row_for_an_unknown_artifact_is_reported(self) -> None:
+        result = run_project(
+            {
+                "project-index.md": self._data_index_with_record(),
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": self.DATA_MANIFEST,
+                "data-task-record.md": self.DATA_RECORD.replace("| WS-1 | lab.csv", "| WS-9 | lab.csv"),
+                "lab.csv": self.LAB_CSV,
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("is not active in artifact-manifest.md", result.stdout)
 
     def test_project_requires_active_index_paths(self) -> None:
         index = """- Schema version: 1.0
@@ -1974,9 +2115,9 @@ class ProjectValidatorTests(unittest.TestCase):
 """
         manifest = """# Artifact Manifest
 - Schema version: 1.0
-| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required |
+| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | https://example.edu/ws | student | LO-1 | draft | manual | none | 2026-08-01 | not required | pending | not required | not applicable — no dataset |
 """
         state_stub = "# State\n- Schema version: 1.0\n"
         result = run_project(
@@ -2021,6 +2162,46 @@ class RepositoryIntegrityTests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_packaged_archive_matches_the_package(self) -> None:
+        """The tracked upload zip ships whatever it last contained."""
+        import zipfile
+
+        archive = ROOT / "course-development-partner.zip"
+        if not archive.is_file():
+            self.skipTest("no packaged archive is tracked")
+        sys.path.insert(0, str(ROOT / "tests"))
+        import check_repository
+
+        with zipfile.ZipFile(archive) as bundle:
+            packaged = {name for name in bundle.namelist() if not name.endswith("/")}
+        self.assertEqual(
+            packaged,
+            set(check_repository.actual_inventory()),
+            "course-development-partner.zip does not match the package; rebuild it",
+        )
+
+    def test_stale_archive_is_reported(self) -> None:
+        """The check must fail on a zip missing a file, not just pass on a good one."""
+        sys.path.insert(0, str(ROOT / "tests"))
+        import check_repository
+
+        original = check_repository.ARCHIVE
+        with tempfile.TemporaryDirectory() as temp_dir:
+            import zipfile
+
+            stale = Path(temp_dir) / "stale.zip"
+            names = check_repository.actual_inventory()
+            with zipfile.ZipFile(stale, "w") as bundle:
+                for name in names[:-1]:
+                    bundle.writestr(name, "")
+            check_repository.ARCHIVE = stale
+            try:
+                errors, issues = check_repository.check_package_archive()
+            finally:
+                check_repository.ARCHIVE = original
+        self.assertEqual(errors, [])
+        self.assertTrue(any("is missing packaged file" in item for item in issues), issues)
 
     def test_inventory_drift_returns_two(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -2085,6 +2266,595 @@ class RepositoryIntegrityTests(unittest.TestCase):
         self.assertEqual(record["current_scenario_file_sha256"], scenario_hash)
         self.assertEqual(record["current_rubric_file_sha256"], rubric_hash)
         self.assertEqual(record["evidence_status"], "historical-exploratory-only")
+
+
+class DatasetValidatorTests(unittest.TestCase):
+    """The reported failure: a scatter plot requested from categorical totals."""
+
+    CATEGORICAL = "region,total\nNorth,120\nSouth,90\nEast,140\nWest,75\n"
+    PAIRED = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+    IDS = "student_id,course_code\n1001,101\n1002,102\n1003,103\n1004,104\n"
+    ORDERED = "week,yield\n1,4.2\n2,5.1\n3,6.3\n"
+
+    def test_scatter_from_categorical_totals_is_rejected(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.CATEGORICAL, ".csv",
+            "--representation", "scatter", "--x", "region", "--y", "total",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("must be quantitative", result.stdout)
+
+    def test_same_data_supports_a_bar_chart(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.CATEGORICAL, ".csv",
+            "--representation", "bar", "--category", "region", "--value", "total",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_paired_quantitative_supports_scatter(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.PAIRED, ".csv",
+            "--representation", "scatter", "--x", "mass_kg", "--y", "extension_mm",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_identifier_columns_do_not_satisfy_scatter(self) -> None:
+        """Two numeric columns are not two measurements."""
+        result = run_script(
+            "validate_dataset.py", self.IDS, ".csv",
+            "--representation", "scatter", "--x", "student_id", "--y", "course_code",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("looks like an identifier", result.stdout)
+
+    def test_counts_are_not_mistaken_for_identifiers(self) -> None:
+        """Whole, unique, non-negative describes totals as well as IDs."""
+        result = run_script(
+            "validate_dataset.py",
+            "trial,reading\n1,120\n2,90\n3,140\n4,75\n",
+            ".csv",
+            "--representation", "line", "--order", "trial", "--y", "reading",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_line_chart_requires_an_ordered_column(self) -> None:
+        result = run_script(
+            "validate_dataset.py", "measurement\n4.2\n5.1\n6.3\n", ".csv",
+            "--representation", "line",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("requires explicit column roles", result.stdout)
+
+    def test_non_ordered_column_named_as_order_is_rejected(self) -> None:
+        result = run_script(
+            "validate_dataset.py", "label,value\nz,4.2\na,5.1\nm,6.3\n", ".csv",
+            "--representation", "line", "--order", "label", "--y", "value",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("not an ordered or time variable", result.stdout)
+
+    def test_ordered_column_passes(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.ORDERED, ".csv",
+            "--representation", "line", "--order", "week", "--y", "yield",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_named_column_that_does_not_exist_is_reported(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.PAIRED, ".csv",
+            "--representation", "scatter", "--x", "mass_kg", "--y", "temperature",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("does not exist in the dataset", result.stdout)
+
+    def test_negative_min_rows_is_an_error(self) -> None:
+        result = run_script(
+            "validate_dataset.py", self.PAIRED, ".csv",
+            "--representation", "scatter", "--x", "mass_kg", "--y", "extension_mm",
+            "--min-rows", "-5",
+        )
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("must be a positive number", result.stdout)
+
+    def test_too_few_observations_is_reported(self) -> None:
+        result = run_script(
+            "validate_dataset.py", "x,y\n1.5,2.5\n", ".csv",
+            "--representation", "scatter", "--x", "x", "--y", "y",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("observation", result.stdout)
+
+    # One row per line of the minimum-requirements table in data-task-fit.md:
+    # data that meets the row, and data that misses it in the way the row
+    # forbids. Checking only that the token exists says nothing about whether
+    # the check is faithful to the documented requirement.
+    QUANT_PAIR = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+    ONE_QUANT = "reading\n2.1\n4.3\n6.0\n8.2\n5.5\n7.1\n"
+    TWO_GROUPS = "arm,score\ncontrol,3\ncontrol,4\ntreated,7\ntreated,8\n"
+    ONE_GROUP = "arm,score\ncontrol,3\ncontrol,4\ncontrol,5\ncontrol,6\n"
+    GRID = "site,month,ppm\nA,jan,3\nA,feb,4\nB,jan,5\nB,feb,6\n"
+    PARTS = "part,share\nalpha,40\nbeta,35\ngamma,25\n"
+    PARTS_NEGATIVE = "part,share\nalpha,40\nbeta,-35\ngamma,25\n"
+    PARTS_REPEATED = "part,share\nalpha,40\nalpha,35\nbeta,25\n"
+    TIMED = "week,yield\n1,4.2\n2,5.1\n3,6.3\n"
+    UNORDERED = "colour,yield\nred,4.2\nblue,5.1\ngreen,6.3\n"
+
+    class Case(NamedTuple):
+        representation: str
+        roles: tuple[str, ...]
+        good: str
+        bad: str
+        expected: str
+        bad_roles: tuple[str, ...] | None = None
+
+    REPRESENTATION_CASES = (
+        Case("scatter", ("--x", "mass_kg", "--y", "extension_mm"), QUANT_PAIR,
+             "mass_kg,extension_mm\nlight,2.1\nheavy,4.3\nmid,6.0\n",
+             "must be quantitative"),
+        Case("correlation", ("--x", "mass_kg", "--y", "extension_mm"), QUANT_PAIR,
+             "mass_kg,extension_mm\n0.5,2.1\n", "observation"),
+        Case("regression", ("--x", "mass_kg", "--y", "extension_mm"), QUANT_PAIR,
+             "mass_kg,extension_mm\n0.5,2.1\n", "observation"),
+        Case("line", ("--order", "week", "--y", "yield"), TIMED,
+             UNORDERED, "not an ordered",
+             bad_roles=("--order", "colour", "--y", "yield")),
+        Case("bar", ("--category", "region", "--value", "total"),
+             "region,total\nNorth,120\nSouth,90\n",
+             "region,total\nNorth,many\nSouth,few\n", "must be quantitative"),
+        Case("pie", ("--category", "part", "--value", "share"), PARTS,
+             PARTS_NEGATIVE, "negative value"),
+        Case("pie", ("--category", "part", "--value", "share"), PARTS,
+             PARTS_REPEATED, "mutually exclusive"),
+        Case("heatmap", ("--category", "site", "--series", "month", "--value", "ppm"),
+             GRID, "site,month,ppm\nA,jan,3\nA,jan,4\nA,jan,5\nA,jan,6\n",
+             "distinct level"),
+        Case("grouped-comparison", ("--category", "arm", "--value", "score"),
+             TWO_GROUPS, ONE_GROUP, "distinct level"),
+        Case("box", ("--value", "reading"), ONE_QUANT, "reading\n2.1\n4.3\n",
+             "observation"),
+        Case("histogram", ("--value", "reading"), ONE_QUANT, "reading\n2.1\n4.3\n",
+             "observation"),
+        Case("mean", ("--value", "reading"), ONE_QUANT, "reading\nhigh\nlow\n",
+             "must be quantitative"),
+        Case("standard-deviation", ("--value", "reading"), ONE_QUANT,
+             "reading\n2.1\n", "observation"),
+        Case("uncertainty", ("--value", "reading"), ONE_QUANT, "reading\n2.1\n",
+             "observation"),
+    )
+
+    def test_every_documented_representation_accepts_and_rejects(self) -> None:
+        for case in self.REPRESENTATION_CASES:
+            with self.subTest(representation=case.representation, data="compatible"):
+                result = run_script(
+                    "validate_dataset.py", case.good, ".csv",
+                    "--representation", case.representation, *case.roles,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            with self.subTest(representation=case.representation, data="incompatible"):
+                result = run_script(
+                    "validate_dataset.py", case.bad, ".csv",
+                    "--representation", case.representation,
+                    *(case.bad_roles or case.roles),
+                )
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertIn(case.expected, result.stdout)
+
+    def test_documented_representations_are_all_supported(self) -> None:
+        """Every row of the reference table must be a real --representation choice."""
+        sys.path.insert(0, str(SCRIPTS))
+        import validate_dataset
+
+        supported = set(validate_dataset.REPRESENTATIONS)
+        covered = {case[0] for case in self.REPRESENTATION_CASES}
+        for token in (
+            "scatter", "bar", "histogram", "line", "box", "pie", "heatmap",
+            "correlation", "regression", "mean", "standard-deviation",
+            "uncertainty", "grouped-comparison",
+        ):
+            self.assertIn(token, supported, token)
+            self.assertIn(token, covered, f"{token} has no behavioral fixture")
+        reference = (
+            ROOT / "course-development-partner" / "references" / "data-task-fit.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Minimum compatible data", reference)
+        self.assertIn("standard deviation, uncertainty", reference)
+
+    def test_one_column_cannot_fill_two_roles(self) -> None:
+        """Plotting a variable against itself passes every per-role type check."""
+        result = run_script(
+            "validate_dataset.py", self.QUANT_PAIR, ".csv",
+            "--representation", "scatter", "--x", "mass_kg", "--y", "mass_kg",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("more than one role", result.stdout)
+
+    def test_heatmap_requires_its_second_dimension(self) -> None:
+        """One categorical column plus a value is a bar chart, not a heatmap."""
+        result = run_script(
+            "validate_dataset.py", self.GRID, ".csv",
+            "--representation", "heatmap", "--category", "site", "--value", "ppm",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("--series", result.stdout)
+
+    def test_consecutive_integer_measurements_are_not_identifiers(self) -> None:
+        """Set-point temperatures are whole, unique, and consecutive — and real."""
+        result = run_script(
+            "validate_dataset.py",
+            "temp_c,yield_g\n20,4.1\n21,4.4\n22,5.0\n23,5.6\n", ".csv",
+            "--representation", "scatter", "--x", "temp_c", "--y", "yield_g",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_row_index_columns_are_still_identifiers(self) -> None:
+        """Relaxing the run heuristic must not readmit the 1..n index."""
+        result = run_script(
+            "validate_dataset.py",
+            "entry,yield_g\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", ".csv",
+            "--representation", "scatter", "--x", "entry", "--y", "yield_g",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("looks like an identifier", result.stdout)
+
+    def test_multi_sheet_workbook_requires_an_explicit_sheet(self) -> None:
+        openpyxl = importlib.util.find_spec("openpyxl")
+        if openpyxl is None:
+            self.skipTest("openpyxl not installed")
+        from openpyxl import Workbook
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "book.xlsx"
+            book = Workbook()
+            first = book.active
+            first.title = "Notes"
+            first.append(["comment"])
+            first.append(["ignore me"])
+            second = book.create_sheet("Results")
+            second.append(["mass_kg", "extension_mm"])
+            for row in ((0.5, 2.1), (1.0, 4.3), (1.5, 6.0), (2.0, 8.2)):
+                second.append(list(row))
+            book.save(path)
+
+            ambiguous = run_path(
+                "validate_dataset.py", path,
+                "--representation", "scatter", "--x", "mass_kg", "--y", "extension_mm",
+            )
+            self.assertEqual(ambiguous.returncode, 1, ambiguous.stdout)
+            self.assertIn("name one with --sheet", ambiguous.stdout)
+
+            named = run_path(
+                "validate_dataset.py", path,
+                "--representation", "scatter", "--x", "mass_kg", "--y", "extension_mm",
+                "--sheet", "Results",
+            )
+            self.assertEqual(named.returncode, 0, named.stdout)
+
+
+class DataTaskRecordValidatorTests(unittest.TestCase):
+    """A validation token asserts executed work; this re-executes it.
+
+    Before this validator the `data-task-fit` token was self-attested: a row
+    that did the check and a row that typed the word produced identical output.
+    """
+
+    HEADER = (
+        "# Data–Task Fit Record\n"
+        "- Schema version: 1.0\n"
+        "- Last updated: 2026-08-09\n\n"
+        "| Artifact ID | Dataset file | Dataset version or date | Representation "
+        "| Column roles | Expected student output | Intended interpretation "
+        "| Execution method | Executed on | Result |\n"
+        "|---|---|---|---|---|---|---|---|---|---|\n"
+    )
+    PAIRED = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+    AGGREGATE = "region,total\nNorth,120\nSouth,90\nEast,140\nWest,75\n"
+
+    def _row(
+        self,
+        dataset: str = "lab.csv",
+        representation: str = "scatter",
+        roles: str = "x=mass_kg; y=extension_mm",
+        executed_on: str = "2026-08-09",
+        method: str = "validator",
+    ) -> str:
+        return (
+            f"| WS-1 | {dataset} | 2026-08-01 | {representation} | {roles} "
+            f"| Fitted line with slope | Extension rises with mass | {method} "
+            f"| {executed_on} | Produced; slope 4.1 mm/kg |\n"
+        )
+
+    def _run(self, record: str, data: dict[str, str] | None = None):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project = Path(temp_dir)
+            (project / "data-task-record.md").write_text(record, encoding="utf-8")
+            for name, content in (data or {"lab.csv": self.PAIRED}).items():
+                (project / name).write_text(content, encoding="utf-8")
+            return run_path(
+                "validate_data_task_record.py", project / "data-task-record.md"
+            )
+
+    def test_recorded_claim_that_re_executes_passes(self) -> None:
+        result = self._run(self.HEADER + self._row())
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_recorded_claim_contradicted_by_its_dataset_fails(self) -> None:
+        """The owner's failure, recorded as a passing check."""
+        result = self._run(
+            self.HEADER + self._row(roles="x=region; y=total"),
+            {"lab.csv": self.AGGREGATE},
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("re-executing the recorded claim failed", result.stdout)
+        self.assertIn("must be quantitative", result.stdout)
+
+    def test_absent_dataset_is_a_gap_not_a_pass(self) -> None:
+        result = self._run(self.HEADER + self._row(dataset="missing.csv"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("declared dataset is not present", result.stdout)
+
+    def test_unknown_representation_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(representation="sunburst"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown representation", result.stdout)
+
+    def test_unparseable_roles_are_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(roles="mass_kg and extension_mm"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("not written as role=column", result.stdout)
+
+    def test_unknown_role_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(roles="horizontal=mass_kg"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown column role", result.stdout)
+
+    def test_missing_execution_date_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(executed_on=""))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("missing executed-on date", result.stdout)
+
+    def test_unknown_execution_method_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(method="checked it"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown execution method", result.stdout)
+
+    def test_unfilled_template_supports_no_claim(self) -> None:
+        asset = (
+            ROOT
+            / "course-development-partner"
+            / "assets"
+            / "data-task-record.md"
+        )
+        result = run_path("validate_data_task_record.py", asset)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("no filled rows", result.stdout)
+
+    def test_duplicate_artifact_row_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row() + self._row())
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("duplicate artifact ID", result.stdout)
+
+
+class HandoffStateValidatorTests(unittest.TestCase):
+    """Handoff requires these three files; requiring a file is not requiring content."""
+
+    def test_unfilled_templates_are_reported(self) -> None:
+        assets = ROOT / "course-development-partner" / "assets"
+        for kind in ("design-log", "source-register", "capability-manifest"):
+            with self.subTest(kind=kind):
+                result = run_path(
+                    "validate_handoff_state.py", assets / f"{kind}.md", "--kind", kind
+                )
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+
+    def test_file_without_a_table_is_a_gap_not_an_error(self) -> None:
+        result = run_script(
+            "validate_handoff_state.py",
+            "# Design Log\n\n- Schema version: 1.0\n",
+            ".md",
+            "--kind",
+            "design-log",
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("no records table", result.stdout)
+
+    def test_a_filled_design_log_passes(self) -> None:
+        content = """# Design Log
+
+| Date | Decision or change | Rationale | Source or owner | Affected artifacts | Follow-up |
+|---|---|---|---|---|---|
+| 2026-08-03 | Chose balanced rubric orientation | Partial reasoning matters | Course owner | RUB-1 | none |
+"""
+        result = run_script(
+            "validate_handoff_state.py", content, ".md", "--kind", "design-log"
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_source_provenance_is_required_only_at_handoff(self) -> None:
+        """Produce-time drafts tolerate thin provenance; a handoff bundle does not."""
+        content = """# Source Register
+
+| Source ID | Title | Owner/publisher | Stable reference | Authority type | Publication/revision date | Last verified | Supported claim or artifact | Population/context and fit | Strength/limits | License/reuse | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SRC-1 | A study |  |  | scholarly |  |  | Retrieval helps |  |  |  | draft |
+"""
+        lenient = run_script(
+            "validate_handoff_state.py", content, ".md", "--kind", "source-register"
+        )
+        self.assertEqual(lenient.returncode, 0, lenient.stdout + lenient.stderr)
+        strict = run_script(
+            "validate_handoff_state.py", content, ".md",
+            "--kind", "source-register", "--strict",
+        )
+        self.assertEqual(strict.returncode, 2, strict.stdout + strict.stderr)
+        for field in ("stable reference", "last verified", "license/reuse"):
+            self.assertIn(field, strict.stdout, field)
+
+    def test_unresolved_capability_manifest_is_reported(self) -> None:
+        content = """# Capability Manifest
+
+| Capability | Available provider or tool | Access level | Intended use | Approval required | Fallback | Verification date |
+|---|---|---|---|---|---|---|
+| read_course_sources |  | read | inspect materials | no | upload or paste |  |
+"""
+        result = run_script(
+            "validate_handoff_state.py", content, ".md", "--kind", "capability-manifest"
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("not been resolved against the current client", result.stdout)
+
+
+class BehavioralHeuristicTests(unittest.TestCase):
+    """The heuristics must see the failure mode the owner cares most about.
+
+    A reply bundling several decision cards into one turn contains only a few
+    question marks, so a question-count check certifies it as a pass. These
+    tests pin the decision-card counter against a real stored transcript.
+    """
+
+    @staticmethod
+    def _runner():
+        sys.path.insert(0, str(ROOT / "tests"))
+        import run_behavioral_scenarios
+
+        return run_behavioral_scenarios
+
+    def test_decision_card_check_catches_what_question_count_misses(self) -> None:
+        runner = self._runner()
+        stored = sorted((ROOT / "tests" / "behavioral-results").glob("*.json"))
+        self.assertTrue(stored, "no stored behavioral transcripts to check against")
+        question_check = runner.check_questions_between(1, 4)
+        blind_spots = []
+        for path in stored:
+            record = json.loads(path.read_text(encoding="utf-8"))
+            for result in record.get("results", []):
+                for run in result.get("runs", [result]):
+                    for turn in run.get("turns", []):
+                        reply = turn.get("model_response", "")
+                        if not reply:
+                            continue
+                        old_ok, _ = question_check(reply)
+                        new_ok, _ = runner.check_single_decision_per_turn(reply)
+                        if old_ok and not new_ok:
+                            blind_spots.append(path.name)
+        self.assertTrue(
+            blind_spots,
+            "no stored reply demonstrates the question-count blind spot; if the "
+            "transcripts changed, keep one bundled example as regression evidence",
+        )
+
+    ADVERSARIAL_DATA_REPLIES = (
+        # The exact shape the earlier heuristic certified: the topic word, then
+        # the impossible chart.
+        "The data are categorical; here is the requested scatter plot.",
+        "These totals are aggregated by region.\n"
+        "```python\nplt.scatter(df.region, df.total)\n```",
+        "One row per category, so I've plotted the scatter chart below.",
+        "Chart type: scatter — the categorical totals are shown on both axes.",
+    )
+
+    def test_topical_mention_of_the_mismatch_is_not_a_pass(self) -> None:
+        """Naming "categorical" and then drawing the chart is the failure."""
+        runner = self._runner()
+        for reply in self.ADVERSARIAL_DATA_REPLIES:
+            with self.subTest(reply=reply[:40]):
+                flagged, _ = runner.check_flags_data_mismatch(reply)
+                withheld, detail = runner.check_does_not_produce_scatter(reply)
+                self.assertFalse(
+                    flagged and withheld,
+                    f"adversarial reply passed both checks: {detail}",
+                )
+
+    def test_refusal_with_a_repair_passes(self) -> None:
+        runner = self._runner()
+        reply = (
+            "These totals are one row per region, so the file cannot support a "
+            "scatter plot: there are no paired quantitative observations. A bar "
+            "chart shows the same comparison. If a scatter plot is the goal, I "
+            "need the per-student rows behind the totals."
+        )
+        flagged, detail = runner.check_flags_data_mismatch(reply)
+        self.assertTrue(flagged, detail)
+        withheld, detail = runner.check_does_not_produce_scatter(reply)
+        self.assertTrue(withheld, detail)
+
+    def test_refusal_without_a_repair_is_incomplete(self) -> None:
+        runner = self._runner()
+        flagged, detail = runner.check_flags_data_mismatch(
+            "The supplied file cannot support a scatter plot."
+        )
+        self.assertFalse(flagged, detail)
+        self.assertIn("repair", detail)
+
+    def test_data_task_fit_scenario_checks_both_halves(self) -> None:
+        """Flagging and withholding are separate failures; both must be checked."""
+        runner = self._runner()
+        scenario = runner.SCENARIOS["data-task-fit"]
+        names = {
+            check.__name__ for turn in scenario.turns for check in turn.checks
+        }
+        self.assertIn("check_flags_data_mismatch", names)
+        self.assertIn("check_does_not_produce_scatter", names)
+
+    def test_every_scenario_rubric_row_exists(self) -> None:
+        """A scenario whose rubric_row has no criterion cannot be humanly evaluated."""
+        runner = self._runner()
+        rubric = (ROOT / "tests" / "evaluator-rubric.md").read_text(encoding="utf-8")
+        rows = {
+            line.split("|")[1].strip()
+            for line in rubric.splitlines()
+            if line.startswith("|") and line.count("|") >= 3
+        }
+        for scenario in runner.SCENARIOS.values():
+            if not scenario.rubric_row:
+                continue
+            self.assertIn(
+                scenario.rubric_row,
+                rows,
+                f"scenario {scenario.scenario_id} names rubric row "
+                f"{scenario.rubric_row!r}, which evaluator-rubric.md does not define",
+            )
+
+    def test_every_scenario_heading_exists(self) -> None:
+        runner = self._runner()
+        scenarios = (ROOT / "tests" / "faculty-review-scenarios.md").read_text(
+            encoding="utf-8"
+        )
+        for scenario in runner.SCENARIOS.values():
+            self.assertIn(
+                f"## {scenario.heading}",
+                scenarios,
+                f"scenario {scenario.scenario_id} has no prompt heading",
+            )
+
+    def test_a_single_decision_card_still_passes(self) -> None:
+        runner = self._runner()
+        compliant = (
+            "### Decision: activity format\n\n"
+            "**Options**\n1. Worked examples\n2. Contrasting cases\n\n"
+            'Your choice: choose, modify, or say "decide for me."\n'
+        )
+        ok, detail = runner.check_single_decision_per_turn(compliant)
+        self.assertTrue(ok, f"canonical single card was rejected: {detail}")
+
+    def test_narrow_no_break_space_headings_are_counted(self) -> None:
+        runner = self._runner()
+        # Models emit U+202F inside headings; a literal [ \t] class misses it.
+        text = "### Decision\u202f1 \u2013 outcomes\n### Decision\u202f2 \u2013 evidence\n"
+        markers, _, _ = runner.count_decision_cards(text)
+        self.assertEqual(markers, 2, "unicode-spaced decision headings were not counted")
+
+    def test_runner_has_no_unused_dataclass_import(self) -> None:
+        source = (ROOT / "tests" / "run_behavioral_scenarios.py").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(r"from dataclasses import ([^\n]+)", source)
+        if match is None:
+            return
+        for name in (part.strip() for part in match.group(1).split(",")):
+            # A name is used either as a decorator (@dataclass) or a call (field(...)).
+            used = f"@{name}" in source or f"{name}(" in source
+            self.assertTrue(used, f"dataclasses.{name} is imported but never used")
 
 
 class PackageContentTests(unittest.TestCase):
@@ -2331,6 +3101,47 @@ class PackageContentTests(unittest.TestCase):
             "record it in `lesson-storyboard.md` marked provisional", rich_text
         )
         self.assertIn("recorded decision or an open item", checklists_text)
+
+    def test_auto_records_are_tier_scoped_not_tier_blind(self) -> None:
+        # Auto answers the checkpoints instead of removing them, so the record
+        # is mandatory. But Focused tier forbids the state bundle, and requiring
+        # design-log.md unconditionally made Auto + Focused contradict itself:
+        # a one-page worksheet would spawn a design log the tier says not to
+        # create. The tier decides where the record lives, never whether one
+        # exists, so both rules hold.
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        interaction_text = (
+            skill_root / "references" / "interaction-protocol.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "The engagement tier decides **where** the record lives, never "
+            "whether there is one",
+            interaction_text,
+        )
+        self.assertIn(
+            "the tier decides where the record lives and never whether there is one",
+            skill_text,
+        )
+        # Every instruction that names a record location carries both tiers.
+        for phrase in (
+            "in `design-log.md` at Project and Course tier, and inline with the "
+            "deliverable at Focused tier",
+            "in its state file at Project and Course tier, and inside the returned "
+            "work at Focused tier",
+            "in the design log at Project and Course tier, inline with the "
+            "deliverable at Focused tier",
+            "in its state file at Project and Course tier, inline with the "
+            "deliverable at Focused tier",
+        ):
+            self.assertIn(phrase, interaction_text, phrase)
+        # The Focused-tier rule the fix has to respect must still be stated.
+        self.assertIn(
+            "Do not surface tiers, modes, or state files to the educator in "
+            "Focused work",
+            skill_text,
+        )
+        self.assertIn("do not create the full state bundle", interaction_text)
 
     def test_cognitive_demand_vocabulary_is_documented_where_it_is_used(self) -> None:
         skill_root = ROOT / "course-development-partner"

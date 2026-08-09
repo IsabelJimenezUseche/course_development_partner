@@ -33,7 +33,7 @@ Historical retest observation: **Appeared to pass the then-current criteria**
 
 The retest made the palette optional, supplied contrast pairings and non-color cues, avoided protected marks and brand-approval implications, and explicitly required final rendered contrast, legibility, and layout inspection.
 
-This probe used a now-removed institution-associated palette. The current unbranded semantic-role palette requires a fresh test with complete model, evaluator, response, and evidence records.
+This probe used an earlier palette arrangement. The current palette is institution-derived and disclosed as such — it is not unbranded — and its mode-dependent application requires a fresh test with complete model, evaluator, response, and evidence records.
 
 ## Auto non-interactive lesson design
 

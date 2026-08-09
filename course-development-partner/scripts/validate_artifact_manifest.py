@@ -42,11 +42,12 @@ REQUIRED = (
     "production plan",
     "accessibility review",
     "safety review",
+    "data-task-fit evidence",
 )
 VALID_STATUSES = {"draft", "review", "validated", "teaching-ready", "retired"}
 EMPTY_ISSUES = {"", "-", "none", "n/a", "na"}
 REFERENCE_STATES = {"pending", "not required", "not-required"}
-UNAPPROVED_SAFETY_STATES = {
+UNAPPROVED_REVIEW_STATES = {
     "blocked",
     "draft",
     "not reviewed",
@@ -105,6 +106,7 @@ VALIDATION_TOKENS = {
     "privacy/metadata",
     "reopen",
     "manual",
+    "data-task-fit",
 }
 BASE_READY_TOKENS = {"technical", "alignment", "accessibility", "reopen"}
 RICH_READY_TOKENS = BASE_READY_TOKENS | {
@@ -125,7 +127,8 @@ def is_reference_state(value: str) -> bool:
     )
 
 
-def is_safety_not_required(value: str) -> bool:
+def is_not_applicable(value: str) -> bool:
+    """An explicit declaration that a gate does not apply, with a reason."""
     normalized = normalize(value)
     if normalized in {"not required", "not-required"}:
         return True
@@ -238,6 +241,16 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
         invalid_validation = validation_tokens - VALIDATION_TOKENS
         for token in sorted(invalid_validation):
             issues.append(f"{label}: unknown validation token {token}")
+        # The token asserts that somebody executed the operation on the exact
+        # dataset. Without a record naming that dataset the assertion cannot be
+        # re-checked, which is the state the token exists to prevent.
+        if "data-task-fit" in validation_tokens and not looks_like_review_reference(
+            row["data-task-fit evidence"]
+        ):
+            issues.append(
+                f"{label}: claims the data-task-fit token without referencing the "
+                "record of the executed check"
+            )
         if row["last reviewed"] and not parse_iso_date(row["last reviewed"]):
             issues.append(f"{label}: last reviewed must use YYYY-MM-DD")
         if status in {"validated", "teaching-ready"}:
@@ -274,6 +287,33 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                 issues.append(
                     f"{label}: teaching-ready artifact is missing accessibility review"
                 )
+            # The validator cannot tell which artifacts are data-based, so it
+            # requires the declaration instead: a record it can re-execute, or an
+            # explicit statement that no dataset is involved. A bare token is a
+            # claim about work nobody can check.
+            evidence = row["data-task-fit evidence"]
+            if not evidence:
+                issues.append(
+                    f"{label}: teaching-ready artifact has no data-task-fit declaration; "
+                    "link the data-task record or state not applicable with a reason"
+                )
+            elif normalize(evidence) in UNAPPROVED_REVIEW_STATES:
+                issues.append(
+                    f"{label}: teaching-ready artifact has unresolved data-task-fit "
+                    f"evidence state {evidence}"
+                )
+            elif is_not_applicable(evidence):
+                pass
+            elif not looks_like_review_reference(evidence):
+                issues.append(
+                    f"{label}: teaching-ready data-task-fit evidence must reference the "
+                    "record of the executed check or state not applicable with a reason"
+                )
+            elif "data-task-fit" not in validation_tokens:
+                issues.append(
+                    f"{label}: teaching-ready artifact references a data-task-fit record "
+                    "but is missing the data-task-fit validation token"
+                )
             # Safety applies only to hazard-bearing work, which the validator cannot detect.
             # Require an affirmative declaration instead: a review reference, or an explicit
             # not-required/not-applicable statement. A blank cell is an undeclared decision.
@@ -284,12 +324,12 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                     f"{label}: teaching-ready artifact has no safety review declaration; "
                     "reference the review or state not required"
                 )
-            elif normalized_safety in UNAPPROVED_SAFETY_STATES:
+            elif normalized_safety in UNAPPROVED_REVIEW_STATES:
                 issues.append(
                     f"{label}: teaching-ready artifact has unapproved safety review state "
                     f"{safety_review}"
                 )
-            elif not is_safety_not_required(
+            elif not is_not_applicable(
                 safety_review
             ) and not looks_like_review_reference(safety_review):
                 issues.append(
@@ -303,6 +343,7 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                 "production plan",
                 "accessibility review",
                 "safety review",
+                "data-task-fit evidence",
             ):
                 reference = row[field]
                 if field != "file or reference" and is_reference_state(reference):

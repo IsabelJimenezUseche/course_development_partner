@@ -8,12 +8,12 @@
   "response_artifacts": "not retained",
   "initial_scenario_file_sha256": "b5bd441da35d355669ca89f895103af871f450efd2cd862acc89a65307979ed2",
   "initial_rubric_file_sha256": "2cfb9d22f19da8a4163534ddd4267c24b3030baef393a340669028f9fc21d41b",
-  "current_scenario_file_sha256": "af23309cde17561869ba3a65eedbf6a04a5f4db4e87e838c2f69b7731ca79f32",
-  "current_rubric_file_sha256": "d1ad44b63dae40016abb1e36e6cd903da861bce8e13022d44cb4f12e0f7373b3",
+  "current_scenario_file_sha256": "7b9608bee4b55d716708fa9cfd3407568698694db19c664aa67b83694f9bc013",
+  "current_rubric_file_sha256": "19c446e4b665ff77f32c32c85dd29df6eb07cb2ab6c45bdd3b2cc1d3169ed40d",
   "results": [
     {
       "scenario_id": "focused-review-only",
-      "prompt": "Review this single low-stakes discussion prompt for clarity and alignment. Do not rewrite it: ‘Describe what justice means in the reading and reply to two peers.’",
+      "prompt": "Review this single low-stakes discussion prompt for clarity and alignment. Do not rewrite it: \u2018Describe what justice means in the reading and reply to two peers.\u2019",
       "result": "historical-observed-pass-not-qualifying",
       "rubric_ids": [
         "S1",

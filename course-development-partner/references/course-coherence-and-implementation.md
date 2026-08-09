@@ -15,7 +15,7 @@
 
 ## 1. Decide when course-level mapping is needed
 
-Use `assets/course-curriculum-map.md` for a full course, multi-week module, prerequisite sequence, or redesign that changes assessment timing. Skip it for a focused artifact when the surrounding course sequence is already confirmed and unaffected.
+Create `course-curriculum-map.md` in the project from `assets/course-curriculum-map.md` for a full course, multi-week module, prerequisite sequence, or redesign that changes assessment timing. Skip it for a focused artifact when the surrounding course sequence is already confirmed and unaffected.
 
 Ask which course, program, accreditation, or professional requirements apply. Map only requirements supplied or verified by the instructor; do not infer that an external framework governs the course.
 
@@ -65,7 +65,7 @@ Treat `retired` rows as historical state: do not let them satisfy current outcom
 
 ## 3. Check implementation load
 
-Use `assets/implementation-plan.md`. Estimate rather than hide:
+Create `implementation-plan.md` in the project from `assets/implementation-plan.md`. Estimate rather than hide:
 
 - professor design and preparation time;
 - TA or grader preparation, training, facilitation, and moderation;
@@ -99,10 +99,10 @@ Define and record:
 - **Facilitation moves, not just answers.** Supply the questions to ask a stuck group, the common wrong turns and what each reveals, and what to do when a group finishes early or stalls. An answer key prepares a grader; it does not prepare a facilitator.
 - **The disciplinary content of the session.** Give assistants the solution, the expected reasoning, and the known misconceptions in advance, and confirm they can work the task themselves before they facilitate it.
 - **Calibration for scoring.** Apply `references/assessment-quality.md`. Independent scoring of shared examples before live grading, with disagreement diagnosed rather than averaged away.
-- **Safety role.** For any hazard-bearing session, state explicitly what supervision an assistant provides, what they are qualified and authorized to supervise, what required training they hold, and the stop-work authority every assistant has. Route this through `references/stem-authenticity.md` and record it in `assets/safety-review.md`; do not treat assistant supervision as equivalent to the responsible owner's approval.
+- **Safety role.** For any hazard-bearing session, state explicitly what supervision an assistant provides, what they are qualified and authorized to supervise, what required training they hold, and the stop-work authority every assistant has. Route this through `references/stem-authenticity.md` and record it in the project's `safety-review.md`; do not treat assistant supervision as equivalent to the responsible owner's approval.
 - **Feedback to the team.** A route for assistants to report what failed in the session, since they observe the design running and the instructor usually does not.
 
-Budget the preparation time explicitly in `assets/implementation-plan.md`, including recurring per-session preparation and not only one orientation before the term. When preparation time is unavailable, say so and reduce the design's dependence on skilled facilitation rather than assuming it will be supplied.
+Budget the preparation time explicitly in the project's `implementation-plan.md`, including recurring per-session preparation and not only one orientation before the term. When preparation time is unavailable, say so and reduce the design's dependence on skilled facilitation rather than assuming it will be supplied.
 
 ## 5. Adjust the design to class size
 
@@ -161,7 +161,7 @@ Do not silently transfer workload to instructors, teaching assistants, graders, 
 
 ## 8. Plan implementation evidence
 
-Use `assets/implementation-evidence-plan.md` before collecting or analyzing learning evidence.
+Create `implementation-evidence-plan.md` in the project from `assets/implementation-evidence-plan.md` before collecting or analyzing learning evidence.
 
 Define:
 

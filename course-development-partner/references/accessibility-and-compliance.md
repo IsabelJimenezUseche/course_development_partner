@@ -117,7 +117,7 @@ When a barrier remains, document the affected task, educational/access effect, i
 
 ## 8. Report bounded findings
 
-Use `assets/accessibility-review.md`. Treat a required-use barrier that prevents equal participation, effective communication, independent use, or demonstration of the intended construct as a Blocker unless authorized guidance determines otherwise.
+Create `accessibility-review.md` in the project from `assets/accessibility-review.md`. Treat a required-use barrier that prevents equal participation, effective communication, independent use, or demonstration of the intended construct as a Blocker unless authorized guidance determines otherwise.
 
 Use bounded language:
 
