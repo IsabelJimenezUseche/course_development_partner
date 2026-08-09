@@ -36,7 +36,9 @@ The core design chain is:
 
 Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint validator reports an outcome whose entire active assessment sample falls below its aligned demand, while allowing lower-demand scaffolding items.
 
-Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Disciplines outside those profiles use the general workflow; no discipline-specific authenticity profile exists for them yet, and the skill does not claim one. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval. Every teaching-ready artifact must declare both a safety review and its data-task fit in the manifest — each either a reference to the completed review or an explicit statement, with a reason, that it does not apply. A blank cell is an undeclared decision, not an absent requirement.
+Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Disciplines outside those profiles use the general workflow; no discipline-specific authenticity profile exists for them yet, and the skill does not claim one. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval.
+
+Every teaching-ready artifact must reference an accessibility review, declare safety through an approved review or `not required`, and declare data-task evidence through a linked record or `not applicable — [reason]`. Rich artifacts must also reference a completed production plan. Connected project validation runs `scripts/validate_release_record.py` on the local safety, accessibility, and production records behind those claims, so a blank copied template cannot support teaching-ready status. The validator checks that the record contains an affirmative, unblocked decision; it cannot determine whether the review was competent or whether the named owner was qualified. Those judgments remain with the responsible human.
 
 Any activity that hands students a dataset must hold this chain end to end:
 
@@ -109,7 +111,7 @@ The skill selects a recommendation from the construct and stakes rather than usi
 
 The grading system itself — weighting, revision and retake policy, thresholds, late work, and any mandated scheme — stays with the course owner. The skill asks for it rather than inferring it, because it determines whether feedback can actually be used, and it surfaces conflicts between an instrument's scoring logic and the grading system instead of resolving them silently.
 
-After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies the rubric, diagnoses disagreements, proposes focused revisions, re-scores the examples, and records approved boundary interpretations in a separate grader guide.
+After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies the rubric, diagnoses disagreements, proposes focused revisions, re-scores the examples, and records approved boundary interpretations in a separate grader guide. Consequential scoring requires course-owner approval. Calibration with authentic student responses always uses Co-design or Guided mode; Auto may prepare the de-identification check, sample plan, and calibration questions, but it may not interpret responses, assign scores, or revise the rubric from them.
 
 ## MCP and tool support
 
@@ -157,6 +159,8 @@ The example palette is organized by semantic roles: black (`#000000`), warm gold
 ```text
 course_development_partner/
 ├── README.md
+├── LICENSE
+├── NOTICE
 ├── ruff.toml                      # Lint rule set, pinned independently of the ruff version
 ├── course-development-partner/    # Installable skill directory
 │   ├── SKILL.md
@@ -208,7 +212,9 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 ## Validation
 
-The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, dataset and representation fit, recorded data-task fit claims, handoff state (design log, source register, capability manifest), project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, package inventory boundaries, and the packaged archive's contents. Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or `all-active`; retired records remain structurally checked but do not satisfy current coverage, artifact-family, progression, dependency, or workload requirements; Course-tier production requires a curriculum map; Course-tier handoff requires ordered active-outcome progression; and the project index contains one confined, resolvable entry per state file.
+The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, dataset and representation fit, recorded data-task fit claims, release records (safety review, accessibility review, and production plan), handoff state (design log, source register, capability manifest), project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, package inventory boundaries, and the packaged archive's contents.
+
+Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or `all-active`; retired records remain structurally checked but do not satisfy current coverage, artifact-family, progression, dependency, or workload requirements; Course-tier production requires a curriculum map; and Course-tier handoff requires ordered active-outcome progression. The project validator also reports recognized portable-state files omitted from the project index, requires one confined and resolvable index entry per active state file, checks consequential handoff fields and conditional team/safety records, and validates the local release records cited by teaching-ready manifest rows.
 
 Run the repository tests with Python 3.10 or later **from the repository root**:
 
@@ -232,3 +238,7 @@ python3 -m unittest discover -s /path/to/course_development_partner/tests
 Do not add `-t .` to work around this: `tests/` is intentionally not an importable package, and a separate top-level directory makes discovery fail outright.
 
 Exploratory forward tests have covered focused review, accessibility-authority, visual-design, STEM, non-STEM, and rubric-calibration scenarios, but the historical records do not retain all metadata, responses, and evaluator evidence required for a current passing claim. See [the current test index](tests/test-index.md) for current, historical, and pending evidence. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts were produced and inspected, but those temporary files were not retained; [the historical report](tests/rich-artifact-production-report.md) therefore remains bounded and non-reproducible. Current behavioral reruns, live integrations, a faithful mock institutional authorization flow, a retained rich-artifact rerun, and clean bidirectional named-client installation and handoff still require testing before broader production or compatibility claims.
+
+## License and attribution
+
+Course Development Partner is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Isabel Jimenez and Daniel Mejia. See [NOTICE](NOTICE) for attribution and third-party provenance information.
