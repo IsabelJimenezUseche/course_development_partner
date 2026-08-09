@@ -9,6 +9,7 @@ Store consequential context in ordinary Markdown:
 - `alignment-map.md`
 - `assessment-blueprint.md`
 - `course-curriculum-map.md`
+- `data-task-record.md`
 - `context-brief.md`
 - `lesson-storyboard.md`
 - `implementation-plan.md`

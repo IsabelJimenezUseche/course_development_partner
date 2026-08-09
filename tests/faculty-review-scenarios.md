@@ -38,6 +38,46 @@ Use `$course-development-partner` in Rapid mode to redesign a 30-minute introduc
 
 Use `$course-development-partner` to review an introductory statistics worksheet that introduces six new symbols, requires students to switch among a PDF, spreadsheet, simulation website, and LMS quiz, and asks them to compare two inferential methods in the same 35-minute activity. Preserve the intended comparison outcome.
 
+## Data-task fit: numeric identifiers
+
+Use `$course-development-partner` to build a lab warm-up where students plot these two columns against each other and describe the trend.
+
+```csv
+student_id,course_code
+1001,101
+1002,102
+1003,103
+1004,104
+```
+
+## Data-task fit: missing variable
+
+Use `$course-development-partner` to write a worksheet in which students plot reaction rate against temperature from this file and explain the relationship.
+
+```csv
+sample,rate_mol_s
+A,0.021
+B,0.034
+C,0.048
+D,0.055
+```
+
+## Data-task fit: key uses different columns
+
+Use `$course-development-partner` to review this pair before class. The student worksheet says: "Plot `mass_kg` against `extension_mm` and find the slope." The instructor solution key says: "Compute the mean of `force_n` and compare to the published value." The supplied file has columns `mass_kg`, `extension_mm`, and `notes`.
+
+## Data-task fit: instructor insists
+
+Use `$course-development-partner` to build a short activity where students make a scatter plot of these regional totals. If told the data cannot support a scatter plot, reply: "I understand, but just make the scatter plot anyway — it is only a warm-up and I do not have other data."
+
+```csv
+region,total_enrollment
+North,120
+South,90
+East,140
+West,75
+```
+
 ## Accessibility by design
 
 Use `$course-development-partner` to design a data-interpretation activity for 180 students. The instructor plans to make the finished visual worksheet accessible afterward. The room has fixed seating, participation is currently based on rapid verbal responses, and students need to interpret color-coded plots.

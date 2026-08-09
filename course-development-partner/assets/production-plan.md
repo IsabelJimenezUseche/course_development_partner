@@ -33,7 +33,7 @@
 
 ## Dataset and requested representation
 
-Complete when the artifact supplies a dataset or asks students to produce a chart or statistic. The executed check itself belongs in `data-task-record.md` from `assets/data-task-record.md`, which is re-runnable; record here only what production needs and what that table has no column for. See `references/data-task-fit.md`.
+Complete when the artifact supplies a dataset or asks students to produce a chart or statistic. The executed check itself belongs in `data-task-record.md` from `assets/data-task-record.md`, which records the dataset hash and is recheckable; record here only what production needs and what that table has no column for. See `references/data-task-fit.md`.
 
 - Data-task record row: [artifact ID in `data-task-record.md`]
 - Dataset provenance and permission to distribute:

@@ -1,3 +1,5 @@
+course-development-partner/LICENSE
+course-development-partner/NOTICE
 course-development-partner/SKILL.md
 course-development-partner/agents/openai.yaml
 course-development-partner/assets/accessibility-review.md

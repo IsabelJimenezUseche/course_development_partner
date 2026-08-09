@@ -146,13 +146,13 @@ def table_identifiers(
     return identifiers, issues
 
 
-def manifest_artifact_ids(path: Path) -> tuple[set[str], set[str]]:
-    """Return (active artifact IDs, IDs whose row claims the data-task-fit token)."""
+def manifest_artifact_ids(path: Path) -> tuple[set[str], dict[str, str]]:
+    """Return active artifact IDs and, per claiming ID, its evidence reference."""
     required = validate_artifact_manifest.REQUIRED
     _, headers, rows = load_table(path, required)
     mapping = normalized_mapping(headers, required)
     active: set[str] = set()
-    claimed: set[str] = set()
+    claimed: dict[str, str] = {}
     for raw in rows:
         row = normalized_row(raw, mapping)
         if normalize(row["status"]) == "retired":
@@ -168,28 +168,29 @@ def manifest_artifact_ids(path: Path) -> tuple[set[str], set[str]]:
             if token.strip()
         }
         if "data-task-fit" in tokens:
-            claimed.update(identifiers)
+            for identifier in identifiers:
+                claimed[identifier] = row["data-task-fit evidence"]
     return active, claimed
 
 
 def check_data_task_fit(
     manifest_path: Path | None, record_path: Path | None
 ) -> tuple[list[str], list[str]]:
-    """A fit claim in the manifest must point at a record that can be re-run."""
+    """A fit claim in the manifest must point at the record that rechecks it."""
     if manifest_path is None:
         return [], []
     try:
-        active_ids, claimed_ids = manifest_artifact_ids(manifest_path)
+        active_ids, claimed = manifest_artifact_ids(manifest_path)
     except (OSError, UnicodeError, ValueError) as exc:
         return [f"artifact-manifest.md: {exc}"], []
-    if not claimed_ids and record_path is None:
+    if not claimed and record_path is None:
         return [], []
     if record_path is None:
         return [], [
             f"artifact-manifest.md: {identifier} claims the data-task-fit token but "
             "the project has no active data-task-record.md, so the claim cannot be "
-            "re-executed"
-            for identifier in sorted(claimed_ids)
+            "rechecked"
+            for identifier in sorted(claimed)
         ]
     try:
         recorded_ids = validate_data_task_record.artifact_ids(record_path)
@@ -198,8 +199,28 @@ def check_data_task_fit(
     issues = [
         f"artifact-manifest.md: {identifier} claims the data-task-fit token but has "
         "no row in data-task-record.md"
-        for identifier in sorted(claimed_ids - recorded_ids)
+        for identifier in sorted(set(claimed) - recorded_ids)
     ]
+    # Matching artifact IDs is not the same as pointing at the record. Without
+    # this, any Markdown reference satisfies the evidence cell as long as some
+    # record elsewhere happens to carry the same ID.
+    for identifier, evidence in sorted(claimed.items()):
+        if identifier not in recorded_ids:
+            continue
+        try:
+            target = local_reference_path(evidence, manifest_path.parent)
+        except (OSError, RuntimeError) as exc:
+            issues.append(
+                f"artifact-manifest.md: {identifier} data-task-fit evidence cannot be "
+                f"resolved: {exc}"
+            )
+            continue
+        if target is None or target.resolve() != record_path.resolve():
+            issues.append(
+                f"artifact-manifest.md: {identifier} data-task-fit evidence points to "
+                f"{evidence or 'nothing'} rather than the active data-task-record.md "
+                "that rechecks the claim"
+            )
     issues.extend(
         f"data-task-record.md: artifact is not active in artifact-manifest.md: "
         f"{identifier}"

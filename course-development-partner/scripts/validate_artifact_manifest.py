@@ -287,7 +287,7 @@ def validate(path: Path, check_paths: bool = False) -> tuple[list[str], list[str
                     f"{label}: teaching-ready artifact is missing accessibility review"
                 )
             # The validator cannot tell which artifacts are data-based, so it
-            # requires the declaration instead: a record it can re-execute, or an
+            # requires the declaration instead: a record it can recheck, or an
             # explicit statement that no dataset is involved. A bare token is a
             # claim about work nobody can check.
             evidence = row["data-task-fit evidence"]

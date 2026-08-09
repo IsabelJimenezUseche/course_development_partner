@@ -1,23 +1,31 @@
 #!/usr/bin/env python3
-"""Re-execute the fit claims recorded in a data-task record.
+"""Revalidate the structural fit claims recorded in a data-task record.
 
 A validation token in the artifact manifest is a claim that somebody executed
 the requested operation on the exact supplied dataset. On its own it is
 self-attested: nothing distinguishes a row where the work happened from a row
-where the token was typed. This validator removes that gap by re-running each
-recorded claim against the dataset it names, using the same checks as
-``validate_dataset.py``.
+where the token was typed. This validator narrows that gap by rechecking each
+recorded claim against the dataset it names.
 
-A row that cannot be re-executed — an absent dataset, an unknown
-representation, unparseable roles — is reported as a gap, because an
-unverifiable claim and a false one are indistinguishable to the reader.
+What it proves, precisely:
 
-What it still cannot do: confirm that the produced output answers the question
-students were asked, or that the intended interpretation follows from it. Those
-stay with a qualified human, as ``references/data-task-fit.md`` says.
+* the dataset named in the row is present and unchanged since the check was
+  recorded, by comparing its SHA-256 against the recorded hash;
+* the columns the row names exist, and their types, roles, levels, pairing, and
+  observation counts support the declared representation.
+
+What it does not prove: that the recorded ``Result`` is correct. It does not
+redraw the chart or recompute the statistic, so a recorded slope, mean, or
+interpretation is checked by a human or not at all. The hash is what stands
+between those two: a dataset whose values changed while its schema held still
+fails here, which is the case a structural check alone cannot see.
+
+A row that cannot be rechecked — an absent dataset, an unknown representation,
+unparseable roles — is reported as a gap, because an unverifiable claim and a
+false one are indistinguishable to the reader.
 
 Exit codes:
-  0: every recorded claim re-executes against its dataset
+  0: every recorded claim rechecks against an unchanged dataset
   1: file, parsing, or structural error
   2: fit-record gaps detected
 """
@@ -25,6 +33,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -44,25 +53,39 @@ from _tabular import (
 REQUIRED = (
     "artifact id",
     "dataset file",
+    "dataset sha-256",
     "dataset version or date",
+    "worksheet",
     "representation",
     "column roles",
     "expected student output",
     "intended interpretation",
     "execution method",
+    "execution evidence",
     "executed on",
     "result",
 )
 
 EXECUTION_METHODS = {"validator", "code", "manual"}
+WORKBOOK_SUFFIXES = {".xlsx", ".xlsm"}
+SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$", re.IGNORECASE)
 # Values that look filled in but assert nothing.
 PLACEHOLDERS = {"", "-", "tbd", "todo", "n/a", "na", "none", "?", "pending"}
+# Fields every filled row must carry. Worksheet and execution evidence are
+# conditional, so they are checked against the row's own dataset and method.
+ALWAYS_REQUIRED = (
+    "dataset version or date",
+    "expected student output",
+    "intended interpretation",
+    "result",
+)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Re-run each recorded data-task fit claim against the dataset it names."
+            "Recheck each recorded data-task fit claim against the dataset it "
+            "names, and confirm that dataset has not changed since."
         ),
         epilog=(
             "Examples:\n"
@@ -82,6 +105,14 @@ def parse_args() -> argparse.Namespace:
 
 def is_placeholder(value: str) -> bool:
     return normalize(value) in PLACEHOLDERS
+
+
+def file_digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(65536), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def parse_roles(value: str) -> tuple[dict[str, str], list[str]]:
@@ -127,6 +158,92 @@ def artifact_ids(path: Path) -> set[str]:
         except ValueError:
             continue
     return identifiers
+
+
+def check_dataset(row: dict[str, str], label: str, record_dir: Path) -> list[str]:
+    """Resolve, hash-verify, and recheck one row's dataset."""
+    issues: list[str] = []
+    representation = normalize(row["representation"])
+    known_representation = representation in validate_dataset.REPRESENTATIONS
+    roles, role_problems = parse_roles(row["column roles"])
+    issues.extend(f"{label}: {problem}" for problem in role_problems)
+
+    if is_placeholder(row["dataset file"]):
+        return issues + [
+            f"{label}: missing dataset file; the fit claim cannot be rechecked "
+            "without the exact file students receive"
+        ]
+    try:
+        dataset = local_reference_path(row["dataset file"], record_dir)
+    except (OSError, RuntimeError) as exc:
+        return issues + [
+            f"{label}: cannot resolve dataset {row['dataset file']}: {exc}"
+        ]
+    if dataset is None:
+        return issues + [
+            f"{label}: dataset file is not a local path: {row['dataset file']}; "
+            "record the exact file so the claim can be rechecked"
+        ]
+    if not dataset.exists():
+        return issues + [
+            f"{label}: declared dataset is not present: {row['dataset file']}; "
+            "the recorded fit claim cannot be rechecked"
+        ]
+
+    # The hash is the only check that sees a dataset whose values moved while
+    # its columns held still, which no structural check can detect.
+    recorded_hash = normalize(row["dataset sha-256"])
+    if is_placeholder(recorded_hash):
+        issues.append(
+            f"{label}: missing dataset SHA-256; without it a dataset can change "
+            "its values and still pass every structural check"
+        )
+    elif not SHA256_PATTERN.match(recorded_hash):
+        issues.append(
+            f"{label}: dataset SHA-256 is not a 64-character hex digest: "
+            f"{row['dataset sha-256']}"
+        )
+    else:
+        try:
+            actual = file_digest(dataset)
+        except OSError as exc:
+            return issues + [f"{label}: cannot hash {row['dataset file']}: {exc}"]
+        if actual != recorded_hash:
+            issues.append(
+                f"{label}: dataset has changed since the check was recorded "
+                f"(recorded {recorded_hash[:12]}…, found {actual[:12]}…); the "
+                "recorded result is void until the operation is executed again"
+            )
+
+    sheet = row["worksheet"].strip()
+    is_workbook = dataset.suffix.casefold() in WORKBOOK_SUFFIXES
+    if is_workbook and is_placeholder(sheet):
+        issues.append(
+            f"{label}: missing worksheet; name the sheet even when the workbook "
+            "has one today, so adding a sheet later cannot move the check"
+        )
+    elif not is_workbook and not is_placeholder(sheet):
+        issues.append(
+            f"{label}: worksheet {sheet} declared for a non-workbook dataset"
+        )
+
+    if not known_representation:
+        return issues
+    # Recheck, do not trust. Roles are strict here: an inferred role confirms
+    # that some column of the right kind exists, not the one the activity names.
+    dataset_errors, dataset_issues = validate_dataset.validate(
+        dataset,
+        representation,
+        {role: roles.get(role) for role in validate_dataset.ROLE_FLAGS},
+        sheet=sheet or None,
+        strict_roles=True,
+    )
+    issues.extend(f"{label}: dataset cannot be read: {item}" for item in dataset_errors)
+    issues.extend(
+        f"{label}: rechecking the recorded claim failed: {item}"
+        for item in dataset_issues
+    )
+    return issues
 
 
 def validate(path: Path) -> tuple[list[str], list[str]]:
@@ -178,12 +295,7 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
             except ValueError as exc:
                 issues.append(f"{label}: {exc}")
 
-        for field in (
-            "dataset version or date",
-            "expected student output",
-            "intended interpretation",
-            "result",
-        ):
+        for field in ALWAYS_REQUIRED:
             if is_placeholder(row[field]):
                 issues.append(f"{label}: missing {field}")
 
@@ -195,6 +307,23 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
                 f"{label}: unknown execution method {row['execution method']}; use "
                 + ", ".join(sorted(EXECUTION_METHODS))
             )
+        evidence = row["execution evidence"]
+        if method == "code" and is_placeholder(evidence):
+            issues.append(
+                f"{label}: execution method code without execution evidence; point "
+                "to the produced chart, notebook, or output"
+            )
+        elif not is_placeholder(evidence):
+            try:
+                target = local_reference_path(evidence, path.parent)
+            except (OSError, RuntimeError) as exc:
+                issues.append(f"{label}: cannot resolve execution evidence: {exc}")
+            else:
+                if target is not None and not target.exists():
+                    issues.append(
+                        f"{label}: execution evidence does not exist: {evidence}"
+                    )
+
         executed_on = row["executed on"]
         if is_placeholder(executed_on):
             issues.append(
@@ -205,55 +334,15 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
             issues.append(f"{label}: executed on must use YYYY-MM-DD")
 
         representation = normalize(row["representation"])
-        known_representation = representation in validate_dataset.REPRESENTATIONS
         if is_placeholder(representation):
             issues.append(f"{label}: missing representation")
-        elif not known_representation:
+        elif representation not in validate_dataset.REPRESENTATIONS:
             issues.append(
                 f"{label}: unknown representation {row['representation']}; use one of "
                 + ", ".join(sorted(validate_dataset.REPRESENTATIONS))
             )
 
-        roles, role_problems = parse_roles(row["column roles"])
-        for problem in role_problems:
-            issues.append(f"{label}: {problem}")
-
-        if is_placeholder(row["dataset file"]):
-            issues.append(
-                f"{label}: missing dataset file; the fit claim cannot be re-executed "
-                "without the exact file students receive"
-            )
-            continue
-        try:
-            dataset = local_reference_path(row["dataset file"], path.parent)
-        except (OSError, RuntimeError) as exc:
-            issues.append(f"{label}: cannot resolve dataset {row['dataset file']}: {exc}")
-            continue
-        if dataset is None:
-            issues.append(
-                f"{label}: dataset file is not a local path: {row['dataset file']}; "
-                "record the exact file so the claim can be re-executed"
-            )
-            continue
-        if not dataset.exists():
-            issues.append(
-                f"{label}: declared dataset is not present: {row['dataset file']}; "
-                "the recorded fit claim cannot be re-executed"
-            )
-            continue
-        if not known_representation:
-            continue
-        # The claim is re-run, not read. A row that passed when it was written and
-        # broke when the dataset changed fails here.
-        dataset_errors, dataset_issues = validate_dataset.validate(
-            dataset,
-            representation,
-            {role: roles.get(role) for role in validate_dataset.ROLE_FLAGS},
-        )
-        for item in dataset_errors:
-            issues.append(f"{label}: dataset cannot be read: {item}")
-        for item in dataset_issues:
-            issues.append(f"{label}: re-executing the recorded claim failed: {item}")
+        issues.extend(check_dataset(row, label, path.parent))
 
     return [], issues
 
@@ -267,8 +356,8 @@ def main() -> int:
         issues,
         issue_label="GAP",
         ok_message=(
-            "every recorded fit claim re-executes against its dataset; whether the "
-            "result answers the student's question still requires review"
+            "every recorded claim rechecks against an unchanged dataset; the "
+            "recorded results themselves still require review"
         ),
         as_json=args.json,
     )

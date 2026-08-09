@@ -1669,9 +1669,9 @@ class ProjectValidatorTests(unittest.TestCase):
 """
     DATA_RECORD = """# Data–Task Fit Record
 - Schema version: 1.0
-| Artifact ID | Dataset file | Dataset version or date | Representation | Column roles | Expected student output | Intended interpretation | Execution method | Executed on | Result |
-|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | lab.csv | 2026-08-01 | scatter | x=mass_kg; y=extension_mm | Fitted line | Extension rises with mass | validator | 2026-08-01 | Produced |
+| Artifact ID | Dataset file | Dataset SHA-256 | Dataset version or date | Worksheet | Representation | Column roles | Expected student output | Intended interpretation | Execution method | Execution evidence | Executed on | Result |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | lab.csv | c92da196adf584e997392a15e62474fc7ca8ffc59ca1495adfc874b69bf410e6 | 2026-08-01 |  | scatter | x=mass_kg; y=extension_mm | Fitted line | Extension rises with mass | validator |  | 2026-08-01 | Produced |
 """
     LAB_CSV = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
 
@@ -1707,7 +1707,7 @@ class ProjectValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_project_re_executes_the_recorded_claim(self) -> None:
+    def test_project_rechecks_the_recorded_claim(self) -> None:
         """A record that no longer matches its dataset fails at project level."""
         result = run_project(
             {
@@ -1720,7 +1720,31 @@ class ProjectValidatorTests(unittest.TestCase):
             }
         )
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertIn("re-executing the recorded claim failed", result.stdout)
+        self.assertIn("rechecking the recorded claim failed", result.stdout)
+
+    def test_evidence_must_point_at_the_record_not_merely_share_an_id(self) -> None:
+        """Matching artifact IDs is not the same as pointing at the record.
+
+        Without this, any Markdown reference satisfies the evidence cell as
+        long as some record elsewhere happens to carry the same artifact ID.
+        """
+        result = run_project(
+            {
+                "project-index.md": self._data_index_with_record(),
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": self.DATA_MANIFEST.replace(
+                    "| data-task-record.md |", "| unrelated-notes.md |"
+                ),
+                "data-task-record.md": self.DATA_RECORD,
+                "unrelated-notes.md": "# Notes\n",
+                "lab.csv": self.LAB_CSV,
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn(
+            "points to unrelated-notes.md rather than the active", result.stdout
+        )
 
     def test_record_row_for_an_unknown_artifact_is_reported(self) -> None:
         result = run_project(
@@ -2528,6 +2552,32 @@ class DatasetValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("looks like an identifier", result.stdout)
 
+    # Value shape alone cannot separate an index from a small-integer
+    # measurement, so the header decides first in both directions. Doses and
+    # elapsed times starting at 0 or 1 are the false positives that motivated
+    # this; a key-named column is the true positive that must survive it.
+    IDENTIFIER_HEURISTIC_CASES = (
+        ("dose_mg", "dose_mg,response\n0,1.2\n1,2.4\n2,3.1\n3,4.6\n", 0),
+        ("time_s", "time_s,reading\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
+        ("temp_c", "temp_c,yield_g\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
+        ("trial_count", "trial_count,mass_kg\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
+        ("student_id", "student_id,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+        ("sample_code", "sample_code,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+        ("entry", "entry,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+    )
+
+    def test_measurement_headers_survive_the_identifier_heuristic(self) -> None:
+        for header, content, expected in self.IDENTIFIER_HEURISTIC_CASES:
+            with self.subTest(column=header):
+                second = content.splitlines()[0].split(",")[1]
+                result = run_script(
+                    "validate_dataset.py", content, ".csv",
+                    "--representation", "scatter", "--x", header, "--y", second,
+                )
+                self.assertEqual(
+                    result.returncode, expected, result.stdout + result.stderr
+                )
+
     def test_multi_sheet_workbook_requires_an_explicit_sheet(self) -> None:
         openpyxl = importlib.util.find_spec("openpyxl")
         if openpyxl is None:
@@ -2563,61 +2613,118 @@ class DatasetValidatorTests(unittest.TestCase):
 
 
 class DataTaskRecordValidatorTests(unittest.TestCase):
-    """A validation token asserts executed work; this re-executes it.
+    """A validation token asserts executed work; this rechecks what it can.
 
     Before this validator the `data-task-fit` token was self-attested: a row
     that did the check and a row that typed the word produced identical output.
+    The validator narrows that to a stated boundary — dataset unchanged, columns
+    and roles still supporting the representation — and leaves the recorded
+    result to a human, which is the honest limit of what a script can say.
     """
 
+    COLUMNS = (
+        "| Artifact ID | Dataset file | Dataset SHA-256 | Dataset version or date "
+        "| Worksheet | Representation | Column roles | Expected student output "
+        "| Intended interpretation | Execution method | Execution evidence "
+        "| Executed on | Result |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|\n"
+    )
     HEADER = (
-        "# Data–Task Fit Record\n"
+        "# Data\u2013Task Fit Record\n"
         "- Schema version: 1.0\n"
-        "- Last updated: 2026-08-09\n\n"
-        "| Artifact ID | Dataset file | Dataset version or date | Representation "
-        "| Column roles | Expected student output | Intended interpretation "
-        "| Execution method | Executed on | Result |\n"
-        "|---|---|---|---|---|---|---|---|---|---|\n"
+        "- Last updated: 2026-08-09\n\n" + COLUMNS
     )
     PAIRED = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
     AGGREGATE = "region,total\nNorth,120\nSouth,90\nEast,140\nWest,75\n"
 
+    @staticmethod
+    def digest(content: str) -> str:
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
     def _row(
         self,
         dataset: str = "lab.csv",
+        digest: str | None = None,
+        worksheet: str = "",
         representation: str = "scatter",
         roles: str = "x=mass_kg; y=extension_mm",
-        executed_on: str = "2026-08-09",
         method: str = "validator",
+        evidence: str = "",
+        executed_on: str = "2026-08-09",
     ) -> str:
+        if digest is None:
+            digest = self.digest(self.PAIRED)
         return (
-            f"| WS-1 | {dataset} | 2026-08-01 | {representation} | {roles} "
-            f"| Fitted line with slope | Extension rises with mass | {method} "
+            f"| WS-1 | {dataset} | {digest} | 2026-08-01 | {worksheet} "
+            f"| {representation} | {roles} | Fitted line with slope "
+            f"| Extension rises with mass | {method} | {evidence} "
             f"| {executed_on} | Produced; slope 4.1 mm/kg |\n"
         )
 
-    def _run(self, record: str, data: dict[str, str] | None = None):
+    def _run(self, record: str, data: dict[str, str] | None = None, extra=None):
         with tempfile.TemporaryDirectory() as temp_dir:
             project = Path(temp_dir)
             (project / "data-task-record.md").write_text(record, encoding="utf-8")
             for name, content in (data or {"lab.csv": self.PAIRED}).items():
                 (project / name).write_text(content, encoding="utf-8")
+            if extra is not None:
+                extra(project)
             return run_path(
                 "validate_data_task_record.py", project / "data-task-record.md"
             )
 
-    def test_recorded_claim_that_re_executes_passes(self) -> None:
+    def test_recorded_claim_that_rechecks_passes(self) -> None:
         result = self._run(self.HEADER + self._row())
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_recorded_claim_contradicted_by_its_dataset_fails(self) -> None:
         """The owner's failure, recorded as a passing check."""
         result = self._run(
-            self.HEADER + self._row(roles="x=region; y=total"),
+            self.HEADER
+            + self._row(
+                digest=self.digest(self.AGGREGATE), roles="x=region; y=total"
+            ),
             {"lab.csv": self.AGGREGATE},
         )
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertIn("re-executing the recorded claim failed", result.stdout)
+        self.assertIn("rechecking the recorded claim failed", result.stdout)
         self.assertIn("must be quantitative", result.stdout)
+
+    def test_changed_values_invalidate_the_recorded_result(self) -> None:
+        """The gap the hash exists for: same columns, same types, new numbers.
+
+        A structural check cannot see this, so without the hash a recorded
+        slope, mean, or interpretation could silently become wrong.
+        """
+        moved = "mass_kg,extension_mm\n0.5,99.0\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+        result = self._run(self.HEADER + self._row(), {"lab.csv": moved})
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("dataset has changed since the check was recorded", result.stdout)
+        self.assertIn("void", result.stdout)
+
+    def test_missing_hash_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(digest=""))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("missing dataset SHA-256", result.stdout)
+
+    def test_malformed_hash_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(digest="not-a-digest"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("not a 64-character hex digest", result.stdout)
+
+    def test_roles_are_mandatory_even_where_the_cli_infers_them(self) -> None:
+        """Inference confirms some column of the right kind, not the named one."""
+        result = self._run(
+            self.HEADER
+            + self._row(
+                digest=self.digest(self.AGGREGATE),
+                representation="bar",
+                roles="",
+            ),
+            {"lab.csv": self.AGGREGATE},
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("requires explicit column roles", result.stdout)
 
     def test_absent_dataset_is_a_gap_not_a_pass(self) -> None:
         result = self._run(self.HEADER + self._row(dataset="missing.csv"))
@@ -2649,12 +2756,68 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("unknown execution method", result.stdout)
 
+    def test_code_execution_requires_its_evidence(self) -> None:
+        result = self._run(self.HEADER + self._row(method="code"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("without execution evidence", result.stdout)
+
+    def test_code_execution_with_present_evidence_passes(self) -> None:
+        result = self._run(
+            self.HEADER + self._row(method="code", evidence="fit.png"),
+            {"lab.csv": self.PAIRED, "fit.png": "x"},
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_missing_evidence_file_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(method="code", evidence="gone.png"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("execution evidence does not exist", result.stdout)
+
+    def test_worksheet_is_required_for_a_workbook(self) -> None:
+        """Named even for a one-sheet workbook, so adding a sheet cannot move it."""
+        openpyxl = importlib.util.find_spec("openpyxl")
+        if openpyxl is None:
+            self.skipTest("openpyxl not installed")
+        from openpyxl import Workbook
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project = Path(temp_dir)
+            book = Workbook()
+            first = book.active
+            first.title = "Notes"
+            first.append(["comment"])
+            sheet = book.create_sheet("Results")
+            sheet.append(["mass_kg", "extension_mm"])
+            for row in ((0.5, 2.1), (1.0, 4.3), (1.5, 6.0), (2.0, 8.2)):
+                sheet.append(list(row))
+            book.save(project / "lab.xlsx")
+            digest = hashlib.sha256((project / "lab.xlsx").read_bytes()).hexdigest()
+
+            record = project / "data-task-record.md"
+            record.write_text(
+                self.HEADER + self._row(dataset="lab.xlsx", digest=digest),
+                encoding="utf-8",
+            )
+            unnamed = run_path("validate_data_task_record.py", record)
+            self.assertEqual(unnamed.returncode, 2, unnamed.stdout)
+            self.assertIn("missing worksheet", unnamed.stdout)
+
+            record.write_text(
+                self.HEADER
+                + self._row(dataset="lab.xlsx", digest=digest, worksheet="Results"),
+                encoding="utf-8",
+            )
+            named = run_path("validate_data_task_record.py", record)
+            self.assertEqual(named.returncode, 0, named.stdout)
+
+    def test_worksheet_on_a_csv_is_reported(self) -> None:
+        result = self._run(self.HEADER + self._row(worksheet="Sheet1"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("declared for a non-workbook dataset", result.stdout)
+
     def test_unfilled_template_supports_no_claim(self) -> None:
         asset = (
-            ROOT
-            / "course-development-partner"
-            / "assets"
-            / "data-task-record.md"
+            ROOT / "course-development-partner" / "assets" / "data-task-record.md"
         )
         result = run_path("validate_data_task_record.py", asset)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)

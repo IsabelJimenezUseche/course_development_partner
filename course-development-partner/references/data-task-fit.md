@@ -86,6 +86,6 @@ Record it after executing, never before. Then link that row from the artifact ma
 Two validators support this, and neither replaces the reviewer:
 
 - `scripts/validate_dataset.py` checks one CSV or spreadsheet against a declared representation and column roles. It confirms that named columns exist, that types, roles, levels, and pairing support the representation, and that observations are sufficient.
-- `scripts/validate_data_task_record.py` re-runs every recorded row against the dataset it names, so a claim that was true when written and false after the dataset changed fails. A row whose dataset is absent is reported as a gap: an unverifiable claim and a false one read the same way.
+- `scripts/validate_data_task_record.py` rechecks every recorded row: it confirms the named dataset is present and unchanged since the check was recorded, by comparing its SHA-256 against the recorded hash, and rechecks the declared columns, types, roles, levels, and counts. A row whose dataset is absent is reported as a gap: an unverifiable claim and a false one read the same way.
 
-Both are structural screens. Whether the resulting chart answers the student's question, and whether the intended interpretation follows from it, stays with the reviewer.
+Both are structural screens, and the boundary matters. Neither redraws the chart nor recomputes the statistic, so the recorded `Result` is verified by a human or not at all. What the hash adds is narrower and worth stating exactly: it catches a dataset whose values moved while its columns held still, which is the one drift a structural check cannot see. Whether the result answers the student's question, and whether the intended interpretation follows from it, stays with the reviewer.

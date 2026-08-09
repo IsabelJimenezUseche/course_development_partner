@@ -112,6 +112,22 @@ IDENTIFIER_HEADER = re.compile(
     r"(^|[\s_-])(id|ids|code|codes|key|keys|number|no|num|index|uuid|roster)$",
     re.IGNORECASE,
 )
+# Headers that name a measured quantity. A unit suffix or a measure word is
+# strong evidence against the identifier heuristic below: dose_mg = 0, 1, 2, 3
+# and time_s = 1, 2, 3, 4 are consecutive small integers and also real data.
+MEASUREMENT_HEADER = re.compile(
+    r"(_(?:mg|g|kg|lb|mm|cm|m|km|in|ft|s|ms|min|hr|h|c|f|k|v|a|w|j|n|pa|hz|"
+    r"ml|l|mol|m2|m3|ppm|pct|deg|rad)$"
+    # Measure words are matched at underscore- and hyphen-delimited boundaries
+    # as well as word boundaries, so trial_count and elapsed_time read as the
+    # measurements they are.
+    r"|(?:^|[\s_-])(?:dose|time|temp|temperature|mass|weight|length|height|"
+    r"width|depth|volume|conc|concentration|pressure|force|speed|velocity|"
+    r"current|voltage|power|energy|freq|frequency|angle|distance|age|score|"
+    r"count|rate|yield|density|ph|absorbance|intensity|elapsed|duration|"
+    r"reading|measurement)(?:$|[\s_-]))",
+    re.IGNORECASE,
+)
 ORDERED_HEADER = re.compile(
     r"(date|time|timestamp|year|month|week|day|hour|minute|second|step|trial|"
     r"session|order|sequence|period|epoch|cycle|iteration|run)",
@@ -254,9 +270,18 @@ def classify(headers: list[str], rows: list[list[str]]) -> dict[str, str]:
 
 
 def looks_like_identifier(header: str, values: list[str]) -> bool:
-    """A numeric key is not a measurement, however numeric it looks."""
+    """A numeric key is not a measurement, however numeric it looks.
+
+    Two signals, deliberately ordered. A header naming a key settles it. A
+    header naming a measured quantity settles it the other way, because the
+    value-shape signal below cannot distinguish an index from a small-integer
+    measurement and would otherwise reject real doses, times, and trial
+    settings. Only a header that says neither falls through to value shape.
+    """
     if IDENTIFIER_HEADER.search(header):
         return True
+    if MEASUREMENT_HEADER.search(header):
+        return False
     if len(values) < 3 or not all(is_number(value) for value in values):
         return False
     numbers = [float(value.replace(",", "")) for value in values]
@@ -310,7 +335,16 @@ def validate(
     named_columns: list[str] | None = None,
     min_rows_override: int | None = None,
     sheet: str | None = None,
+    strict_roles: bool = False,
 ) -> tuple[list[str], list[str]]:
+    """Check a dataset against a representation's minimum requirements.
+
+    `strict_roles` requires every role the representation defines, for every
+    representation. The CLI leaves it off so exploratory checks stay cheap, but
+    recorded evidence sets it: without named roles the permissive path only
+    confirms that *some* column of each needed kind exists, which certifies the
+    file rather than the variables the activity actually names.
+    """
     if min_rows_override is not None and min_rows_override <= 0:
         return ["--min-rows must be a positive number of observations"], []
     try:
@@ -350,7 +384,7 @@ def validate(
     spec = REPRESENTATIONS[representation]
     supplied = {role: value for role, value in roles.items() if value}
 
-    if spec.require_roles:
+    if spec.require_roles or strict_roles:
         missing = [role for role in spec.roles if role not in supplied]
         if missing:
             issues.append(
