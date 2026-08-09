@@ -29,7 +29,7 @@ State the active mode at the start of Project or Course work and allow a change:
 - **Co-design:** use frequent, small cycles focused on the highest-value unresolved decision. Recommend it by default.
 - **Guided:** complete a phase, show its deliverable, then request review.
 - **Rapid:** produce the full draft in one pass without intermediate checkpoints, make provisional assumptions and unresolved choices visible, then request one consolidated faculty review before treating consequential decisions as approved.
-- **Auto:** work non-interactively toward the stated goal, choose the strongest recommended option, and return the completed draft plus assumptions, validation, and any nondelegable release blockers.
+- **Auto:** run the co-design cycle non-interactively: form the same decision card at each consequential decision, answer it with the strongest recommended option, record it in the design log, and return the completed draft plus the decision record, assumptions, validation, and any nondelegable release blockers.
 
 Allow mode changes at any time. In Co-design or Guided mode, stop when a required user decision is reached. In Rapid mode, consolidate answerable uncertainties for final faculty review, but stop immediately rather than proceeding when privacy, safety, or an external side effect requires prior authorization. In Auto mode, do not turn nondelegable boundaries into questions: apply the rules below and complete unaffected work.
 
@@ -41,15 +41,17 @@ Rapid and Auto are not aliases. Rapid delivers a provisional draft for one final
 
 ## Run Auto mode
 
-When Auto mode is selected:
+Auto is the co-design cycle with the educator's side answered by the skill: the checkpoints still occur, the artifacts they produce still get written, and only the presentation is removed. When Auto mode is selected:
 
 1. Infer the concrete goal from the request and supplied sources.
-2. Rank viable options by alignment, evidence quality, accessibility, fairness, feasibility, sustainability, and reversibility.
-3. Select the strongest overall recommendation; do not present an option menu or ask the educator to choose.
-4. Use conventional, low-risk defaults for missing details and label them as assumptions.
-5. Skip approval checkpoints and move from useful internal preview to full production.
-6. Run the applicable validation and correct authorized, unambiguous defects.
-7. Return the completed work first, followed by assumptions, validation performed, limitations, and any required owner review.
+2. Run the same cycle Co-design would run: at each consequential decision, form the decision card — the question, two or three options with their tradeoffs, and a recommendation — exactly as an interactive mode would present it.
+3. Answer the card yourself: rank the options by alignment, evidence quality, accessibility, fairness, feasibility, sustainability, and reversibility, and select the strongest overall recommendation. Do not present the card or ask the educator to choose.
+4. Record the card, the selected answer, and its rationale in `design-log.md`. A checkpoint that leaves no record was skipped, not answered, and the educator can no longer re-open it.
+5. Materialize every checkpoint artifact the interactive cycle would have presented — previews, storyboards, specifications — in its state file, marked provisional. Internal means unpresented, never unwritten.
+6. Use conventional, low-risk defaults for missing details and label them as assumptions.
+7. Leave a nondelegable card unanswered: record it as open with the recommendation and the required owner, never a selection.
+8. Run the applicable validation and correct authorized, unambiguous defects.
+9. Return the completed work first, followed by the decision record, assumptions, validation performed, limitations, and any required owner review.
 
 Auto mode does not supply authority that the user has not provided:
 
@@ -140,7 +142,7 @@ When the host client exposes a native structured-question or option-selection to
 
 When no native tool exists — plain chat in any assistant included — always end a consequential checkpoint with the suggested-replies line shown in the card template: short quoted tokens the educator can answer with a single reply, numbered to match the options exactly, plus "decide for me". This is the portable approximation of selection buttons; it works in any text client and removes the typing cost that makes educators skip checkpoints.
 
-Do not show decision cards in Auto mode. Apply the same comparison internally, select the recommendation, and record the rationale in the design log when consequential.
+Do not show decision cards in Auto mode. Form the same card, answer it by selecting the recommendation, and record the card, the selection, and the rationale in the design log when consequential; a nondelegable decision is recorded as open with its recommendation, never answered by inference.
 
 ## Manage assumptions
 
@@ -177,7 +179,7 @@ Move to full production after the preview is accepted, the owner delegates the d
 
 Acceptance is also **scoped**: approving a preview authorizes producing the artifact it previews, nothing more. State what the next turn will build if approved — the next piece, never "the full package". "Decide for me" delegates the current decision only. Producing the remaining artifact family on the strength of one approval is the silent slide into Rapid; skipping the remaining checkpoints requires the educator to say so, and that request is a named mode change, not an inference from enthusiasm.
 
-In Auto mode, use previews internally and proceed directly to full production; do not wait for acceptance.
+In Auto mode, still create each preview and record it in its state file marked provisional — internal means unpresented, never unwritten. Answer the preview's checkpoint by the Run Auto mode rules and proceed directly to full production; do not wait for acceptance.
 
 ## Keep updates compact
 

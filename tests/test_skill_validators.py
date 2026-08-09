@@ -2296,6 +2296,42 @@ class PackageContentTests(unittest.TestCase):
         self.assertIn("In Auto mode", rich_text)
         self.assertIn("without an approval checkpoint", rich_text)
 
+    def test_auto_mode_self_answers_the_co_design_cycle(self) -> None:
+        # Auto is the co-design cycle with the educator's side answered by the
+        # skill, not the cycle deleted: every consequential checkpoint leaves a
+        # card in the design log and every checkpoint artifact still reaches its
+        # state file. The prior wording let Auto skip the lesson storyboard,
+        # because its trigger ("benefits from review") dissolved once no review
+        # would occur.
+        skill_root = ROOT / "course-development-partner"
+        skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        interaction_text = (
+            skill_root / "references" / "interaction-protocol.md"
+        ).read_text(encoding="utf-8")
+        workflow_text = (skill_root / "references" / "design-workflow.md").read_text(
+            encoding="utf-8"
+        )
+        rich_text = (
+            skill_root / "references" / "rich-artifact-production.md"
+        ).read_text(encoding="utf-8")
+        checklists_text = (
+            skill_root / "references" / "validation-checklists.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("checkpoints answered internally rather than removed", skill_text)
+        self.assertIn("internal means unpresented, not unwritten", skill_text)
+        self.assertIn("in Rapid and Auto create it anyway", skill_text)
+        # The review-conditioned storyboard trigger is gone in every file.
+        self.assertNotIn("benefits from review", skill_text)
+        self.assertIn("Run the same cycle Co-design would run", interaction_text)
+        self.assertIn("skipped, not answered", interaction_text)
+        self.assertIn("Internal means unpresented, never unwritten", interaction_text)
+        self.assertIn("Leave a nondelegable card unanswered", interaction_text)
+        self.assertIn("recorded as provisional in Rapid and Auto", workflow_text)
+        self.assertIn(
+            "record it in `lesson-storyboard.md` marked provisional", rich_text
+        )
+        self.assertIn("recorded decision or an open item", checklists_text)
+
     def test_cognitive_demand_vocabulary_is_documented_where_it_is_used(self) -> None:
         skill_root = ROOT / "course-development-partner"
         contract_text = (skill_root / "references" / "state-contract.md").read_text(

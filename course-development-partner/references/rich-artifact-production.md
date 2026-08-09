@@ -69,7 +69,7 @@ Export a PDF only after the editable document passes its own review. Do not trea
 
 ## 4. Produce presentations
 
-Require instructor approval of the slide storyboard or equivalent narrative preview before deck production in interactive modes. In Auto mode, select and record the strongest recommended storyboard internally as provisional and proceed without presenting it for approval. Define the audience, communication job, learning sequence, and one narrative purpose for each slide.
+Require instructor approval of the slide storyboard or equivalent narrative preview before deck production in interactive modes. In Auto mode, select the strongest recommended storyboard, record it in `lesson-storyboard.md` marked provisional, log the choice as an answered checkpoint in `design-log.md`, and proceed without presenting it for approval. Define the audience, communication job, learning sequence, and one narrative purpose for each slide.
 
 Use a coherent visual system and varied layouts that serve the content. Keep audience-facing copy concise. Use editable text, tables, charts, and simple diagrams when possible. Put facilitation guidance, timing, answers, and source notes in instructor notes rather than student-facing slide content unless students need them.
 

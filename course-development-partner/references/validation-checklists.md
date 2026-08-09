@@ -143,6 +143,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Label student and instructor versions clearly.
 - Verify links, references, citations, and cross-references.
 - Confirm file names and manifest entries match.
+- Confirm a produced lesson, session, or narrative artifact at Project or Course tier has its storyboard or equivalent preview record on file. In interactive modes the educator's acceptance is that record; in Rapid and Auto every consequential checkpoint must appear in the design log as a recorded decision or an open item. A produced artifact with no checkpoint record is a finding: the checkpoint was skipped, not answered.
 - Record the last-reviewed date and unresolved issues.
 - Verify the editable source, final distribution artifact, renderer/playback evidence, accessibility review, and regeneration method agree with the artifact manifest.
 

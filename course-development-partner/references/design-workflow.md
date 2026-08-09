@@ -119,7 +119,7 @@ When appropriate, include retrieval, worked or contrasting examples, self-explan
 
 For collaborative work, define the reason collaboration improves this task, the team formation basis, an early team agreement, a process checkpoint before the final deliverable, equitable participation, individual accountability, interdependence, team-process support, and evidence of both individual and collective learning.
 
-Output: accepted sequence map or lesson storyboard.
+Output: sequence map or lesson storyboard — accepted by the educator in interactive modes, recorded as provisional in Rapid and Auto. The record is produced in every mode; only its acceptance is mode-dependent.
 
 ## 6. Add authentic context
 
