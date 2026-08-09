@@ -220,6 +220,23 @@ def check_does_not_produce_scatter(text: str) -> tuple[bool, str]:
     return True, "did not produce the requested scatter plot"
 
 
+# Naming an identifier word is not enough: the columns in this scenario are
+# literally called student_id and course_code, so any reply that echoes them —
+# including one that then plots them — contains "id" and "code". The
+# discriminating half is the claim that they are not measurements.
+IDENTIFIER_WORDS = (
+    "identifier", "ids", "id column", "id number", "code", "key", "label",
+    "nominal",
+)
+NON_MEASUREMENT_PHRASES = (
+    "not a measurement", "not measurements", "rather than measurements",
+    "rather than a measurement", "not quantitative", "not continuous",
+    "not measured", "no meaningful", "meaningless", "arbitrary",
+    "no numerical meaning", "no numeric meaning", "carry no", "not real values",
+    "not a quantity", "no inherent order",
+)
+
+
 def check_names_the_identifier_problem(text: str) -> tuple[bool, str]:
     """Two numeric columns are two columns, not two measurements.
 
@@ -228,15 +245,16 @@ def check_names_the_identifier_problem(text: str) -> tuple[bool, str]:
     not a finding.
     """
     lowered = text.lower()
-    hits = [
-        token
-        for token in ("identifier", "id number", "ids", "code", "key", "not a measure",
-                      "not measurements", "no meaningful", "meaningless", "arbitrary")
-        if token in lowered
-    ]
-    if hits:
-        return True, f"names the identifier problem ({hits[:3]})"
-    return False, "treated two numeric key columns as two measurements"
+    named = [token for token in IDENTIFIER_WORDS if token in lowered]
+    claimed = [token for token in NON_MEASUREMENT_PHRASES if token in lowered]
+    if not named:
+        return False, "never named the columns as identifiers or codes"
+    if not claimed:
+        return False, (
+            f"named them ({named[:3]}) but never said they are not measurements, "
+            "which any reply echoing student_id and course_code would also do"
+        )
+    return True, f"names the identifier problem ({claimed[:3]})"
 
 
 def check_names_the_missing_variable(text: str) -> tuple[bool, str]:
@@ -256,11 +274,15 @@ def check_names_the_missing_variable(text: str) -> tuple[bool, str]:
 def check_names_the_key_mismatch(text: str) -> tuple[bool, str]:
     """The key must use the same data and columns as the student version."""
     lowered = text.lower()
-    named = "force_n" in lowered or "solution key" in lowered or "key" in lowered
+    # Bare "key" is too easy — the prompt itself says "solution key". The reply
+    # has to reach the offending column or say the two documents disagree.
+    named = "force_n" in lowered or "solution key" in lowered
     flagged = any(
         token in lowered
-        for token in ("does not match", "mismatch", "different column", "inconsistent",
-                      "disagree", "not the same", "differs", "not present")
+        for token in ("does not match", "do not match", "don't match", "mismatch",
+                      "different column", "inconsistent", "disagree", "not the same",
+                      "differs", "not present", "does not contain", "never mentions",
+                      "never names", "cannot be used", "conflict")
     )
     if named and flagged:
         return True, "flags the key/worksheet column mismatch"
