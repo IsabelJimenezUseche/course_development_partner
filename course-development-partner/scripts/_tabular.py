@@ -12,7 +12,6 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-
 IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9][A-Za-z0-9_-]*$")
 REMOTE_SCHEMES = {"http", "https", "mailto", "data", "app", "plugin"}
 

@@ -8,14 +8,18 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+      # Pinned deliberately. Unpinned linters made this workflow's result depend
+      # on the day it ran: ruff's default rule set expanded between releases and
+      # failed a commit that had passed locally, with no change to this
+      # repository. Upgrading these is a commit someone reviews, not a surprise.
+      # openpyxl backs the XLSX path in validate_dataset.py; without it that code
+      # path is unexercised and the spreadsheet claim is untested.
       - name: Install lint and type tooling
-        # openpyxl backs the XLSX path in validate_dataset.py; without it that
-        # code path is unexercised and the spreadsheet claim is untested.
-        run: pip install ruff mypy openpyxl
+        run: pip install ruff==0.16.2 mypy==2.3.0 openpyxl==3.1.5
       # Discovery must run from the repository root: `-s tests` only resolves as a
       # path from here, and a stray top-level `tests` package in site-packages
       # would otherwise be discovered instead.
@@ -25,6 +29,8 @@ jobs:
         run: python tests/check_repository.py
       - name: Privacy audit
         run: python tests/audit_privacy.py
+      # The rule set lives in ruff.toml so both versions agree on what "clean"
+      # means; the pin above keeps the run reproducible.
       - name: Ruff
         run: ruff check course-development-partner/scripts tests
       - name: MyPy

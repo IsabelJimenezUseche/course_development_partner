@@ -14,8 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-from _tabular import fold_lookalikes, emit_report
-
+from _tabular import emit_report, fold_lookalikes
 
 REQUIRED_H2 = (
     "course context",

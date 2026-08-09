@@ -11,7 +11,6 @@ import unittest
 from pathlib import Path
 from typing import NamedTuple
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "course-development-partner" / "scripts"
 FIXTURES = ROOT / "tests" / "fixtures"
@@ -2173,35 +2172,67 @@ class RepositoryIntegrityTests(unittest.TestCase):
         sys.path.insert(0, str(ROOT / "tests"))
         import check_repository
 
+        expected = check_repository.actual_inventory()
         with zipfile.ZipFile(archive) as bundle:
-            packaged = {name for name in bundle.namelist() if not name.endswith("/")}
+            packaged = {
+                name: bundle.read(name)
+                for name in bundle.namelist()
+                if not name.endswith("/")
+            }
         self.assertEqual(
-            packaged,
-            set(check_repository.actual_inventory()),
+            set(packaged),
+            set(expected),
             "course-development-partner.zip does not match the package; rebuild it",
         )
+        # Same names with different bytes ships the same defect under a green check.
+        stale = [path for path in expected if (ROOT / path).read_bytes() != packaged[path]]
+        self.assertEqual(
+            stale, [], "course-development-partner.zip holds stale copies; rebuild it"
+        )
 
-    def test_stale_archive_is_reported(self) -> None:
-        """The check must fail on a zip missing a file, not just pass on a good one."""
+    def _archive_issues(self, build) -> list[str]:
         sys.path.insert(0, str(ROOT / "tests"))
         import check_repository
 
         original = check_repository.ARCHIVE
         with tempfile.TemporaryDirectory() as temp_dir:
-            import zipfile
-
-            stale = Path(temp_dir) / "stale.zip"
-            names = check_repository.actual_inventory()
-            with zipfile.ZipFile(stale, "w") as bundle:
-                for name in names[:-1]:
-                    bundle.writestr(name, "")
-            check_repository.ARCHIVE = stale
+            path = Path(temp_dir) / "candidate.zip"
+            build(check_repository, path)
+            check_repository.ARCHIVE = path
             try:
                 errors, issues = check_repository.check_package_archive()
             finally:
                 check_repository.ARCHIVE = original
         self.assertEqual(errors, [])
+        return issues
+
+    def test_archive_missing_a_file_is_reported(self) -> None:
+        """The check must fail on a bad zip, not just pass on a good one."""
+        import zipfile
+
+        def build(module, path: Path) -> None:
+            with zipfile.ZipFile(path, "w") as bundle:
+                for name in module.actual_inventory()[:-1]:
+                    bundle.write(ROOT / name, name)
+
+        issues = self._archive_issues(build)
         self.assertTrue(any("is missing packaged file" in item for item in issues), issues)
+
+    def test_archive_with_stale_contents_is_reported(self) -> None:
+        """Every expected name present, one file's bytes behind the source."""
+        import zipfile
+
+        def build(module, path: Path) -> None:
+            names = module.actual_inventory()
+            with zipfile.ZipFile(path, "w") as bundle:
+                for name in names:
+                    if name == names[0]:
+                        bundle.writestr(name, "outdated content")
+                    else:
+                        bundle.write(ROOT / name, name)
+
+        issues = self._archive_issues(build)
+        self.assertTrue(any("holds a stale copy of" in item for item in issues), issues)
 
     def test_inventory_drift_returns_two(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

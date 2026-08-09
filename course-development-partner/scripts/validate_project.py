@@ -33,7 +33,6 @@ from _tabular import (
     parse_iso_date,
 )
 
-
 INDEX_REQUIRED = (
     "state file",
     "purpose",

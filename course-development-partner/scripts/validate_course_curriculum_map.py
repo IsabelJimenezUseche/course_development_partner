@@ -26,7 +26,6 @@ from _tabular import (
     parse_positive_finite,
 )
 
-
 REQUIRED = (
     "sequence",
     "module/week",

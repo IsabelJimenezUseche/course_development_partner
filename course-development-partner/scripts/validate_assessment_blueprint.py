@@ -15,9 +15,9 @@ import sys
 from pathlib import Path
 
 from _tabular import (
-    emit_report,
     COGNITIVE_DEMANDS,
     cognitive_demand_vocabulary,
+    emit_report,
     find_cycles,
     load_table,
     normalize,
@@ -28,7 +28,6 @@ from _tabular import (
     parse_nonnegative_finite,
     parse_positive_finite,
 )
-
 
 REQUIRED = (
     "item id",

@@ -25,7 +25,6 @@ from _tabular import (
     parse_iso_date,
 )
 
-
 REQUIRED = (
     "artifact id",
     "artifact type",

@@ -16,7 +16,6 @@ import zipfile
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = ROOT / "course-development-partner"
 DEFAULT_INVENTORY = ROOT / "tests" / "package-inventory.txt"
@@ -97,28 +96,39 @@ def check_package_archive() -> tuple[list[str], list[str]]:
     means it ships whatever it last contained. Nothing else in this checker
     looks inside it, so a zip built before a reference or validator was added
     passes every other gate while shipping a package without it.
+
+    Membership is not enough: a zip holding every expected filename with stale
+    contents ships the same defect under a passing check, which is how an
+    autofix pass over two validators slipped through the first version of this
+    function. Compare the bytes.
     """
     if not ARCHIVE.is_file():
         return [], []
     try:
         with zipfile.ZipFile(ARCHIVE) as archive:
             packaged = {
-                str(ROOT / name)
+                name: archive.read(name)
                 for name in archive.namelist()
                 if not name.endswith("/")
             }
     except (OSError, zipfile.BadZipFile) as exc:
         return [f"Cannot read {ARCHIVE.name}: {exc}"], []
 
-    expected = {str(ROOT / path) for path in actual_inventory()}
+    expected = set(actual_inventory())
     issues = [
-        f"{ARCHIVE.name} is missing packaged file: {Path(path).relative_to(ROOT)}"
-        for path in sorted(expected - packaged)
+        f"{ARCHIVE.name} is missing packaged file: {path}"
+        for path in sorted(expected - set(packaged))
     ]
     issues.extend(
-        f"{ARCHIVE.name} contains unpackaged file: {Path(path).relative_to(ROOT)}"
-        for path in sorted(packaged - expected)
+        f"{ARCHIVE.name} contains unpackaged file: {path}"
+        for path in sorted(set(packaged) - expected)
     )
+    for path in sorted(expected & set(packaged)):
+        try:
+            if (ROOT / path).read_bytes() != packaged[path]:
+                issues.append(f"{ARCHIVE.name} holds a stale copy of: {path}")
+        except OSError as exc:
+            return [f"Cannot read {path}: {exc}"], issues
     if issues:
         issues.append(
             f"Rebuild it: rm -f {ARCHIVE.name} && zip -r -X {ARCHIVE.name} "

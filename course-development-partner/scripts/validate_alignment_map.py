@@ -14,8 +14,8 @@ import sys
 from pathlib import Path
 
 from _tabular import (
-    emit_report,
     cognitive_demand_vocabulary,
+    emit_report,
     load_table,
     normalize,
     normalized_mapping,
@@ -23,7 +23,6 @@ from _tabular import (
     parse_cognitive_demand,
     parse_identifier_list,
 )
-
 
 REQUIRED = (
     "outcome id",
