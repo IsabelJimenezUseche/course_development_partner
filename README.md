@@ -18,6 +18,7 @@ The skill is designed for skills-compatible agents and portable Markdown handoff
 - Interactive rubric construction and calibration
 - Team learning, peer evaluation, and individual-versus-team evidence
 - Teaching-assistant and grader preparation, and class-size adaptation
+- Data-based activities, with the requested operation executed on the exact supplied dataset before release
 - Worksheets, study guides, slide storyboards, visuals, surveys, and communications
 - Review of legacy teaching materials
 - Technical, pedagogical, accessibility, fairness, and artifact validation
@@ -36,6 +37,12 @@ The core design chain is:
 Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint validator reports an outcome whose entire active assessment sample falls below its aligned demand, while allowing lower-demand scaffolding items.
 
 Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Disciplines outside those profiles use the general workflow; no discipline-specific authenticity profile exists for them yet, and the skill does not claim one. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval, and every teaching-ready artifact must declare a safety review in its manifest or state that none is required.
+
+Any activity that hands students a dataset must hold this chain end to end:
+
+> exact dataset → requested operation or representation → expected student output → intended interpretation
+
+The failure this prevents is specific: an activity that reads well, names plausible variables, and cannot be done with the data supplied — a scatter plot asked of one-row-per-category totals, which support a bar chart and nothing else. Students find it in class and the instructor has no fallback. So the operation is executed on the real file before release, never on a description of it, and the check is written to `data-task-record.md` where `scripts/validate_data_task_record.py` re-runs it against the dataset it names. A validation token with no record behind it is treated as an unverified claim rather than a passing check: a row whose fit claim cannot be re-executed is a gap, because an unverifiable claim and a false one read the same way.
 
 The skill also:
 
@@ -64,9 +71,11 @@ The skill also:
 | **Co-design — default** | Uses frequent, focused checkpoints on each consequential decision. |
 | **Guided** | Requests instructor review at major phase boundaries. |
 | **Rapid** | Produces the complete provisional draft in one pass without intermediate checkpoints, then requests one consolidated faculty review. |
-| **Auto** | Works without faculty checkpoints, selects the strongest recommended option, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
+| **Auto** | Runs the same cycle as Co-design with the checkpoints answered internally rather than removed: it forms each decision card, selects the strongest recommended option, records the card and its rationale, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
 
-Co-design is the skill's defining experience and its non-blocking default: it works like a design partner beside the educator — one consequential decision at a time, small visible drafts, each answer shaping the next piece — rather than collecting requirements at intake and returning a finished product. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review; Auto removes faculty interaction and chooses the best-supported path. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it completes unaffected work and marks those portions provisional or blocked instead.
+Co-design is the skill's defining experience and its non-blocking default: it works like a design partner beside the educator — one consequential decision at a time, small visible drafts, each answer shaping the next piece — rather than collecting requirements at intake and returning a finished product. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review.
+
+Auto removes the educator's turn, not the checkpoint. It forms the same decision card an interactive mode would present, answers it by ranking the options on alignment, evidence quality, accessibility, fairness, feasibility, sustainability, and reversibility, and writes the card, the selection, and the rationale down — because a checkpoint that leaves no record was skipped rather than answered, and the educator can no longer re-open it. Internal means unpresented, never unwritten. The engagement tier decides where that record lives (inline with the deliverable at Focused tier, in state files at Project and Course), never whether one exists. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it records those as open with a recommendation and completes the unaffected work.
 
 ## Educational-design workflow
 
@@ -132,7 +141,9 @@ The skill never infers an institution-specific accessibility rule from an instit
 
 ## Visual design
 
-When no authoritative template or visual system is supplied, the skill can suggest an optional example palette organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray (`#C4BFC0`), and white (`#FFFFFF`). These values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic roles with verified contrast pairs; the skill states that provenance when offering them, implies no endorsement by or affiliation with that institution, and recommends substituting the user's own institutionally authorized system. It provides calculated high-contrast pairings, uses color only as a supplementary cue, requires final rendered inspection, and never implies institutional brand approval or adds protected marks or proprietary assets without authorization.
+A supplied authoritative design system always governs. When none is supplied, the visual system is treated as a consequential choice rather than a detail left to improvisation: in Co-design and Guided the skill asks which system applies and recommends the example palette below; in Rapid and Auto it applies that palette and records the choice as provisional. The educator remains free to decline or replace it, but the skill never invents a different color scheme in any mode — an ad-hoc palette is a failure, and so is presenting the example as merely optional and then applying nothing.
+
+The example palette is organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray (`#C4BFC0`), and white (`#FFFFFF`). These values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic roles with verified contrast pairs; the skill states that provenance whenever it offers them, implies no endorsement by or affiliation with that institution, and recommends substituting the user's own institutionally authorized system. It provides calculated high-contrast pairings, uses color only as a supplementary cue, requires final rendered inspection, and never implies institutional brand approval or adds protected marks or proprietary assets without authorization.
 
 ## Privacy and responsible use
 
@@ -148,13 +159,23 @@ When no authoritative template or visual system is supplied, the skill can sugge
 ```text
 course_development_partner/
 ├── README.md
+├── ruff.toml                      # Lint rule set, pinned independently of the ruff version
 ├── course-development-partner/    # Installable skill directory
 │   ├── SKILL.md
 │   ├── agents/
 │   ├── assets/
 │   ├── references/
 │   └── scripts/
+├── course-development-partner.zip # The same directory, packaged for upload
+├── .github/workflows/             # Tests, repository checks, privacy audit, lint, types
 └── tests/
+```
+
+`course-development-partner.zip` is a tracked build artifact, not a source of truth. `tests/check_repository.py` compares its contents byte for byte against the package and fails when it lags, because a zip carrying the right filenames with stale contents ships the same defect under a passing check. Rebuild it after changing anything under `course-development-partner/`:
+
+```bash
+rm -f course-development-partner.zip
+zip -r -X course-development-partner.zip course-development-partner -x '*.DS_Store'
 ```
 
 The GitHub repository uses an underscore in its name, while the installable skill directory and frontmatter use the standards-compliant hyphenated name `course-development-partner`.
