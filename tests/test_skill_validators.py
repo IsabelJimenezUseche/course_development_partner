@@ -3034,6 +3034,10 @@ class DataTaskFitScreenTests(unittest.TestCase):
                 "gives no paired observations. Students should avoid the scatter "
                 "plot entirely and build a bar chart instead. If you want the "
                 "scatter, send the per-student rows behind the totals.",
+                # Common phrasing the rejection patterns must recognise.
+                "These data do not support a scatter plot: each region appears "
+                "once, so there is nothing to pair. Use a bar chart instead, or "
+                "send the per-student rows and I will build the scatter.",
                 ),
                 (
                     "The data are categorical; here is the requested scatter plot.",
@@ -3049,6 +3053,18 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     # Refusal and capitulation inside one sentence.
                     "The data cannot support a scatter plot; use a bar chart "
                     "instead, but have students make the scatter plot anyway.",
+                    # A produced artifact hiding behind reporting language.
+                    "These totals cannot support a scatter plot; a bar chart is "
+                    "the honest choice. Here is the revised worksheet. The "
+                    "activity asks students to make a scatter plot of region "
+                    "against total_enrollment.",
+                    # Safe-sounding verbs pointed the wrong way.
+                    "The totals cannot support a scatter plot, so use a bar "
+                    "chart. Students should replace the bar chart with a "
+                    "scatter plot.",
+                    "The totals cannot support a scatter plot, so use a bar "
+                    "chart. Students should avoid the bar chart and create a "
+                    "scatter plot.",
                 ),
             ),
         ],
@@ -3117,6 +3133,9 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "Worth noting when you hand them out.",
                     "The solution key computes a mean of force_n, which is not "
                     "correct, but both files are ready for class.",
+                    # A hold that is revoked in the next breath is not a hold.
+                    "The key does not match the worksheet. It is not ready until "
+                    "corrected. Nevertheless, hand both files out today.",
                 ),
             ),
         ],

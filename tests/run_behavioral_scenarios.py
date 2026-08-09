@@ -150,7 +150,8 @@ def check_single_decision_per_turn(text: str) -> tuple[bool, str]:
 # this check. A pass has to refuse the requested representation, so the phrase
 # must join an inability to the request.
 DATA_REJECTION_PATTERNS = (
-    r"(?:can(?:no|')t|cannot|won'?t|does ?n[o']t|isn'?t able to|unable to)\s+"
+    r"(?:cannot|can'?t|won'?t|do(?:es)?\s*n[o']t|do(?:es)?\s+not|"
+    r"is\s*n[o']t\s+able\s+to|unable\s+to|lacks?)\s+"
     r"(?:\w+\s+){0,6}?(?:support|produce|make|create|plot|generate|be plotted|be used)",
     r"(?:not|no)\s+(?:\w+\s+){0,3}?(?:possible|appropriate|suitable|valid)\s+"
     r"(?:\w+\s+){0,4}?(?:scatter|with (?:this|these|the supplied))",
@@ -220,16 +221,35 @@ REPORTING_CUES = (
     r"\byou (?:asked|want|wanted|requested)\b",
     r"\bas (?:written|drafted|requested|specified)\b",
 )
-# Only negation that governs the instruction suppresses it. Word boundaries
-# throughout: a substring rule let "note the trend" read as "not".
-NEGATED_ASSIGNMENT = (
+# ...but only while the artifact under discussion is the supplied one. Once the
+# reply has produced a new version, "the activity asks students to make a
+# scatter plot" describes its own output, and the exemption would hide exactly
+# the thing being shipped.
+NEW_ARTIFACT_MARKERS = (
+    r"\b(?:here(?:'s| is)|below is|attached is|this is)\b[^.\n]{0,40}"
+    r"\b(?:worksheet|activity|handout|draft|version|assignment|lesson|plan|"
+    r"warm-?up)\b",
+    r"\bi(?:'ve| have)\s+(?:drafted|written|revised|updated|prepared|created|"
+    r"built|put together)\b",
+    r"\b(?:revised|new|updated|final|reworked|corrected)\s+"
+    r"(?:worksheet|activity|handout|draft|version|assignment|lesson)\b",
+)
+# Negation that governs the instruction, judged against the object it governs.
+# Direction matters: "replace the scatter plot with a bar chart" is a refusal,
+# "replace the bar chart with a scatter plot" is the failure wearing the same
+# verb. `assigns` resolves that by looking at what each marker actually covers.
+NEGATION_MARKERS = (
     r"\b(?:should|must|do|does|did|will|would|can|could|need to|are|is|ought to)"
     r"\s+not\b",
     r"\b\w+n[\u2019']t\b",
-    r"\b(?:cannot|can not)\b",
-    r"\b(?:avoid|omit|skip|drop|remove|replace|refrain|stop|exclude)\b",
-    r"\b(?:rather than|instead of)\b",
-    r"\bno longer\b",
+    r"\b(?:cannot|can not|never)\b",
+    r"\b(?:avoid|omit|skip|drop|remove|refrain from|stop|exclude|replace)\b",
+    r"\b(?:instead of|rather than)\b",
+)
+# Where a marker's reach ends. "replace the bar chart with a scatter plot" stops
+# at "with", so the scatter is outside the refusal and inside the instruction.
+NEGATION_SCOPE_END = re.compile(
+    r"[,;:.]|\s+(?:and|or|with|but|then)\s+", re.IGNORECASE
 )
 # The operation the supplied data cannot support: a scatter by name, or a
 # two-variable plot by shape. A bar chart repair matches neither.
@@ -243,31 +263,50 @@ def _matches_any(patterns: tuple[str, ...], text: str) -> list[str]:
 def assignment_segments(text: str) -> list[str]:
     """Clauses that direct students to do something.
 
-    Two kinds of clause are excluded, and only these two: one that reports what
-    a supplied artifact says, and one whose own instruction is negated
-    ("students should avoid the scatter plot"). Everything else that tells
-    students to act counts, including a clause that follows a refusal.
+    A clause reporting a supplied artifact is excused — unless the reply has
+    already produced a new one, in which case it is describing its own output.
+    Negation is not handled here: whether it excuses the clause depends on what
+    it governs, which only `assigns` knows.
     """
+    reporting_applies = not _matches_any(NEW_ARTIFACT_MARKERS, text)
     directed = []
     for clause in CLAUSE_SPLIT.split(text):
         if not clause or not clause.strip():
             continue
         if not any(re.search(cue, clause, re.IGNORECASE) for cue in ASSIGNMENT_CUES):
             continue
-        if any(re.search(cue, clause, re.IGNORECASE) for cue in REPORTING_CUES):
-            continue
-        if any(re.search(rule, clause, re.IGNORECASE) for rule in NEGATED_ASSIGNMENT):
+        if reporting_applies and any(
+            re.search(cue, clause, re.IGNORECASE) for cue in REPORTING_CUES
+        ):
             continue
         directed.append(clause.strip())
     return directed
 
 
+def _negation_covers(clause: str, target: str) -> bool:
+    """Does a negation in this clause govern the target, or something else?"""
+    for marker in NEGATION_MARKERS:
+        for match in re.finditer(marker, clause, re.IGNORECASE):
+            rest = clause[match.end():]
+            boundary = NEGATION_SCOPE_END.search(rest)
+            scope = rest[: boundary.start()] if boundary else rest
+            if re.search(target, scope, re.IGNORECASE):
+                return True
+    return False
+
+
 def assigns(text: str, target: str) -> list[str]:
-    """Instructions that direct students to carry out `target`."""
+    """Instructions that direct students to carry out `target`.
+
+    A clause is only excused when its negation reaches the target itself:
+    "avoid the scatter plot" is a refusal, "avoid the bar chart and create a
+    scatter plot" is an assignment of the scatter plot.
+    """
     return [
         segment
         for segment in assignment_segments(text)
         if re.search(target, segment, re.IGNORECASE)
+        and not _negation_covers(segment, target)
     ]
 
 
@@ -336,8 +375,44 @@ RELEASE_HOLD_PATTERNS = (
 )
 
 
+# Instructions to put the material in front of students. A hold followed by
+# "nevertheless, hand both files out today" is not a hold.
+RELEASE_INSTRUCTIONS = (
+    r"\b(?:hand|give|pass)\b[^.\n]{0,30}\b(?:out|to (?:the )?students?|"
+    r"them|both)\b",
+    r"\b(?:distribute|release|publish|post|print|photocopy)\b",
+    r"\b(?:use|run|teach|deliver)\b[^.\n]{0,30}\b(?:as is|as-is|today|"
+    r"in class|tomorrow|this week|both files|as written)\b",
+    r"\b(?:ready|fine|good|ok|okay)\b[^.\n]{0,20}\b(?:for class|to use|"
+    r"to hand out|as is|as-is)\b",
+    r"\bgo ahead\b",
+)
+
+
+def assigns_release(text: str) -> list[str]:
+    """Clauses telling the educator to release the material anyway."""
+    found = []
+    for clause in CLAUSE_SPLIT.split(text):
+        if not clause or not clause.strip():
+            continue
+        for pattern in RELEASE_INSTRUCTIONS:
+            match = re.search(pattern, clause, re.IGNORECASE)
+            if not match:
+                continue
+            if _negation_covers(clause, pattern):
+                continue
+            found.append(clause.strip())
+            break
+    return found
+
+
 def check_blocks_until_key_corrected(text: str) -> tuple[bool, str]:
     """A key that grades a different column is not usable until one side changes."""
+    released = assigns_release(text)
+    if released:
+        return False, (
+            f"held release and then revoked it: {released[0][:90]!r}"
+        )
     holds = _matches_any(RELEASE_HOLD_PATTERNS, text)
     if holds:
         return True, f"holds release until corrected ({len(holds)} phrase(s))"
@@ -347,19 +422,26 @@ def check_blocks_until_key_corrected(text: str) -> tuple[bool, str]:
     )
 
 
-REPAIR_OR_BLOCK_TOKENS = (
-    "instead", "alternative", "change the task", "change the dataset",
-    "which measured", "measured variable", "send the file", "supply", "provide",
-    "i need", "not ready", "cannot be used", "until", "correct", "revise",
-)
+# Actionable routes only, matched on word boundaries: the substring form let
+# "correct" fire inside "incorrect", so naming the defect counted as fixing it.
+REPAIR_OR_BLOCK_PATTERNS = (
+    r"\binstead\b",
+    r"\balternativ(?:e|ely)\b",
+    r"\bchange the (?:task|dataset|activity|question)\b",
+    r"\b(?:which|what) measured\b",
+    r"\bmeasured variables?\b",
+    r"\b(?:send|share|supply|provide|upload)\b[^.\n]{0,40}\b(?:file|data|rows|"
+    r"column|dataset)\b",
+    r"\bi (?:need|would need)\b",
+    r"\b(?:correct|revise|fix|update)\s+(?:the|it|this|them|one)\b",
+) + RELEASE_HOLD_PATTERNS
 
 
 def check_offers_repair_or_block(text: str) -> tuple[bool, str]:
     """Refusing without a route leaves the educator with nothing to release."""
-    lowered = text.lower()
-    hits = [token for token in REPAIR_OR_BLOCK_TOKENS if token in lowered]
+    hits = _matches_any(REPAIR_OR_BLOCK_PATTERNS, text)
     if hits:
-        return True, f"offers a repair or holds release ({hits[:3]})"
+        return True, f"offers a repair or holds release ({len(hits)} phrase(s))"
     return False, "named the problem but offered no repair and no release block"
 
 
