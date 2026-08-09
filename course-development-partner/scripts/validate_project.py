@@ -22,6 +22,7 @@ import validate_course_curriculum_map
 import validate_data_task_record
 import validate_design_state
 import validate_handoff_state
+import validate_release_record
 from _tabular import (
     emit_report,
     load_table,
@@ -59,6 +60,30 @@ PROFILE_REQUIRED_STATE = {
         "capability-manifest.md",
     },
 }
+# Every recognized portable-state filename. The state contract requires each
+# active one to appear in the project index; without this list the validator
+# only ever sees the files it was already told about, so omitting a record from
+# the index is a way to skip its checks entirely.
+RECOGNIZED_STATE = frozenset(
+    {
+        "accessibility-review.md",
+        "alignment-map.md",
+        "artifact-manifest.md",
+        "assessment-blueprint.md",
+        "capability-manifest.md",
+        "context-brief.md",
+        "course-curriculum-map.md",
+        "course-design-brief.md",
+        "data-task-record.md",
+        "design-log.md",
+        "implementation-evidence-plan.md",
+        "implementation-plan.md",
+        "lesson-storyboard.md",
+        "production-plan.md",
+        "safety-review.md",
+        "source-register.md",
+    }
+)
 TIER_REQUIRED_STATE = {
     "project": set(),
     "course": {"course-curriculum-map.md"},
@@ -212,6 +237,91 @@ def check_data_task_fit(
         f"{identifier}"
         for identifier in sorted(recorded_ids - active_ids)
     )
+    return [], issues
+
+
+def check_unindexed_state(project: Path, indexed: dict[str, Path]) -> list[str]:
+    """Report recognized state files present in the project but absent from the index.
+
+    Validation reaches a file through the index, so an unindexed record is an
+    unchecked one: a model can write an assessment blueprint or a safety review,
+    leave it out of the index, and skip every rule that would have applied to it.
+    """
+    issues: list[str] = []
+    known = {path.resolve() for path in indexed.values()}
+    for candidate in sorted(project.rglob("*.md")):
+        if candidate.name not in RECOGNIZED_STATE:
+            continue
+        try:
+            if candidate.resolve() in known:
+                continue
+        except (OSError, RuntimeError):
+            continue
+        issues.append(
+            f"{candidate.relative_to(project)} is a portable-state file that no "
+            "active project-index row lists; index it or mark it not-applicable "
+            "with a rationale"
+        )
+    return issues
+
+
+def check_referenced_release_records(
+    project: Path, manifest_path: Path
+) -> tuple[list[str], list[str]]:
+    """Validate the records a teaching-ready row cites as its release evidence.
+
+    The manifest can only check that a reference looks like a file and that the
+    file exists. Neither says anything was reviewed, so a blank copied template
+    supported teaching-ready status until this ran.
+    """
+    required = validate_artifact_manifest.REQUIRED
+    try:
+        _, headers, rows = load_table(manifest_path, required)
+        mapping = normalized_mapping(headers, required)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return [f"artifact-manifest.md: {exc}"], []
+
+    kinds = {
+        "safety review": "safety-review",
+        "accessibility review": "accessibility-review",
+        "production plan": "production-plan",
+    }
+    issues: list[str] = []
+    seen: set[tuple[Path, str]] = set()
+    for raw in rows:
+        row = normalized_row(raw, mapping)
+        if normalize(row["status"]) != "teaching-ready":
+            continue
+        label = row["artifact id"] or "row"
+        for column, kind in kinds.items():
+            reference = row[column]
+            if not reference or validate_artifact_manifest.is_reference_state(reference):
+                continue
+            if validate_artifact_manifest.is_not_applicable(reference):
+                continue
+            try:
+                target = local_reference_path(reference, manifest_path.parent)
+            except (OSError, RuntimeError) as exc:
+                issues.append(f"{label}: cannot resolve {column}: {exc}")
+                continue
+            if target is None or target.suffix.casefold() != ".md":
+                # A PDF or a URL may well be the authoritative review, but a
+                # filename is not an approval. The project needs a record here
+                # that cites it and carries the decision.
+                issues.append(
+                    f"{label}: {column} {reference} cannot be checked; a "
+                    f"teaching-ready row needs a local {kind}.md recording the "
+                    "decision, which may cite the external document"
+                )
+                continue
+            if not target.is_file():
+                continue
+            key = (target.resolve(), kind)
+            if key in seen:
+                continue
+            seen.add(key)
+            record_errors, record_issues = validate_release_record.validate(target, kind)
+            issues.extend(f"{label}: {item}" for item in record_errors + record_issues)
     return [], issues
 
 
@@ -424,6 +534,15 @@ def validate_project(
         "data-task-record.md": lambda path: validate_data_task_record.validate(
             path, project
         ),
+        "safety-review.md": lambda path: validate_release_record.validate(
+            path, "safety-review"
+        ),
+        "accessibility-review.md": lambda path: validate_release_record.validate(
+            path, "accessibility-review"
+        ),
+        "production-plan.md": lambda path: validate_release_record.validate(
+            path, "production-plan"
+        ),
         "design-log.md": lambda path: validate_handoff_state.validate(
             path, "design-log", design_profile == "handoff"
         ),
@@ -453,6 +572,16 @@ def validate_project(
     )
     errors.extend(fit_errors)
     issues.extend(fit_issues)
+
+    issues.extend(check_unindexed_state(project, active))
+
+    manifest_path = active.get("artifact-manifest.md")
+    if manifest_path is not None:
+        release_errors, release_issues = check_referenced_release_records(
+            project, manifest_path
+        )
+        errors.extend(release_errors)
+        issues.extend(release_issues)
 
     if errors or alignment_path is None:
         return errors, issues

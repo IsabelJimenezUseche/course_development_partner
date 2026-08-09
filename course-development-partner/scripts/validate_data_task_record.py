@@ -97,11 +97,24 @@ def parse_args() -> argparse.Namespace:
         epilog=(
             "Examples:\n"
             "  validate_data_task_record.py data-task-record.md\n"
-            "  validate_data_task_record.py data-task-record.md --json"
+            "  validate_data_task_record.py data-task-record.md --json\n"
+            "  validate_data_task_record.py project/state/data-task-record.md "
+            "--root project"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", type=Path, help="Path to data-task-record.md")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help=(
+            "Project directory recorded paths must stay inside. Defaults to the "
+            "record's own directory, which rejects a dataset stored anywhere "
+            "else in the project; a caller invoking this file standalone "
+            "outside validate_project.py should pass the true project root."
+        ),
+    )
     parser.add_argument(
         "--json",
         action="store_true",
@@ -429,7 +442,7 @@ def validate(path: Path, root: Path | None = None) -> tuple[list[str], list[str]
 
 def main() -> int:
     args = parse_args()
-    errors, issues = validate(args.path)
+    errors, issues = validate(args.path, args.root)
     return emit_report(
         args.path,
         errors,

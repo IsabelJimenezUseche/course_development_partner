@@ -56,6 +56,71 @@ PROFILE_REQUIRED_FIELDS = {
 }
 VALID_ENGAGEMENT_TIERS = {"focused", "project", "course"}
 
+# Handoff is where a brief stops being a working document and becomes the thing
+# the next person relies on. These fields change what may be built and how it may
+# be graded, so at handoff each needs an answer of some kind — a real value, an
+# explicit not-applicable with a reason, or a named owner it is waiting on. A
+# blank is none of those; it reads as "nobody considered this".
+HANDOFF_SECTIONS = (
+    "team and collaborative work",
+    "safety authority when physical hazards are involved",
+)
+HANDOFF_CONSEQUENTIAL = (
+    "student population",
+    "delivery mode",
+    "required technical accessibility target",
+    "permitted collaboration, resources, and ai use",
+    "how scores combine into a course grade",
+    "revision, resubmission, retake, or replacement policy",
+    "student workload expectation",
+)
+# Yes/no fields whose answer decides whether a whole block below applies.
+CONDITIONAL_HANDOFF = (
+    (
+        "physical hazards present",
+        (
+            "responsible safety owner and role",
+            "governing institutional safety document, version, and date",
+            "approval status before student use",
+        ),
+    ),
+    (
+        "collaborative or team work required",
+        (
+            "team formation basis and rationale",
+            "how team and individual performance each reach the grade",
+            "peer-evaluation instrument and its bounded grade effect",
+            "escalation path for non-participation or conflict",
+        ),
+    ),
+)
+NOT_APPLICABLE = re.compile(r"^not applicable\s*[—-]\s*\S.+", re.IGNORECASE)
+AWAITING_OWNER = re.compile(r"^not yet supplied by\s+\S.+", re.IGNORECASE)
+TEMPLATE_CHOICE = re.compile(r"^[\w\s/-]+(?:\s*\|\s*[\w\s/-]+)+$")
+
+
+def is_answered(value: str) -> bool:
+    """A real value, an explicit not-applicable, or a named owner it awaits."""
+    stripped = value.strip()
+    if not stripped:
+        return False
+    if TEMPLATE_CHOICE.match(stripped):
+        # "yes | no | undecided" is the prompt still sitting there.
+        return False
+    if stripped.startswith("[") and stripped.endswith("]"):
+        return False
+    return bool(
+        NOT_APPLICABLE.match(stripped)
+        or AWAITING_OWNER.match(stripped)
+        or len(stripped) > 1
+    )
+
+
+def decided_yes_no(value: str) -> str | None:
+    """`yes`/`no` only; `undecided` and the untouched prompt are neither."""
+    token = value.strip().casefold()
+    return token if token in {"yes", "no"} else None
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -205,6 +270,45 @@ def validate_detailed(
             f"{len(deferred) - 8} further fields are unanswered and not required "
             f"for {profile}"
         )
+
+    if profile == "handoff":
+        for heading in HANDOFF_SECTIONS:
+            if (2, heading) not in counts:
+                errors.append(f"Missing required level-2 heading: {heading}")
+        for name in HANDOFF_CONSEQUENTIAL:
+            located = located_fields.get(name)
+            if located is None:
+                incomplete.append(f"Handoff requires the field: {name}")
+            elif not is_answered(located[0]):
+                incomplete.append(
+                    f"Handoff leaves a consequential field unanswered on line "
+                    f"{located[1]}: {name}. Give a value, `not applicable — reason`, "
+                    "or `not yet supplied by [owner]` and record it under Open"
+                )
+        for trigger, dependents in CONDITIONAL_HANDOFF:
+            located = located_fields.get(trigger)
+            if located is None:
+                incomplete.append(f"Handoff requires the field: {trigger}")
+                continue
+            answer = decided_yes_no(located[0])
+            if answer is None:
+                incomplete.append(
+                    f"Handoff needs a yes or no on line {located[1]}: {trigger}"
+                )
+                continue
+            if answer != "yes":
+                continue
+            for name in dependents:
+                dependent = located_fields.get(name)
+                if dependent is None:
+                    incomplete.append(
+                        f"{trigger} is yes, so the brief requires the field: {name}"
+                    )
+                elif not is_answered(dependent[0]):
+                    incomplete.append(
+                        f"{trigger} is yes, so line {dependent[1]} must be answered: "
+                        f"{name}"
+                    )
 
     for heading in REQUIRED_H3:
         body = section_body(text, heading, 3)

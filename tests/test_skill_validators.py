@@ -1585,6 +1585,10 @@ class ProjectValidatorTests(unittest.TestCase):
 - Technology and format: Markdown.
 ## Implementation load
 - Minimum viable fallback: Printable activity.
+## Team and collaborative work
+- Collaborative or team work required: no
+## Safety authority when physical hazards are involved
+- Physical hazards present: no
 ## Collaboration
 - Interaction level: Co-design
 - Requested artifacts: Student worksheet.
@@ -1759,6 +1763,78 @@ class ProjectValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("is not active in artifact-manifest.md", result.stdout)
+
+    def test_unindexed_state_file_is_reported(self) -> None:
+        """Validation reaches a file through the index; an unindexed one is unchecked."""
+        index = """# Project Index
+- Schema version: 1.0
+- Engagement tier: Project
+| State file | Purpose | Authority/owner | Schema version | Status | Last updated | Notes |
+|---|---|---|---|---|---|---|
+| course-design-brief.md | design authority | course owner | 1.0 | approved | 2026-08-01 | current |
+| alignment-map.md | alignment authority | course owner | 1.0 | approved | 2026-08-01 | current |
+"""
+        result = run_project(
+            {
+                "project-index.md": index,
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                # Written into the project, left out of the index.
+                "assessment-blueprint.md": "# Assessment Blueprint\n- Schema version: 1.0\n",
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("no active project-index row lists", result.stdout)
+
+    def test_teaching_ready_row_cannot_cite_a_blank_safety_review(self) -> None:
+        """A copied template satisfies "the file exists" and reviews nothing."""
+        index = self.DATA_INDEX.replace(
+            "| artifact-manifest.md | artifact authority | course owner | 1.0 | review | 2026-08-01 | current |\n",
+            "| artifact-manifest.md | artifact authority | course owner | 1.0 | review | 2026-08-01 | current |\n"
+            "| safety-review.md | safety authority | safety owner | 1.0 | draft | 2026-08-01 | current |\n",
+        )
+        blank = (
+            ROOT / "course-development-partner" / "assets" / "safety-review.md"
+        ).read_text(encoding="utf-8")
+        manifest = """# Artifact Manifest
+- Schema version: 1.0
+| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | ws.md | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | none | 2026-08-09 | not required | https://example.edu/a11y | safety-review.md | not applicable — no dataset |
+"""
+        result = run_project(
+            {
+                "project-index.md": index,
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": manifest,
+                "safety-review.md": blank,
+                "ws.md": "# Worksheet\n",
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("approved for student use is undecided", result.stdout)
+
+    def test_external_review_reference_needs_a_local_record(self) -> None:
+        """A filename is not an approval, so a PDF alone cannot carry the decision."""
+        manifest = """# Artifact Manifest
+- Schema version: 1.0
+| Artifact ID | Artifact type | Artifact family | Variant | Required variants | File or reference | Audience | Outcome(s) | Status | Validation completed | Blockers/open issues | Last reviewed | Production plan | Accessibility review | Safety review | Data-task-fit evidence |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WS-1 | markdown |  |  |  | ws.md | student | LO-1 | teaching-ready | technical; alignment; accessibility; reopen | none | 2026-08-09 | not required | ehs-approval.pdf | not required | not applicable — no dataset |
+"""
+        result = run_project(
+            {
+                "project-index.md": self.DATA_INDEX,
+                "course-design-brief.md": self.BRIEF,
+                "alignment-map.md": self.ALIGNMENT,
+                "artifact-manifest.md": manifest,
+                "ehs-approval.pdf": "%PDF-1.4",
+                "ws.md": "# Worksheet\n",
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("cannot be checked", result.stdout)
 
     def test_project_requires_active_index_paths(self) -> None:
         index = """- Schema version: 1.0
@@ -2684,6 +2760,58 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         result = self._run(self.HEADER + self._row())
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_root_flag_admits_a_dataset_outside_the_records_own_directory(self) -> None:
+        """A host that keeps state files and uploaded sources in sibling
+        directories -- state/data-task-record.md next to sources/lab.csv --
+        cannot satisfy confinement under the default root (the record's own
+        directory), because the dataset is a sibling, not a descendant, of
+        that directory. --root lets such a caller name the true project root
+        so a `../`-relative reference that stays inside the project is not
+        mistaken for an escape."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project = Path(temp_dir)
+            (project / "state").mkdir()
+            (project / "sources").mkdir()
+            (project / "sources" / "lab.csv").write_text(self.PAIRED, encoding="utf-8")
+            record = project / "state" / "data-task-record.md"
+            record.write_text(
+                self.HEADER + self._row(dataset="../sources/lab.csv"),
+                encoding="utf-8",
+            )
+
+            default_root = run_path("validate_data_task_record.py", record)
+            self.assertEqual(default_root.returncode, 2, default_root.stdout)
+            self.assertIn("resolves outside the project directory", default_root.stdout)
+
+            explicit_root = run_path(
+                "validate_data_task_record.py", record, "--root", str(project)
+            )
+            self.assertEqual(
+                explicit_root.returncode, 0,
+                explicit_root.stdout + explicit_root.stderr,
+            )
+
+    def test_root_flag_still_rejects_a_true_escape(self) -> None:
+        """--root widens what counts as inside the project; it must not stop
+        rejecting a dataset that is genuinely outside it."""
+        with tempfile.TemporaryDirectory() as outer:
+            project = Path(outer) / "project"
+            (project / "state").mkdir(parents=True)
+            sibling_project = Path(outer) / "other-project"
+            sibling_project.mkdir()
+            (sibling_project / "lab.csv").write_text(self.PAIRED, encoding="utf-8")
+            record = project / "state" / "data-task-record.md"
+            record.write_text(
+                self.HEADER + self._row(dataset="../../other-project/lab.csv"),
+                encoding="utf-8",
+            )
+
+            result = run_path(
+                "validate_data_task_record.py", record, "--root", str(project)
+            )
+            self.assertEqual(result.returncode, 2, result.stdout)
+            self.assertIn("resolves outside the project directory", result.stdout)
+
     def test_recorded_claim_contradicted_by_its_dataset_fails(self) -> None:
         """The owner's failure, recorded as a passing check."""
         result = self._run(
@@ -2927,6 +3055,205 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         result = self._run(self.HEADER + self._row() + self._row())
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("duplicate artifact ID", result.stdout)
+
+
+class HandoffBriefCompletenessTests(unittest.TestCase):
+    """At handoff a blank consequential field is not a deferral, it is a hole."""
+
+    BASE = (ROOT / "course-development-partner" / "assets" / "course-design-brief.md")
+
+    def _brief(self, **overrides: str) -> str:
+        text = self.BASE.read_text(encoding="utf-8")
+        answers = {
+            "Engagement tier": "Project",
+            "Course or module": "CHM 115",
+            "Learning outcomes": "Evaluate titration results against a tolerance.",
+            "Technology and format": "Markdown.",
+            "Interaction level": "Co-design",
+            "Requested artifacts": "Worksheet and key.",
+            "Minimum viable fallback": "Printable worksheet.",
+            "Accessibility contact, review, procurement, or exception process":
+                "Campus accessibility office intake form.",
+            "Student population": "Second-year chemistry majors.",
+            "Delivery mode": "In person.",
+            "Required technical accessibility target": "WCAG 2.1 AA",
+            "Permitted collaboration, resources, and AI use": "Pairs; no AI.",
+            "How scores combine into a course grade": "Category weights.",
+            "Revision, resubmission, retake, or replacement policy": "One revision.",
+            "Student workload expectation": "Three hours per week.",
+            "Collaborative or team work required": "no",
+            "Physical hazards present": "no",
+        }
+        answers.update(overrides)
+        lines = []
+        for line in text.splitlines():
+            for label, value in answers.items():
+                if line.startswith(f"- {label}:"):
+                    line = f"- {label}: {value}"
+                    break
+            # The template's Status subsections ship empty bullets; a handoff
+            # brief has to say something under each.
+            if line.strip() == "-":
+                line = "- Recorded with the course owner."
+            lines.append(line)
+        return "\n".join(lines) + "\n"
+
+    def _run(self, content: str):
+        return run_script(
+            "validate_design_state.py", content, ".md", "--profile", "handoff"
+        )
+
+    def test_answered_brief_passes_handoff(self) -> None:
+        result = self._run(self._brief())
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_blank_consequential_field_fails_handoff(self) -> None:
+        result = self._run(self._brief(**{"Student workload expectation": ""}))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("consequential field unanswered", result.stdout)
+
+    def test_explicit_not_applicable_is_accepted(self) -> None:
+        result = self._run(
+            self._brief(**{"Student workload expectation":
+                           "not applicable — audited seminar with no graded work"})
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_named_owner_deferral_is_accepted(self) -> None:
+        result = self._run(
+            self._brief(**{"How scores combine into a course grade":
+                           "not yet supplied by the course owner"})
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_undecided_hazard_trigger_fails(self) -> None:
+        result = self._run(self._brief(**{"Physical hazards present": "undecided"}))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("needs a yes or no", result.stdout)
+
+    def test_hazards_present_requires_the_safety_authority(self) -> None:
+        result = self._run(self._brief(**{"Physical hazards present": "yes"}))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("responsible safety owner and role", result.stdout)
+
+    def test_team_work_requires_the_team_structure(self) -> None:
+        result = self._run(
+            self._brief(**{"Collaborative or team work required": "yes"})
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("team formation basis", result.stdout)
+
+
+class ReleaseRecordValidatorTests(unittest.TestCase):
+    """Referencing a review is not the same as having had one.
+
+    The manifest can check that a file exists. A template copied into the
+    project and never filled in satisfies that, so a blank safety review could
+    support teaching-ready status for hazard-bearing work.
+    """
+
+    ASSETS = ROOT / "course-development-partner" / "assets"
+
+    def test_blank_templates_support_no_release(self) -> None:
+        for kind in ("safety-review", "accessibility-review", "production-plan"):
+            with self.subTest(kind=kind):
+                result = run_path(
+                    "validate_release_record.py", self.ASSETS / f"{kind}.md",
+                    "--kind", kind,
+                )
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+
+    def _safety(self, **overrides: str) -> str:
+        values = {
+            "owner": "Dr. R. Alvarez, laboratory manager",
+            "governing": "EHS Chemical Hygiene Plan v4.2, 2026-01-15",
+            "verified": "2026-08-01",
+            "approved_on": "2026-08-02",
+            "blockers": "none",
+            "recorded": "yes",
+            "student_use": "yes",
+        }
+        values.update(overrides)
+        return f"""# Safety Review
+- Schema version: 1.0
+- Last updated: 2026-08-02
+- Activity, session, or artifact(s) covered: Titration lab, week 4
+- Responsible safety owner and role: {values['owner']}
+- Governing document, version, and date: {values['governing']}
+- Source last verified: {values['verified']}
+- Approval date: {values['approved_on']}
+- Unresolved blockers: {values['blockers']}
+- Responsible owner approval recorded: {values['recorded']}
+- Approved for student use: {values['student_use']}
+"""
+
+    def test_complete_safety_review_passes(self) -> None:
+        result = run_script("validate_release_record.py", self._safety(), ".md",
+                            "--kind", "safety-review")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_undecided_approval_is_not_approval(self) -> None:
+        """The template ships "yes | no"; leaving both is not a decision."""
+        result = run_script("validate_release_record.py",
+                            self._safety(student_use="yes | no"), ".md",
+                            "--kind", "safety-review")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("undecided", result.stdout)
+
+    def test_unapproved_safety_blocks_release(self) -> None:
+        result = run_script("validate_release_record.py",
+                            self._safety(student_use="no"), ".md",
+                            "--kind", "safety-review")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("release is blocked", result.stdout)
+
+    def test_unresolved_blocker_is_reported(self) -> None:
+        result = run_script("validate_release_record.py",
+                            self._safety(blockers="fume hood recertification pending"),
+                            ".md", "--kind", "safety-review")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unresolved safety blocker", result.stdout)
+
+    def test_bracketed_prompt_is_not_an_owner(self) -> None:
+        result = run_script("validate_release_record.py",
+                            self._safety(owner="[instructor of record, safety officer]"),
+                            ".md", "--kind", "safety-review")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("missing responsible safety owner", result.stdout)
+
+    def test_production_plan_must_be_teaching_ready(self) -> None:
+        plan = """# Rich-Artifact Production Plan
+- Schema version: 1.0
+- Last updated: 2026-08-02
+- Artifact ID and working title: WS-1 titration worksheet
+- Requested final format: DOCX
+- Production method: host document capability
+- Blockers: none
+- Final status: draft
+- Artifact-manifest entry updated: yes
+"""
+        result = run_script("validate_release_record.py", plan, ".md",
+                            "--kind", "production-plan")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("final status is draft", result.stdout)
+
+    def test_accessibility_claim_must_be_bounded(self) -> None:
+        review = """# Accessibility Review
+- Schema version: 1.0
+- Last updated: 2026-08-02
+- Artifact(s), pages, states, and user paths reviewed: worksheet PDF
+- Required technical target: WCAG 2.1 AA
+- Source last verified: 2026-08-01
+- Review date: 2026-08-02
+- Reviewers and qualifications: A. Chen, accessibility specialist
+- Claim supported by this review: tagged structure and contrast checked
+- Claims not supported: no legal compliance determination
+- Unresolved barriers: none
+"""
+        result = run_script("validate_release_record.py", review, ".md",
+                            "--kind", "accessibility-review")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("untested scope is blank", result.stdout)
 
 
 class HandoffStateValidatorTests(unittest.TestCase):

@@ -113,7 +113,7 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Offer multiple means of engagement, representation, or expression only when they preserve the target construct.
 - Combine automated, keyboard, rendered, assistive-technology, and human-content checks in proportion to the artifact and stakes; record untested scope.
 - Do not claim WCAG conformance from an automated scan alone or make an ADA/Section 504 compliance or exception determination.
-- Record unresolved barriers, responsible owners, interim access, remediation dates, and required institutional approvals in the project's `accessibility-review.md`.
+- Record unresolved barriers, responsible owners, interim access, remediation dates, and required institutional approvals in the project's `accessibility-review.md`, and run `scripts/validate_release_record.py` on it before citing it as release evidence: a referenced record that names no reviewer and bounds no claim supports no accessibility claim.
 
 ## 7. Assessment integrity and fairness
 

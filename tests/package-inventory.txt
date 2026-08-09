@@ -49,3 +49,4 @@ course-development-partner/scripts/validate_dataset.py
 course-development-partner/scripts/validate_design_state.py
 course-development-partner/scripts/validate_handoff_state.py
 course-development-partner/scripts/validate_project.py
+course-development-partner/scripts/validate_release_record.py

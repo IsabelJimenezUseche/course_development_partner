@@ -91,15 +91,13 @@ Auto removes the educator's turn, not the checkpoint. It forms the same decision
 
 ## Rubric creation and refinement
 
-Before creating a final rubric, the skill asks the instructor to clarify:
+Rubric clarification is staged rather than delivered as one interrogation. The first exchange asks at most three questions — the ones that determine the rubric's architecture:
 
-- the educational objectives and required evidence;
-- formative, summative, or combined use;
-- analytic, holistic, single-point, checklist, or another structure;
-- scale, weights, thresholds, and partial-credit rules;
-- treatment of conceptual, procedural, computational, communication, and minor errors;
-- error propagation, carry-forward credit, and alternative correct approaches;
-- the desired scoring orientation.
+- which educational objectives and evidence the rubric should evaluate;
+- whether the use is formative, summative, or both;
+- which scoring orientation should govern, with the orientations explained when asked.
+
+Everything else — structure, scale, weights, thresholds, partial-credit and error rules, error propagation, carry-forward credit, and treatment of alternative correct approaches — is proposed as a reviewable default in the criteria preview, where the instructor reacts to something concrete instead of answering a requirements list. Asking all of it up front is the interrogation the staged contract exists to prevent.
 
 The supported orientations are:
 
