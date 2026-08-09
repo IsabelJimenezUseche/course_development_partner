@@ -377,6 +377,23 @@ def find_cycles(graph: dict[str, set[str]]) -> list[str]:
     return [" -> ".join(cycle) for cycle in sorted(cycles)]
 
 
+def metadata_values(text: str, label: str) -> list[str]:
+    """Every `- Label: value` line in a state file's metadata block."""
+    return [
+        match.group(1).strip()
+        for match in re.finditer(
+            rf"^[ \t]*-[ \t]*{re.escape(label)}:[ \t]*([^\r\n]*)[ \t]*$",
+            text,
+            flags=re.IGNORECASE | re.MULTILINE,
+        )
+    ]
+
+
+def metadata_value(text: str, label: str) -> str:
+    values = metadata_values(text, label)
+    return values[0] if values else ""
+
+
 def extract_link_target(value: str) -> str:
     stripped = value.strip()
     match = re.fullmatch(r"!?\[[^\]]*\]\((.+)\)", stripped)

@@ -26,6 +26,8 @@ from _tabular import (
     emit_report,
     load_table,
     local_reference_path,
+    metadata_value,
+    metadata_values,
     normalize,
     normalized_mapping,
     normalized_row,
@@ -103,22 +105,6 @@ def schema_version(path: Path) -> str:
     text = path.read_text(encoding="utf-8-sig")
     match = re.search(r"^\s*-\s*Schema version:\s*(\S+)\s*$", text, flags=re.I | re.M)
     return match.group(1) if match else ""
-
-
-def metadata_value(text: str, label: str) -> str:
-    values = metadata_values(text, label)
-    return values[0] if values else ""
-
-
-def metadata_values(text: str, label: str) -> list[str]:
-    return [
-        match.group(1).strip()
-        for match in re.finditer(
-            rf"^[ \t]*-[ \t]*{re.escape(label)}:[ \t]*([^\r\n]*)[ \t]*$",
-            text,
-            flags=re.I | re.M,
-        )
-    ]
 
 
 def table_identifiers(

@@ -44,6 +44,7 @@ from _tabular import (
     extract_link_target,
     load_table,
     local_reference_path,
+    metadata_values,
     normalize,
     normalized_mapping,
     normalized_row,
@@ -72,6 +73,7 @@ REQUIRED = (
 # method would let a row pass without anyone performing the operation students
 # are asked to perform. The structural recheck runs for every row anyway.
 EXECUTION_METHODS = {"code", "manual"}
+SCHEMA_VERSION = "1.0"
 WORKBOOK_SUFFIXES = {".xlsx", ".xlsm"}
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$", re.IGNORECASE)
 # Values that look filled in but assert nothing.
@@ -299,6 +301,25 @@ def validate(path: Path, root: Path | None = None) -> tuple[list[str], list[str]
         return [str(exc)], []
 
     issues: list[str] = []
+    # A record whose schema version or date is wrong is not a record of when
+    # anything was checked, which is most of what this file is for.
+    versions = metadata_values(text, "Schema version")
+    if not versions or not versions[0]:
+        issues.append("Data-task record is missing its schema version")
+    elif len(versions) > 1:
+        issues.append("Data-task record declares more than one schema version")
+    elif versions[0] != SCHEMA_VERSION:
+        issues.append(
+            f"Data-task record declares schema version {versions[0]}; this package "
+            f"uses {SCHEMA_VERSION}"
+        )
+    updated = metadata_values(text, "Last updated")
+    if not updated or not updated[0]:
+        issues.append("Data-task record is missing its last-updated date")
+    elif len(updated) > 1:
+        issues.append("Data-task record declares more than one last-updated date")
+    elif not parse_iso_date(updated[0]):
+        issues.append("Data-task record last updated must use YYYY-MM-DD")
     # The schema is exact, not a minimum. The shared parser accepts any table
     # carrying the required columns, so an extra column — a field removed from
     # the schema, or one invented for this project — would otherwise ride along
@@ -318,7 +339,7 @@ def validate(path: Path, root: Path | None = None) -> tuple[list[str], list[str]
         if any(not is_placeholder(row[field]) for field in REQUIRED)
     ]
     if not populated:
-        return [], [
+        return [], issues + [
             "Data-task record contains no filled rows; an unfilled record supports "
             "no fit claim"
         ]
@@ -367,9 +388,20 @@ def validate(path: Path, root: Path | None = None) -> tuple[list[str], list[str]
             )
             if problem is not None:
                 issues.append(f"{label}: {problem}")
-            elif target is not None and not target.exists():
+            elif target is None:
+                # A URL, a bare anchor, or anything else that does not resolve
+                # locally is not evidence a recipient of this project can open.
+                issues.append(
+                    f"{label}: execution evidence must be a local file inside the "
+                    f"project, not a link or anchor: {evidence}"
+                )
+            elif not target.exists():
                 issues.append(
                     f"{label}: execution evidence does not exist: {evidence}"
+                )
+            elif not target.is_file():
+                issues.append(
+                    f"{label}: execution evidence is not a file: {evidence}"
                 )
 
         executed_on = row["executed on"]

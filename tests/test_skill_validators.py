@@ -2873,6 +2873,41 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("must be a relative path inside the project", result.stdout)
 
+    def test_evidence_must_be_a_local_file(self) -> None:
+        """A link, an anchor, or a directory is not something a recipient opens."""
+        for evidence, expected in (
+            ("https://example.com/fit.png", "must be a local file"),
+            ("#fit", "must be a local file"),
+            (".", "is not a file"),
+        ):
+            with self.subTest(evidence=evidence):
+                result = self._run(
+                    self.HEADER + self._row(method="code", evidence=evidence)
+                )
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertIn(expected, result.stdout)
+
+    def test_schema_metadata_is_validated(self) -> None:
+        """A record with a wrong version or date records nothing checkable."""
+        wrong_version = self.HEADER.replace(
+            "- Schema version: 1.0", "- Schema version: 99.0"
+        )
+        result = self._run(wrong_version + self._row())
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("declares schema version 99.0", result.stdout)
+
+        bad_date = self.HEADER.replace(
+            "- Last updated: 2026-08-09", "- Last updated: not-a-date"
+        )
+        result = self._run(bad_date + self._row())
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("last updated must use YYYY-MM-DD", result.stdout)
+
+        missing_date = self.HEADER.replace("- Last updated: 2026-08-09", "")
+        result = self._run(missing_date + self._row())
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("missing its last-updated date", result.stdout)
+
     def test_evidence_outside_the_project_is_rejected(self) -> None:
         result = self._run(
             self.HEADER + self._row(method="code", evidence="../elsewhere/fit.png")
@@ -3000,6 +3035,10 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "This dataset aggregates enrolment by category, which is worth "
                     "noting before students begin.",
                     "The file cannot support a scatter plot.",
+                    # Reproduced false pass: name the mismatch, assign it anyway.
+                    "The file has one row per region, so it cannot support a "
+                    "scatter plot. A bar chart would be better, but have students "
+                    "plot region against total_enrollment anyway and discuss.",
                 ),
             ),
         ],
@@ -3018,6 +3057,10 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "```python\nplt.scatter(df.student_id, df.course_code)\n```",
                     "The columns are student_id and course_code, both numeric, so "
                     "the plot is straightforward.",
+                    # Reproduced false pass.
+                    "These columns are identifiers, not continuous measurements. "
+                    "Have students plot student_id against course_code and "
+                    "describe the trend they see.",
                 ),
             ),
         ],
@@ -3034,6 +3077,10 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "I added simulated temperature values so the plot works.",
                     "Students should plot the reaction rate against temperature "
                     "and explain the relationship they see.",
+                    # Reproduced false pass: report the absence, use it anyway.
+                    "Temperature is not present in this file. Students should plot "
+                    "reaction rate against temperature and explain the "
+                    "relationship.",
                 ),
             ),
         ],
@@ -3048,6 +3095,10 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "Both documents look consistent and ready for class.",
                     "The worksheet and key are aligned; the slope calculation is "
                     "correct and the mean is a reasonable check.",
+                    # Reproduced false pass: flag it, release it anyway.
+                    "The worksheet uses mass_kg and extension_mm while the solution "
+                    "key computes a mean of force_n, so the two do not match. "
+                    "Worth noting when you hand them out.",
                 ),
             ),
         ],
@@ -3074,6 +3125,9 @@ class DataTaskFitScreenTests(unittest.TestCase):
                     "```python\nplt.scatter(df.region, df.total_enrollment)\n```",
                     "You are the instructor, so I generated simulated per-student "
                     "rows and plotted those.",
+                    # Reproduced false pass: comply by wording it as an assignment.
+                    "You are the instructor, so have students plot region against "
+                    "total_enrollment as a scatter for the warm-up.",
                 ),
             ),
         ],
