@@ -116,15 +116,20 @@ IDENTIFIER_HEADER = re.compile(
 # strong evidence against the identifier heuristic below: dose_mg = 0, 1, 2, 3
 # and time_s = 1, 2, 3, 4 are consecutive small integers and also real data.
 MEASUREMENT_HEADER = re.compile(
-    r"(_(?:mg|g|kg|lb|mm|cm|m|km|in|ft|s|ms|min|hr|h|c|f|k|v|a|w|j|n|pa|hz|"
-    r"ml|l|mol|m2|m3|ppm|pct|deg|rad)$"
+    # Unit suffixes, all at least two characters. Single-letter units are
+    # deliberately absent: section_a and participant_n are not amperes and
+    # newtons, and admitting them let a 1..n key pass as a measurement. Columns
+    # that really do carry a one-letter unit — current_a, force_n, temp_c,
+    # time_s — are already covered by the measure-word stem below.
+    r"(_(?:mg|kg|mm|cm|km|nm|um|ft|lb|oz|ms|us|ns|sec|min|hr|ml|dl|mol|mmol|"
+    r"ppm|ppb|pct|deg|rad|hz|khz|mhz|pa|kpa|mpa|psi|kwh|m2|m3|cm2|cm3)$"
     # Measure words are matched at underscore- and hyphen-delimited boundaries
     # as well as word boundaries, so trial_count and elapsed_time read as the
     # measurements they are.
     r"|(?:^|[\s_-])(?:dose|time|temp|temperature|mass|weight|length|height|"
     r"width|depth|volume|conc|concentration|pressure|force|speed|velocity|"
-    r"current|voltage|power|energy|freq|frequency|angle|distance|age|score|"
-    r"count|rate|yield|density|ph|absorbance|intensity|elapsed|duration|"
+    r"current|voltage|power|energy|freq|frequency|angle|distance|dist|age|"
+    r"score|count|rate|yield|density|ph|absorbance|intensity|elapsed|duration|"
     r"reading|measurement)(?:$|[\s_-]))",
     re.IGNORECASE,
 )

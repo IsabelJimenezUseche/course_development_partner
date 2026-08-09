@@ -36,11 +36,12 @@ import argparse
 import hashlib
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import validate_dataset
 from _tabular import (
     emit_report,
+    extract_link_target,
     load_table,
     local_reference_path,
     normalize,
@@ -66,7 +67,11 @@ REQUIRED = (
     "result",
 )
 
-EXECUTION_METHODS = {"validator", "code", "manual"}
+# `validator` is deliberately absent. This script confirms structure; it never
+# draws the chart or computes the statistic, so recording it as the execution
+# method would let a row pass without anyone performing the operation students
+# are asked to perform. The structural recheck runs for every row anyway.
+EXECUTION_METHODS = {"code", "manual"}
 WORKBOOK_SUFFIXES = {".xlsx", ".xlsm"}
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$", re.IGNORECASE)
 # Values that look filled in but assert nothing.
@@ -105,6 +110,32 @@ def parse_args() -> argparse.Namespace:
 
 def is_placeholder(value: str) -> bool:
     return normalize(value) in PLACEHOLDERS
+
+
+def confined_path(
+    value: str, base: Path, root: Path, label: str
+) -> tuple[Path | None, str | None]:
+    """Resolve a recorded reference, refusing anything outside the project.
+
+    A portable project has to survive being copied elsewhere, so a dataset
+    reached by absolute path or `../` escape is not part of the package the
+    educator receives — the record would describe a file the recipient does not
+    have while still passing every check here.
+    """
+    target = extract_link_target(value)
+    if PurePosixPath(target).is_absolute() or Path(target).is_absolute():
+        return None, f"{label} must be a relative path inside the project: {value}"
+    try:
+        resolved = local_reference_path(value, base)
+    except (OSError, RuntimeError) as exc:
+        return None, f"cannot resolve {label} {value}: {exc}"
+    if resolved is None:
+        return None, None
+    try:
+        resolved.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return None, f"{label} resolves outside the project directory: {value}"
+    return resolved, None
 
 
 def file_digest(path: Path) -> str:
@@ -160,7 +191,9 @@ def artifact_ids(path: Path) -> set[str]:
     return identifiers
 
 
-def check_dataset(row: dict[str, str], label: str, record_dir: Path) -> list[str]:
+def check_dataset(
+    row: dict[str, str], label: str, record_dir: Path, root: Path
+) -> list[str]:
     """Resolve, hash-verify, and recheck one row's dataset."""
     issues: list[str] = []
     representation = normalize(row["representation"])
@@ -173,12 +206,11 @@ def check_dataset(row: dict[str, str], label: str, record_dir: Path) -> list[str
             f"{label}: missing dataset file; the fit claim cannot be rechecked "
             "without the exact file students receive"
         ]
-    try:
-        dataset = local_reference_path(row["dataset file"], record_dir)
-    except (OSError, RuntimeError) as exc:
-        return issues + [
-            f"{label}: cannot resolve dataset {row['dataset file']}: {exc}"
-        ]
+    dataset, problem = confined_path(
+        row["dataset file"], record_dir, root, "dataset file"
+    )
+    if problem is not None:
+        return issues + [f"{label}: {problem}"]
     if dataset is None:
         return issues + [
             f"{label}: dataset file is not a local path: {row['dataset file']}; "
@@ -246,7 +278,14 @@ def check_dataset(row: dict[str, str], label: str, record_dir: Path) -> list[str
     return issues
 
 
-def validate(path: Path) -> tuple[list[str], list[str]]:
+def validate(path: Path, root: Path | None = None) -> tuple[list[str], list[str]]:
+    """Recheck every recorded claim. `root` bounds recorded paths.
+
+    Standalone, the record's own directory is the boundary; under
+    `validate_project.py` it is the project directory, so a record in a
+    subdirectory can still reference a dataset elsewhere in the project.
+    """
+    root = (root or path.parent).resolve()
     try:
         text = path.read_text(encoding="utf-8-sig")
     except (OSError, UnicodeError) as exc:
@@ -260,6 +299,15 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
         return [str(exc)], []
 
     issues: list[str] = []
+    # The schema is exact, not a minimum. The shared parser accepts any table
+    # carrying the required columns, so an extra column — a field removed from
+    # the schema, or one invented for this project — would otherwise ride along
+    # unread and unchecked while the record still passed.
+    for header in headers:
+        if header.strip() and normalize(header) not in REQUIRED:
+            issues.append(
+                f"Unexpected column in the data-task record: {header.strip()}"
+            )
     rows = [
         (number, normalized_row(raw, mapping))
         for number, raw in enumerate(raw_rows, start=1)
@@ -314,15 +362,15 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
                 "to the produced chart, notebook, or output"
             )
         elif not is_placeholder(evidence):
-            try:
-                target = local_reference_path(evidence, path.parent)
-            except (OSError, RuntimeError) as exc:
-                issues.append(f"{label}: cannot resolve execution evidence: {exc}")
-            else:
-                if target is not None and not target.exists():
-                    issues.append(
-                        f"{label}: execution evidence does not exist: {evidence}"
-                    )
+            target, problem = confined_path(
+                evidence, path.parent, root, "execution evidence"
+            )
+            if problem is not None:
+                issues.append(f"{label}: {problem}")
+            elif target is not None and not target.exists():
+                issues.append(
+                    f"{label}: execution evidence does not exist: {evidence}"
+                )
 
         executed_on = row["executed on"]
         if is_placeholder(executed_on):
@@ -342,7 +390,7 @@ def validate(path: Path) -> tuple[list[str], list[str]]:
                 + ", ".join(sorted(validate_dataset.REPRESENTATIONS))
             )
 
-        issues.extend(check_dataset(row, label, path.parent))
+        issues.extend(check_dataset(row, label, path.parent, root))
 
     return [], issues
 

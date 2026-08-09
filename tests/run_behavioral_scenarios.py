@@ -2,20 +2,32 @@
 """Run partner-experience behavioral scenarios against a live model.
 
 Drives selected forward-test scenarios from ``faculty-review-scenarios.md``
-against an OpenAI-compatible chat-completions endpoint — by default the Purdue
-GenAI configuration found in the sibling ``course_development_partner_app/.env``
-— and applies deterministic heuristics to the transcript. The skill text itself
-is the system prompt, so this exercises the portable skill in a minimal client,
-not the app.
+against any OpenAI-compatible chat-completions endpoint and applies
+deterministic heuristics to the transcript. The skill text itself is the system
+prompt, so this exercises the portable skill in a minimal client, not the app.
+
+The runner is endpoint-agnostic on purpose: the scenarios test the skill, and a
+result that only reproduces on one provider is not evidence about the skill.
+Point ``--base-url``/``--chat-path`` at whichever service you have and name the
+model with ``--model``.
 
 Heuristic results are a screen, not qualifying evidence. A qualifying pass
 still requires a human evaluator applying ``evaluator-rubric.md`` to the
 retained transcript; this runner preserves every transcript in full for that
 purpose under ``tests/behavioral-results/``.
 
-Environment variables (a ``.env`` file fills in only the ones not already set):
-  PURDUE_GENAI_BASE_URL, PURDUE_GENAI_CHAT_PATH, PURDUE_GENAI_MODEL_ID,
-  PURDUE_GENAI_API_KEY, PURDUE_GENAI_TIMEOUT_SECONDS, PURDUE_GENAI_MAX_TOKENS
+Environment variables (a ``--env`` file fills in only the ones not already set;
+each falls back to the next name listed, then to a vendor-specific name):
+  BEHAVIORAL_API_KEY / OPENAI_API_KEY
+  BEHAVIORAL_MODEL_ID / OPENAI_MODEL
+  BEHAVIORAL_BASE_URL / OPENAI_BASE_URL   (default https://api.openai.com)
+  BEHAVIORAL_CHAT_PATH                    (default /v1/chat/completions)
+  BEHAVIORAL_TIMEOUT_SECONDS, BEHAVIORAL_MAX_TOKENS
+
+Example:
+  run_behavioral_scenarios.py --scenario data-task-fit --iterations 5 \
+      --base-url http://localhost:11434 --chat-path /v1/chat/completions \
+      --model llama3.1:70b
 
 Exit codes:
   0: every selected scenario passed its heuristics
@@ -692,25 +704,66 @@ def load_env_file(path: Path) -> None:
             os.environ[key] = value.strip().strip('"').strip("'")
 
 
+def first_env(*names: str, default: str = "") -> str:
+    """First non-empty value among these variables.
+
+    Generic names are consulted before vendor-specific ones so the runner is
+    endpoint-agnostic: the scenarios test the skill, not any one provider. The
+    vendor names remain last so an existing configuration keeps working.
+    """
+    for name in names:
+        value = os.environ.get(name, "").strip()
+        if value:
+            return value
+    return default
+
+
 def build_config(args: argparse.Namespace) -> Config:
-    load_env_file(Path(args.env).expanduser())
-    api_key = os.environ.get("PURDUE_GENAI_API_KEY", "").strip()
-    model_id = (args.model or os.environ.get("PURDUE_GENAI_MODEL_ID", "")).strip()
+    env_path = Path(args.env).expanduser()
+    if env_path.is_file():
+        load_env_file(env_path)
+    api_key = args.api_key or first_env(
+        "BEHAVIORAL_API_KEY", "OPENAI_API_KEY", "PURDUE_GENAI_API_KEY"
+    )
+    model_id = args.model or first_env(
+        "BEHAVIORAL_MODEL_ID", "OPENAI_MODEL", "PURDUE_GENAI_MODEL_ID"
+    )
+    base_url = args.base_url or first_env(
+        "BEHAVIORAL_BASE_URL",
+        "OPENAI_BASE_URL",
+        "PURDUE_GENAI_BASE_URL",
+        default="https://api.openai.com",
+    )
+    chat_path = args.chat_path or first_env(
+        "BEHAVIORAL_CHAT_PATH",
+        "PURDUE_GENAI_CHAT_PATH",
+        default="/v1/chat/completions",
+    )
     if not api_key or not model_id:
         raise RuntimeError(
-            "PURDUE_GENAI_API_KEY and PURDUE_GENAI_MODEL_ID must be set (via "
-            f"environment or {args.env})"
+            "An API key and a model id are required. Set BEHAVIORAL_API_KEY (or "
+            "OPENAI_API_KEY) and pass --model, or set BEHAVIORAL_MODEL_ID. Point "
+            "--base-url and --chat-path at any OpenAI-compatible endpoint; "
+            f"--env {args.env} fills in whatever is not already set."
         )
     return Config(
-        base_url=os.environ.get(
-            "PURDUE_GENAI_BASE_URL", "https://genai.rcac.purdue.edu"
-        ),
-        chat_path=os.environ.get("PURDUE_GENAI_CHAT_PATH", "/api/chat/completions"),
+        base_url=base_url,
+        chat_path=chat_path,
         model_id=model_id,
         api_key=api_key,
-        timeout=float(os.environ.get("PURDUE_GENAI_TIMEOUT_SECONDS", "120")),
+        timeout=float(
+            first_env(
+                "BEHAVIORAL_TIMEOUT_SECONDS",
+                "PURDUE_GENAI_TIMEOUT_SECONDS",
+                default="120",
+            )
+        ),
         max_tokens=args.max_tokens
-        or int(os.environ.get("PURDUE_GENAI_MAX_TOKENS", "3000")),
+        or int(
+            first_env(
+                "BEHAVIORAL_MAX_TOKENS", "PURDUE_GENAI_MAX_TOKENS", default="3000"
+            )
+        ),
     )
 
 
@@ -857,7 +910,15 @@ def main() -> int:
         choices=sorted(SCENARIOS),
         help="Scenario to run (repeatable; default: all)",
     )
-    parser.add_argument("--model", help="Override the model id")
+    parser.add_argument("--model", help="Model id to send to the endpoint")
+    parser.add_argument(
+        "--base-url", help="Base URL of any OpenAI-compatible endpoint"
+    )
+    parser.add_argument(
+        "--chat-path",
+        help="Chat-completions path on that endpoint (default /v1/chat/completions)",
+    )
+    parser.add_argument("--api-key", help="API key; prefer an environment variable")
     parser.add_argument("--max-tokens", type=int, default=0)
     parser.add_argument(
         "--iterations",

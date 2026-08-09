@@ -435,7 +435,9 @@ def validate_project(
         "assessment-blueprint.md": lambda path: validate_assessment_blueprint.validate(
             path, [], allow_formal_validation, alignment_path
         ),
-        "data-task-record.md": validate_data_task_record.validate,
+        "data-task-record.md": lambda path: validate_data_task_record.validate(
+            path, project
+        ),
         "design-log.md": lambda path: validate_handoff_state.validate(
             path, "design-log", design_profile == "handoff"
         ),

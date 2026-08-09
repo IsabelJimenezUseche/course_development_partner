@@ -1671,7 +1671,7 @@ class ProjectValidatorTests(unittest.TestCase):
 - Schema version: 1.0
 | Artifact ID | Dataset file | Dataset SHA-256 | Dataset version or date | Worksheet | Representation | Column roles | Expected student output | Intended interpretation | Execution method | Execution evidence | Executed on | Result |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WS-1 | lab.csv | c92da196adf584e997392a15e62474fc7ca8ffc59ca1495adfc874b69bf410e6 | 2026-08-01 |  | scatter | x=mass_kg; y=extension_mm | Fitted line | Extension rises with mass | validator |  | 2026-08-01 | Produced |
+| WS-1 | lab.csv | c92da196adf584e997392a15e62474fc7ca8ffc59ca1495adfc874b69bf410e6 | 2026-08-01 |  | scatter | x=mass_kg; y=extension_mm | Fitted line | Extension rises with mass | manual |  | 2026-08-01 | Produced |
 """
     LAB_CSV = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
 
@@ -2561,9 +2561,16 @@ class DatasetValidatorTests(unittest.TestCase):
         ("time_s", "time_s,reading\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
         ("temp_c", "temp_c,yield_g\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
         ("trial_count", "trial_count,mass_kg\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
+        # A one-letter unit only counts after a measure word, so section_a is
+        # not amperes and participant_n is not newtons.
+        ("current_a", "current_a,voltage_v\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
+        ("force_n", "force_n,mass_kg\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 0),
         ("student_id", "student_id,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
         ("sample_code", "sample_code,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
         ("entry", "entry,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+        ("section_a", "section_a,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+        ("participant_n", "participant_n,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
+        ("group_c", "group_c,score\n1,4.1\n2,4.4\n3,5.0\n4,5.6\n", 2),
     )
 
     def test_measurement_headers_survive_the_identifier_heuristic(self) -> None:
@@ -2648,7 +2655,7 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         worksheet: str = "",
         representation: str = "scatter",
         roles: str = "x=mass_kg; y=extension_mm",
-        method: str = "validator",
+        method: str = "manual",
         evidence: str = "",
         executed_on: str = "2026-08-09",
     ) -> str:
@@ -2814,6 +2821,64 @@ class DataTaskRecordValidatorTests(unittest.TestCase):
         result = self._run(self.HEADER + self._row(worksheet="Sheet1"))
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("declared for a non-workbook dataset", result.stdout)
+
+    def test_validator_is_not_an_execution_method(self) -> None:
+        """This script checks structure; it never performs the operation.
+
+        Accepting it here would let a row record an execution nobody did.
+        """
+        result = self._run(self.HEADER + self._row(method="validator"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("unknown execution method", result.stdout)
+
+    def test_unexpected_column_is_rejected(self) -> None:
+        """The schema is exact; the shared parser only requires a superset."""
+        record = (
+            self.HEADER.replace(
+                "| Executed on | Result |", "| Executed on | Result | Review status |"
+            ).replace(
+                "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+                "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+            )
+            + self._row().rstrip("\n")[:-1]
+            + "| reviewed |\n"
+        )
+        result = self._run(record)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("Unexpected column", result.stdout)
+        self.assertIn("Review status", result.stdout)
+
+    def test_dataset_outside_the_project_is_rejected(self) -> None:
+        """A portable project must survive being copied somewhere else."""
+        outside = "mass_kg,extension_mm\n0.5,2.1\n1.0,4.3\n1.5,6.0\n2.0,8.2\n"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "outside").mkdir()
+            (root / "outside" / "secret.csv").write_text(outside, encoding="utf-8")
+            (root / "project").mkdir()
+            record = root / "project" / "data-task-record.md"
+            record.write_text(
+                self.HEADER
+                + self._row(
+                    dataset="../outside/secret.csv", digest=self.digest(outside)
+                ),
+                encoding="utf-8",
+            )
+            result = run_path("validate_data_task_record.py", record)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("resolves outside the project directory", result.stdout)
+
+    def test_absolute_dataset_path_is_rejected(self) -> None:
+        result = self._run(self.HEADER + self._row(dataset="/etc/hosts"))
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("must be a relative path inside the project", result.stdout)
+
+    def test_evidence_outside_the_project_is_rejected(self) -> None:
+        result = self._run(
+            self.HEADER + self._row(method="code", evidence="../elsewhere/fit.png")
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("execution evidence resolves outside", result.stdout)
 
     def test_unfilled_template_supports_no_claim(self) -> None:
         asset = (
