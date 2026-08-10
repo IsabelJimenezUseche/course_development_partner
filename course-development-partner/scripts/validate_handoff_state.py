@@ -16,6 +16,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -84,6 +85,24 @@ ACCESS_LEVELS = {
 PLACEHOLDERS = {"", "-", "tbd", "todo", "n/a", "na", "none", "?"}
 
 KINDS = ("design-log", "source-register", "capability-manifest")
+
+# A row that records a missing source is an absence claim, and an absence claim
+# nobody can audit is worth little: "we searched and found nothing" and "we
+# never looked" read identically afterwards and call for opposite responses.
+ABSENCE_CLAIM = re.compile(
+    r"\b(?:no (?:source|sources|evidence|literature|reference|study|studies|data)"
+    r"|none (?:found|located|available|identified)|not found|nothing found|"
+    r"no published|unavailable in the literature|evidence gap|source gap|"
+    r"literature gap)\b",
+    re.IGNORECASE,
+)
+# What makes it auditable: the queries behind it.
+SEARCH_EVIDENCE = re.compile(
+    r"\b(?:search(?:ed|es)?|quer(?:y|ies|ied)|look(?:ed|up)|catalog(?:ue)?s?|"
+    r"database|index|scopus|pubmed|eric|ieee|acm|google scholar|web of science|"
+    r"library|terms?|keywords?)\b",
+    re.IGNORECASE,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -159,6 +178,13 @@ def validate_design_log(rows, mapping, strict: bool = False) -> list[str]:
         if row["date"] and not is_placeholder(row["date"]):
             if not parse_iso_date(row["date"]):
                 issues.append(f"Row {number}: date must use YYYY-MM-DD")
+        claim = f"{row['decision or change']} {row['rationale']}"
+        if ABSENCE_CLAIM.search(claim) and not SEARCH_EVIDENCE.search(claim):
+            issues.append(
+                f"Row {number}: records a missing source without the searches that "
+                "justify it; name the catalogues or databases queried and the terms "
+                "used, so the absence can be told apart from an unasked question"
+            )
     return issues
 
 

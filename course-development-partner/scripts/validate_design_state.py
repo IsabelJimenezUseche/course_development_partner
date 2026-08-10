@@ -327,13 +327,31 @@ def validate_detailed(
     }
     for field in sorted(duplicate_fields & tracked_fields):
         errors.append(f"Duplicate scalar field: {field}")
+    headings_present = {name for _, name in heading_records}
     for field in PROFILE_REQUIRED_FIELDS[profile]:
         value, lineno = located_fields.get(field, ("", 0))
         where = f" on line {lineno}" if lineno else " (field is absent)"
         if not value:
-            incomplete.append(
-                f"Required field is unanswered for {profile}: {field}{where}"
-            )
+            if lineno:
+                incomplete.append(
+                    f"Required field is unanswered for {profile}: {field}{where}"
+                )
+            elif field in headings_present:
+                # The value is in the document, written as a section instead of
+                # a field. Reporting this as "absent" sends an agent off to
+                # write the answer again — which is what a real run did, three
+                # times in one turn — so name the shape mismatch instead.
+                incomplete.append(
+                    f"Required field for {profile} is written as a heading rather "
+                    f'than a field: {field}. Expected a "- {field.capitalize()}: '
+                    '<value>" line; found a heading with that name. Move the '
+                    "value onto the field line; the section may stay."
+                )
+            else:
+                incomplete.append(
+                    f"Required field is unanswered for {profile}: {field}{where}. "
+                    f'Expected a "- {field.capitalize()}: <value>" line'
+                )
         elif normalize_heading(value) in {"n/a", "na", "not applicable"}:
             incomplete.append(
                 f"Not-applicable field requires a rationale: {field}{where}"

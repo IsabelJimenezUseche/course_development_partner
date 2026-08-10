@@ -1764,6 +1764,41 @@ class ProjectValidatorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("is not active in artifact-manifest.md", result.stdout)
 
+    def test_planned_artifact_type_needs_a_declared_capability(self) -> None:
+        """A run planned deliverables the host could not produce; nothing noticed."""
+        index = self.DATA_INDEX + (
+            "| capability-manifest.md | tool record | course owner | 1.0 | approved "
+            "| 2026-08-01 | current |\n"
+        )
+        manifest = self.DATA_MANIFEST.replace("| WS-1 | markdown |", "| WS-1 | presentation |")
+        capability = """# Capability Manifest
+- Schema version: 1.0
+| Capability | Available provider or tool | Access level | Intended use | Approval required | Fallback | Verification date |
+|---|---|---|---|---|---|---|
+| markdown authoring | host editor | local | drafting | no | none needed | 2026-08-01 |
+"""
+        files = {
+            "project-index.md": index,
+            "course-design-brief.md": self.BRIEF,
+            "alignment-map.md": self.ALIGNMENT,
+            "artifact-manifest.md": manifest,
+            "capability-manifest.md": capability,
+        }
+        result = run_project(files)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("capability-manifest.md records no capability", result.stdout)
+
+        # Recording the capability — even as unavailable, with a fallback — is
+        # the honest path and clears the finding.
+        files["capability-manifest.md"] = capability.replace(
+            "| markdown authoring | host editor | local | drafting | no | none needed | 2026-08-01 |",
+            "| markdown authoring | host editor | local | drafting | no | none needed | 2026-08-01 |\n"
+            "| presentation production | none in this host | local | slides | no | "
+            "Markdown storyboard the owner renders | 2026-08-01 |",
+        )
+        cleared = run_project(files)
+        self.assertNotIn("records no capability", cleared.stdout)
+
     def test_unindexed_state_file_is_reported(self) -> None:
         """Validation reaches a file through the index; an unindexed one is unchecked."""
         index = """# Project Index
@@ -3142,6 +3177,103 @@ class HandoffBriefCompletenessTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("team formation basis", result.stdout)
+
+
+class RunReportedRegressionTests(unittest.TestCase):
+    """Findings from a real end-to-end run, pinned so they cannot return."""
+
+    BRIEF = (ROOT / "course-development-partner" / "assets" / "course-design-brief.md")
+
+    def test_heading_shaped_field_is_named_as_a_shape_problem(self) -> None:
+        """The run's costliest failure: told "absent" about content that was there.
+
+        The model wrote `### Interaction Level` with `- Rapid` beneath, and the
+        validator reported the field as absent — so the agent wrote the answer
+        again, three times in one turn.
+        """
+        content = self.BRIEF.read_text(encoding="utf-8").replace(
+            "- Interaction level: Co-design | Guided | Rapid | Auto",
+            "### Interaction Level\n\n- Rapid",
+        )
+        result = run_script(
+            "validate_design_state.py", content, ".md", "--profile", "establish"
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("written as a heading rather than a field", result.stdout)
+        self.assertIn('Expected a "- Interaction level: <value>" line', result.stdout)
+
+    def test_genuinely_absent_field_still_says_absent(self) -> None:
+        content = self.BRIEF.read_text(encoding="utf-8").replace(
+            "- Interaction level: Co-design | Guided | Rapid | Auto", ""
+        )
+        result = run_script(
+            "validate_design_state.py", content, ".md", "--profile", "establish"
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("field is absent", result.stdout)
+        self.assertNotIn("written as a heading", result.stdout)
+
+    def test_establish_fields_exist_as_field_lines_in_the_template(self) -> None:
+        """A correctly copied template must be able to pass its own profile."""
+        sys.path.insert(0, str(SCRIPTS))
+        import validate_design_state
+
+        text = self.BRIEF.read_text(encoding="utf-8")
+        for field in validate_design_state.PROFILE_REQUIRED_FIELDS["establish"]:
+            with self.subTest(field=field):
+                pattern = re.compile(
+                    rf"^-\s+{re.escape(field)}\s*:", re.IGNORECASE | re.MULTILINE
+                )
+                self.assertRegex(text, pattern, f"{field} is not a fillable field line")
+
+    DESIGN_LOG = (
+        "# Design Log\n- Schema version: 1.0\n- Last updated: 2026-08-10\n\n"
+        "| Date | Decision or change | Rationale | Source or owner | Affected artifacts | Follow-up |\n"
+        "|---|---|---|---|---|---|\n"
+    )
+
+    def test_absence_claim_requires_its_searches(self) -> None:
+        """"We searched and found nothing" and "we never looked" must differ."""
+        unaudited = self.DESIGN_LOG + (
+            "| 2026-08-10 | Recorded a carrier-statistics evidence gap | No source "
+            "found for the expected student model | course owner | LO-3 | revisit |\n"
+        )
+        result = run_script("validate_handoff_state.py", unaudited, ".md",
+                            "--kind", "design-log")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("without the searches that justify it", result.stdout)
+
+    def test_absence_claim_with_searches_passes(self) -> None:
+        audited = self.DESIGN_LOG + (
+            "| 2026-08-10 | Recorded a carrier-statistics evidence gap | Searched the "
+            "library catalogue and IEEE Xplore for \"carrier statistics "
+            "misconception\"; no source found | course owner | LO-3 | revisit |\n"
+        )
+        result = run_script("validate_handoff_state.py", audited, ".md",
+                            "--kind", "design-log")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_ordinary_rows_are_untouched(self) -> None:
+        ordinary = self.DESIGN_LOG + (
+            "| 2026-08-10 | Chose contrasting cases over worked examples | Targets the "
+            "comparison the outcome names | course owner | LO-1 | none |\n"
+        )
+        result = run_script("validate_handoff_state.py", ordinary, ".md",
+                            "--kind", "design-log")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_production_plan_separates_untested_from_unavailable(self) -> None:
+        plan = (ROOT / "course-development-partner" / "assets" / "production-plan.md")
+        text = plan.read_text(encoding="utf-8")
+        self.assertIn("not available in this environment", text)
+        self.assertIn("`not tested` says a check that could have run did not", text)
+
+    def test_demand_binds_artifact_form(self) -> None:
+        checklists = (
+            ROOT / "course-development-partner" / "references" / "validation-checklists.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("form** follows the outcome's demand verb", checklists)
+        self.assertIn("is a **Blocker**, not a matter of taste", checklists)
 
 
 class ReleaseRecordValidatorTests(unittest.TestCase):

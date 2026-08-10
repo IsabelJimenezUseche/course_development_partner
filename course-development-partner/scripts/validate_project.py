@@ -325,6 +325,63 @@ def check_referenced_release_records(
     return [], issues
 
 
+def check_planned_capability(
+    manifest_path: Path | None, capability_path: Path | None
+) -> tuple[list[str], list[str]]:
+    """Every planned artifact type must appear in the capability manifest.
+
+    A real run planned a design-project brief and a spreadsheet calculator that
+    the host could not produce. The capability manifest existed and was filled
+    in; nothing required consulting it before naming artifacts, so the brief
+    kept listing deliverables that were never coming.
+
+    Absence is the finding, not unavailability: a capability recorded as
+    unavailable carries a fallback, which is the honest path. A capability that
+    was never recorded means nobody checked.
+    """
+    if manifest_path is None or capability_path is None:
+        return [], []
+    required = validate_artifact_manifest.REQUIRED
+    try:
+        _, headers, rows = load_table(manifest_path, required)
+        mapping = normalized_mapping(headers, required)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return [f"artifact-manifest.md: {exc}"], []
+    try:
+        _, cap_headers, cap_rows = load_table(
+            capability_path, validate_handoff_state.CAPABILITY_REQUIRED
+        )
+        cap_mapping = normalized_mapping(
+            cap_headers, validate_handoff_state.CAPABILITY_REQUIRED
+        )
+    except (OSError, UnicodeError, ValueError):
+        # An unreadable or unfilled capability manifest is already reported by
+        # validate_handoff_state as the gap it is; do not restate it as an error.
+        return [], []
+
+    declared = " ".join(
+        normalize(normalized_row(raw, cap_mapping)["capability"]) for raw in cap_rows
+    )
+    issues: list[str] = []
+    reported: set[str] = set()
+    for raw in rows:
+        row = normalized_row(raw, mapping)
+        if normalize(row["status"]) == "retired":
+            continue
+        artifact_type = normalize(row["artifact type"])
+        if artifact_type not in validate_artifact_manifest.RICH_TYPES:
+            continue
+        if artifact_type in declared or artifact_type in reported:
+            continue
+        reported.add(artifact_type)
+        issues.append(
+            f"artifact-manifest.md: {artifact_type} artifacts are planned but "
+            "capability-manifest.md records no capability for them; record the "
+            "provider and fallback, or mark the artifact owner-supplied"
+        )
+    return [], issues
+
+
 def validate_index(
     project: Path,
 ) -> tuple[list[str], list[str], dict[str, Path], str]:
@@ -574,6 +631,12 @@ def validate_project(
     issues.extend(fit_issues)
 
     issues.extend(check_unindexed_state(project, active))
+
+    capability_errors, capability_issues = check_planned_capability(
+        active.get("artifact-manifest.md"), active.get("capability-manifest.md")
+    )
+    errors.extend(capability_errors)
+    issues.extend(capability_issues)
 
     manifest_path = active.get("artifact-manifest.md")
     if manifest_path is not None:

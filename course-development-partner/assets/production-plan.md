@@ -75,6 +75,10 @@ Complete when the artifact supplies a dataset or asks students to produce a char
 | Accessibility |  |  |  |  | planned |
 | Open/edit/reopen |  |  |  |  | planned |
 
+Pass status values: `planned`, `passed`, `failed`, `not tested`, `not available in this environment`.
+
+Keep the last two apart. `not tested` says a check that could have run did not; `not available in this environment` says the host has no such capability — no accessibility checker, no renderer for this format. A reader cannot tell negligence from environment when both are written the same way, and a run that reported five of six lines as untested meant mostly the second. Name the missing capability in `Method/tool` and record the manual fallback used instead.
+
 ## Findings and release state
 
 - Blockers:

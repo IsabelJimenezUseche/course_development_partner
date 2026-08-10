@@ -57,6 +57,18 @@ Correct unambiguous blockers. Ask the instructor when correction changes educati
 - Confirm that an ambiguous outcome was resolved with the educator or recorded as a labeled assumption, not settled silently. An outcome whose verb names no performance, that carries two outcomes in one, or whose scope, conditions, or transfer expectation is unstated is a finding until resolved.
 - Match cognitive demand across outcome, activity, and assessment. Scaffolding items below the outcome's demand are legitimate; an outcome whose entire active sample sits below its aligned demand is a gap.
 - Read the items rather than trusting the tokens. The ranks order kinds of cognition, not difficulty, so a passing automated demand check shows only that the sample is labeled at the outcome's level.
+- Check that the artifact's **form** follows the outcome's demand verb, not merely that it mentions the outcome. An alignment map is satisfied by an artifact that names the outcome and asks nothing of it; this is the most common way a well-formed map produces material that cannot teach what it claims:
+
+| Aligned demand | The artifact must require the student to | Not sufficient |
+|---|---|---|
+| `remember` | retrieve or identify | be shown the item |
+| `understand` | explain, paraphrase, or predict | be given the explanation |
+| `apply` | carry out the procedure on a new case | watch it carried out |
+| `analyze` | decompose, compare, or attribute cause | be told the comparison |
+| `evaluate` | judge against criteria and defend the judgement | be given the verdict |
+| `create` | produce something whose form they chose | assemble to a supplied template |
+
+  An expository deck aligned to an `analyze` outcome is a **Blocker**, not a matter of taste: the outcome has no artifact that develops it. Say which side is wrong — the artifact underserves the outcome, or the recorded demand overstates it — and change one of them.
 - Ensure every important outcome has learning support and evidence.
 - Remove or justify orphan activities and assessments.
 - Ensure engagement serves learning rather than replacing it.

@@ -61,7 +61,7 @@ Use read-only access and the narrowest relevant capability by default. Prefer su
 
 Never publish, message students, change grades, change permissions, overwrite live materials, or alter live settings without explicit action-time authorization. Request de-identified or aggregated student data and apply the approved privacy/governance path; never place identifiable student information in portable state.
 
-Update `capability-manifest.md` from `assets/capability-manifest.md` when tool availability affects work. Read [references/tool-routing.md](references/tool-routing.md) before selecting tools, external sources, or fallbacks. Read [references/mcp-capability-contracts.md](references/mcp-capability-contracts.md) when mapping a client-specific connector to the portable workflow.
+Update `capability-manifest.md` from `assets/capability-manifest.md` when tool availability affects work, and read it before naming a deliverable: an artifact this host cannot produce must be recorded as owner-supplied or replaced with one that can, not promised in a plan and discovered at production. Record the capability with its fallback even when unavailable — an unrecorded capability means nobody checked. Read [references/tool-routing.md](references/tool-routing.md) before selecting tools, external sources, or fallbacks. Read [references/mcp-capability-contracts.md](references/mcp-capability-contracts.md) when mapping a client-specific connector to the portable workflow.
 
 ## Preview and produce proportionately
 
@@ -79,7 +79,7 @@ Read [references/visual-design.md](references/visual-design.md) for visual teach
 
 Read [references/assessment-quality.md](references/assessment-quality.md) before consequential assessment, validity claims, multi-grader calibration, team or peer-evaluated work, or permitted-AI adaptation.
 
-Record cognitive demand as one controlled token — `remember`, `understand`, `apply`, `analyze`, `evaluate`, or `create` — for the target performance, so that demand match can be checked rather than asserted. Items below an outcome's demand are legitimate scaffolding; an outcome whose entire active sample sits below its aligned demand is a coverage gap.
+Record cognitive demand as one controlled token — `remember`, `understand`, `apply`, `analyze`, `evaluate`, or `create` — for the target performance, so that demand match can be checked rather than asserted. The token then governs the artifact's form, not just its label: an `analyze` outcome needs an artifact that makes students decompose or compare, and an expository deck that merely mentions the outcome does not satisfy it. Check form against demand in [references/validation-checklists.md](references/validation-checklists.md) §3 before calling an artifact aligned. Items below an outcome's demand are legitimate scaffolding; an outcome whose entire active sample sits below its aligned demand is a coverage gap.
 
 For team or collaborative work, score the team product, individual learning, and team process as separate claims, and keep an individual evidence channel for every outcome claimed for an individual. Treat peer evaluation as evidence for instructor judgment rather than an automatic grade transformation, and bound how far it can move a grade.
 

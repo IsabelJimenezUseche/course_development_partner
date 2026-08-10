@@ -69,6 +69,8 @@ When the question is what students already believe, where they reliably fail, or
 
 Record the result in the project's `source-register.md` with the population it describes. When nothing is found, say that the expected student model is provisional and state what would confirm it.
 
+Record the searches, not just the conclusion. A gap logged as "no source found" is indistinguishable afterwards from a gap nobody looked for, and the two call for opposite responses. Whenever a design-log row records a missing source, its rationale must name what was searched — the catalogues, databases, or collections queried and the terms used — so a later reader can judge whether the absence is real or an artifact of the query. A run recorded a carrier-statistics gap that two catalogue titles would have closed; the record could not show whether either had been searched.
+
 Do not cite a source solely from a search snippet or secondary paraphrase when the original is available. Do not use citation count, venue prestige, or confident wording as a substitute for fit and quality.
 
 ## 5. Report bounded recommendations
