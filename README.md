@@ -1,14 +1,20 @@
 # Course Development Partner
 
-Course Development Partner is an interactive, client-neutral Agent Skill for responsible educators, course owners, and instructional designers creating higher-education materials. It helps a teaching team move from course goals and source materials to aligned, authentic, scaffolded, accessible, and boundedly validated teaching artifacts.
+## Quick download and install
+1. Find the `course-development-partner.zip` file in the repository root.
+2. Click the `.zip` file name to open its file page.
+3. On the file page, click the download icon (or the "Download" button) to save the ZIP to your computer.
+4. Add or upload the extracted `course-development-partner` directory (the inner folder containing `SKILL.md`) into the skills/workspace area of your preferred LLM client or skill host.
 
-The skill is designed for skills-compatible agents and portable Markdown handoffs. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool. Compatibility claims remain conditional until the same scenarios pass in each named client.
+Course Development Partner is an interactive, client-neutral Agent Skill for responsible educators, course owners, and instructional designers creating higher-education materials. It helps a teachi[...]
+
+The skill is designed for skills-compatible agents and portable Markdown handoffs. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool. Compa[...]
 
 ## What the skill supports
 
 - Course, module, lesson, and activity design
 - Syllabi that keep institutional required language, course-owner policy, and design content distinct
-- Mapping of supplied frameworks and named pedagogies — ABET-style outcome sets, Bloom's and other taxonomies, UDL, CDIO, peer instruction, POGIL, flipped, and similar — onto the internal workflow without assuming any framework governs
+- Mapping of supplied frameworks and named pedagogies — ABET-style outcome sets, Bloom's and other taxonomies, UDL, CDIO, peer instruction, POGIL, flipped, and similar — onto the internal work[...]
 - Course-level evidence packages for program-supplied accreditation indicators, with program-level judgments left to the program authority
 - Online, hybrid, and asynchronous delivery adaptation
 - Lecture-to-active-learning redesign
@@ -28,23 +34,23 @@ The skill is designed for skills-compatible agents and portable Markdown handoff
 
 ## Design principles
 
-The skill treats the responsible educator or course owner as the disciplinary and pedagogical authority. AI assists with analysis, alternatives, drafting, production, and validation, but does not independently determine technical correctness, academic policy, grades, misconduct, accommodations, or student readiness.
+The skill treats the responsible educator or course owner as the disciplinary and pedagogical authority. AI assists with analysis, alternatives, drafting, production, and validation, but does not [...]
 
 The core design chain is:
 
 > learning outcome → evidence of learning → learning activity → instructional support → feedback or assessment
 
-Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint validator reports an outcome whose entire active assessment sample falls below its aligned demand, while allowing lower-demand scaffolding items.
+Cognitive demand is a controlled, ordered field — `remember`, `understand`, `apply`, `analyze`, `evaluate`, `create` — so that alignment can be checked rather than asserted. The blueprint vali[...]
 
-Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mathematics and quantitative reasoning, each with its own profile. Disciplines outside those profiles use the general workflow; no discipline-specific authenticity profile exists for them yet, and the skill does not claim one. Content involving physical hazards is always routed to a qualified responsible safety owner; the skill drafts safety material but never originates the safety basis, and an unverified or unreviewed safety element blocks release in every mode. `safety-review.md` records the owner, governing document, verification dates, and approval.
+Although the skill originated in engineering, its authenticity guidance covers engineering and engineering technology, computing and data disciplines, laboratory and experimental sciences, and mat[...]
 
-Every teaching-ready artifact must reference an accessibility review, declare safety through an approved review or `not required`, and declare data-task evidence through a linked record or `not applicable — [reason]`. Rich artifacts must also reference a completed production plan. Connected project validation runs `scripts/validate_release_record.py` on the local safety, accessibility, and production records behind those claims, so a blank copied template cannot support teaching-ready status. The validator checks that the record contains an affirmative, unblocked decision; it cannot determine whether the review was competent or whether the named owner was qualified. Those judgments remain with the responsible human.
+Every teaching-ready artifact must reference an accessibility review, declare safety through an approved review or `not required`, and declare data-task evidence through a linked record or `not ap[...]
 
 Any activity that hands students a dataset must hold this chain end to end:
 
 > exact dataset → requested operation or representation → expected student output → intended interpretation
 
-The failure this prevents is specific: an activity that reads well, names plausible variables, and cannot be done with the data supplied — a scatter plot asked of one-row-per-category totals, which support a bar chart and nothing else. Students find it in class and the instructor has no fallback. So the operation is executed on the real file before release, never on a description of it, and the check is written to `data-task-record.md`, where `scripts/validate_data_task_record.py` rechecks it: the dataset must still hash to the value recorded when the check ran, and the columns and roles the activity names must still support the representation. It deliberately stops short of redrawing the chart or recomputing the statistic, so the recorded result stays a human's judgment rather than a claim the script certifies. A validation token with no record behind it is treated as an unverified claim rather than a passing check: a row whose fit claim cannot be rechecked is a gap, because an unverifiable claim and a false one read the same way.
+The failure this prevents is specific: an activity that reads well, names plausible variables, and cannot be done with the data supplied — a scatter plot asked of one-row-per-category totals, wh[...]
 
 The skill also:
 
@@ -73,11 +79,11 @@ The skill also:
 | **Co-design — default** | Uses frequent, focused checkpoints on each consequential decision. |
 | **Guided** | Requests instructor review at major phase boundaries. |
 | **Rapid** | Produces the complete provisional draft in one pass without intermediate checkpoints, then requests one consolidated faculty review. |
-| **Auto** | Runs the same cycle as Co-design with the checkpoints answered internally rather than removed: it forms each decision card, selects the strongest recommended option, records the card and its rationale, completes the draft, and reports assumptions, validation, and nondelegable release blockers. |
+| **Auto** | Runs the same cycle as Co-design with the checkpoints answered internally rather than removed: it forms each decision card, selects the strongest recommended option, records the card [...]
 
-Co-design is the skill's defining experience and its non-blocking default: it works like a design partner beside the educator — one consequential decision at a time, small visible drafts, each answer shaping the next piece — rather than collecting requirements at intake and returning a finished product. The owner may change modes at any time. Rapid is a single-pass provisional draft followed by final faculty review.
+Co-design is the skill's defining experience and its non-blocking default: it works like a design partner beside the educator — one consequential decision at a time, small visible drafts, each a[...]
 
-Auto removes the educator's turn, not the checkpoint. It forms the same decision card an interactive mode would present, answers it by ranking the options on alignment, evidence quality, accessibility, fairness, feasibility, sustainability, and reversibility, and writes the card, the selection, and the rationale down — because a checkpoint that leaves no record was skipped rather than answered, and the educator can no longer re-open it. Internal means unpresented, never unwritten. The engagement tier decides where that record lives (inline with the deliverable at Focused tier, in state files at Project and Course), never whether one exists. Auto cannot invent policy authority, approve consequential scoring, process unauthorized identifiable student data, or perform external side effects without explicit authorization; it records those as open with a recommendation and completes the unaffected work.
+Auto removes the educator's turn, not the checkpoint. It forms the same decision card an interactive mode would present, answers it by ranking the options on alignment, evidence quality, accessibi[...]
 
 ## Educational-design workflow
 
@@ -99,7 +105,7 @@ Rubric clarification is staged rather than delivered as one interrogation. The f
 - whether the use is formative, summative, or both;
 - which scoring orientation should govern, with the orientations explained when asked.
 
-Everything else — structure, scale, weights, thresholds, partial-credit and error rules, error propagation, carry-forward credit, and treatment of alternative correct approaches — is proposed as a reviewable default in the criteria preview, where the instructor reacts to something concrete instead of answering a requirements list. Asking all of it up front is the interrogation the staged contract exists to prevent.
+Everything else — structure, scale, weights, thresholds, partial-credit and error rules, error propagation, carry-forward credit, and treatment of alternative correct approaches — is proposed[...]
 
 The supported orientations are:
 
@@ -107,11 +113,11 @@ The supported orientations are:
 - **Error/deduction-based:** subtracts defined errors from full credit while preventing distorted or repeated penalties.
 - **Balanced:** anchors criteria and weights in the educational objectives, then treats errors according to how much they undermine the targeted learning.
 
-The skill selects a recommendation from the construct and stakes rather than using a universal default. Objective-achievement or balanced logic usually fits partial, multidimensional, reasoned, or legitimately diverse evidence; checklist/mastery or explicit error rules fit verified discrete, threshold, or safety-critical requirements.
+The skill selects a recommendation from the construct and stakes rather than using a universal default. Objective-achievement or balanced logic usually fits partial, multidimensional, reasoned, o[...]
 
-The grading system itself — weighting, revision and retake policy, thresholds, late work, and any mandated scheme — stays with the course owner. The skill asks for it rather than inferring it, because it determines whether feedback can actually be used, and it surfaces conflicts between an instrument's scoring logic and the grading system instead of resolving them silently.
+The grading system itself — weighting, revision and retake policy, thresholds, late work, and any mandated scheme — stays with the course owner. The skill asks for it rather than inferring it[...]
 
-After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies the rubric, diagnoses disagreements, proposes focused revisions, re-scores the examples, and records approved boundary interpretations in a separate grader guide. Consequential scoring requires course-owner approval. Calibration with authentic student responses always uses Co-design or Guided mode; Auto may prepare the de-identification check, sample plan, and calibration questions, but it may not interpret responses, assign scores, or revise the rubric from them.
+After the initial rubric exists, the skill asks for a small set of de-identified student responses. It first asks the instructor what each response demonstrates about the objective, then applies [...]
 
 ## MCP and tool support
 
@@ -125,25 +131,25 @@ The skill maps integrations by capability rather than vendor name. Depending on 
 - de-identified learning-evidence analysis;
 - versioning, storage, and LMS draft workflows.
 
-MCP servers are not bundled into this repository. The skill discovers available capabilities, chooses the narrowest appropriate tool, records provenance, and falls back to rigorous Markdown or manual procedures when an integration is unavailable.
+MCP servers are not bundled into this repository. The skill discovers available capabilities, chooses the narrowest appropriate tool, records provenance, and falls back to rigorous Markdown or ma[...]
 
-For rich artifacts, the portable core records an approved preview, editable-source promise, output format, accessibility target, host capability, structural checks, rendered or playback inspection, reopen result, and fallback in a production plan. Format-specific mechanics remain with the host's current document, presentation, spreadsheet, PDF, or visual-production capability so the educational workflow stays client-agnostic.
+For rich artifacts, the portable core records an approved preview, editable-source promise, output format, accessibility target, host capability, structural checks, rendered or playback inspectio[...]
 
-External systems are read-only by default. Publishing, messaging students, changing grades or permissions, overwriting live content, and modifying live course settings require explicit action-time authorization.
+External systems are read-only by default. Publishing, messaging students, changing grades or permissions, overwriting live content, and modifying live course settings require explicit action-tim[...]
 
 ## ADA and WCAG awareness
 
-The skill treats accessibility as a design requirement from intake through production and validation. It asks for the applicable authority and separately records the exact standard/version/level/scope, source-verification date, policy date, compliance deadline, and local release/remediation date. Automated scanning is only one source of evidence; the workflow also covers keyboard use, version-specific focus and input criteria, zoom and reflow, reading order, captions and transcripts, content alternatives, rendered artifacts, assistive technology, third-party tools, and unresolved remediation ownership.
+The skill treats accessibility as a design requirement from intake through production and validation. It asks for the applicable authority and separately records the exact standard/version/level/[...]
 
-ADA, Section 504, institutional policy, WCAG conformance, universal design, and individual accommodations remain distinct. The skill can document evidence and findings, but it does not independently declare legal compliance or exceptions.
+ADA, Section 504, institutional policy, WCAG conformance, universal design, and individual accommodations remain distinct. The skill can document evidence and findings, but it does not independen[...]
 
-The skill never infers an institution-specific accessibility rule from an institution name. It records the governing requirement from current authoritative sources. When an authorized process or current authoritative source confirms that the U.S. ADA Title II web/mobile rule governs the work, it records WCAG 2.1 Level AA for the covered scope while keeping applicability, deadlines, exceptions, and compliance determinations with authorized personnel. It keeps WCAG 2.1 and 2.2 criterion sets distinct and treats current WCAG2ICT material as informative guidance for applying a selected WCAG version to non-web documents and software.
+The skill never infers an institution-specific accessibility rule from an institution name. It records the governing requirement from current authoritative sources. When an authorized process or [...]
 
 ## Visual design
 
-A supplied authoritative design system always governs. When none is supplied, the visual system is treated as a consequential choice rather than a detail left to improvisation: in Co-design and Guided the skill asks which system applies and recommends the example palette below; in Rapid and Auto it applies that palette and records the choice as provisional. The educator remains free to decline or replace it, but the skill never invents a different color scheme in any mode — an ad-hoc palette is a failure, and so is presenting the example as merely optional and then applying nothing.
+A supplied authoritative design system always governs. When none is supplied, the visual system is treated as a consequential choice rather than a detail left to improvisation: in Co-design and G[...]
 
-The example palette is organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray (`#C4BFC0`), and white (`#FFFFFF`). These values match Purdue University's publicly documented brand palette and are included only as a worked example of semantic roles with verified contrast pairs; the skill states that provenance whenever it offers them, implies no endorsement by or affiliation with that institution, and recommends substituting the user's own institutionally authorized system. It provides calculated high-contrast pairings, uses color only as a supplementary cue, requires final rendered inspection, and never implies institutional brand approval or adds protected marks or proprietary assets without authorization.
+The example palette is organized by semantic roles: black (`#000000`), warm gold (`#CFB991`), graphite (`#555960`), bronze (`#8E6F3E`), bright gold (`#DAAA00`), pale gold (`#EBD99F`), light gray [...]
 
 ## Privacy and responsible use
 
@@ -173,7 +179,7 @@ course_development_partner/
 └── tests/
 ```
 
-`course-development-partner.zip` is a tracked build artifact, not a source of truth. `tests/check_repository.py` compares its contents byte for byte against the package and fails when it lags, because a zip carrying the right filenames with stale contents ships the same defect under a passing check. Rebuild it after changing anything under `course-development-partner/`:
+`course-development-partner.zip` is a tracked build artifact, not a source of truth. `tests/check_repository.py` compares its contents byte for byte against the package and fails when it lags, be[...]
 
 ```bash
 rm -f course-development-partner.zip
@@ -195,9 +201,9 @@ Common project-scoped locations include:
 - Codex and cross-client convention: `.agents/skills/course-development-partner/`
 - Claude Code: `.claude/skills/course-development-partner/`
 
-When using a client-specific installer, select the repository subpath `course-development-partner`. For clients that accept an uploaded archive, `course-development-partner.zip` in the repository root is that same directory already packaged.
+When using a client-specific installer, select the repository subpath `course-development-partner`. For clients that accept an uploaded archive, `course-development-partner.zip` in the repository[...]
 
-When copying the directory by hand or packaging it as an archive, exclude generated caches (`__pycache__/`, `*.pyc`); they are gitignored but present in a working checkout, and the approved package inventory in `tests/package-inventory.txt` does not include them.
+When copying the directory by hand or packaging it as an archive, exclude generated caches (`__pycache__/`, `*.pyc`); they are gitignored but present in a working checkout, and the approved packa[...]
 
 ## Invocation examples
 
@@ -212,9 +218,9 @@ Depending on the client, select or invoke the skill as `course-development-partn
 
 ## Validation
 
-The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, dataset and representation fit, recorded data-task fit claims, release records (safety review, accessibility review, and production plan), handoff state (design log, source register, capability manifest), project-level consistency, parser edge cases, CLI behavior, accessibility and rich-artifact routing, privacy auditing, local Markdown links, package inventory boundaries, and the packaged archive's contents.
+The package includes deterministic tests for design state, alignment, artifact manifests, assessment blueprints, curriculum sequence/coherence, dataset and representation fit, recorded data-task [...]
 
-Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or `all-active`; retired records remain structurally checked but do not satisfy current coverage, artifact-family, progression, dependency, or workload requirements; Course-tier production requires a curriculum map; and Course-tier handoff requires ordered active-outcome progression. The project validator also reports recognized portable-state files omitted from the project index, requires one confined and resolvable index entry per active state file, checks consequential handoff fields and conditional team/safety records, and validates the local release records cited by teaching-ready manifest rows.
+Connected validation is engagement-tier-, scope-, order-, and status-aware: duplicate authoritative metadata is rejected; assessment blueprints declare either an explicit active-outcome subset or[...]
 
 Run the repository tests with Python 3.10 or later **from the repository root**:
 
@@ -223,13 +229,13 @@ python3 -m unittest discover -s tests -v
 python3 tests/check_repository.py
 ```
 
-GitHub Actions runs the same steps on every push and pull request, plus `ruff` and `mypy`. The linter and type checker are pinned to exact versions there, and the lint rule set is declared in `ruff.toml` rather than inherited from whichever ruff release is current: ruff's defaults expanded between releases and failed a commit that had passed locally, with nothing in this repository having changed. Upgrading either tool is a reviewed commit, not a surprise. To reproduce a CI run locally, install the pinned versions from `.github/workflows/checks.yml`.
+GitHub Actions runs the same steps on every push and pull request, plus `ruff` and `mypy`. The linter and type checker are pinned to exact versions there, and the lint rule set is declared in `ru[...]
 
-The sibling `course_development_partner_app` project runs this repository's tests through its symlink as part of its own suite; treat it as a second consumer when renaming or restructuring anything under `tests/`.
+The sibling `course_development_partner_app` project runs this repository's tests through its symlink as part of its own suite; treat it as a second consumer when renaming or restructuring anything un[...]
 
-Live behavioral testing is available separately and is opt-in. `tests/run_behavioral_scenarios.py` drives ten forward-test scenarios against any OpenAI-compatible chat endpoint, with the skill text as the system prompt, and retains full transcripts under `tests/behavioral-results/` for human rubric application. Name the endpoint with `--base-url`, `--chat-path`, and `--model`; no provider is assumed or required, because the scenarios test the skill and a result that reproduces on one service only is evidence about that service. The scenarios cover the partner experience (Co-design cadence, rubric co-design, Focused-tier overhead), the mode contrasts (Auto non-interactive, Rapid single-review), and five data-task-fit regressions: categorical totals requested as a scatter plot, two numeric identifier columns, a named variable absent from the file, a solution key computing over columns the worksheet never names, and an educator who insists after being told the chart is impossible. Heuristics include question counts, decision cards per turn, turn size, closing return-to-educator, tier/mode invisibility, and — for data-task fit — an explicit refusal of the impossible representation, an offered repair, and the absence of a produced chart. Use `--iterations 3`; model outputs vary. Heuristic passes are a screen, never a qualifying forward-test claim: a heuristic can only see the shape of a reply, and the data-task-fit check passed a topical mention of "categorical" until it was tightened.
+Live behavioral testing is available separately and is opt-in. `tests/run_behavioral_scenarios.py` drives ten forward-test scenarios against any OpenAI-compatible chat endpoint, with the skill te[...]
 
-The working directory matters. `unittest` resolves `-s tests` as a path only when that path exists relative to the current directory; otherwise it falls back to treating `tests` as a dotted module name. Some third-party packages install a top-level `tests` package into `site-packages`, so from any other directory that fallback silently discovers and runs *their* suite instead of this one — reporting unrelated errors that look like failures in this repository. To run from elsewhere, give an absolute path:
+The working directory matters. `unittest` resolves `-s tests` as a path only when that path exists relative to the current directory; otherwise it falls back to treating `tests` as a dotted modul[...]
 
 ```bash
 python3 -m unittest discover -s /path/to/course_development_partner/tests
@@ -237,8 +243,8 @@ python3 -m unittest discover -s /path/to/course_development_partner/tests
 
 Do not add `-t .` to work around this: `tests/` is intentionally not an importable package, and a separate top-level directory makes discovery fail outright.
 
-Exploratory forward tests have covered focused review, accessibility-authority, visual-design, STEM, non-STEM, and rubric-calibration scenarios, but the historical records do not retain all metadata, responses, and evaluator evidence required for a current passing claim. See [the current test index](tests/test-index.md) for current, historical, and pending evidence. In one capable host, representative DOCX, PDF, PPTX, XLSX, and SVG artifacts were produced and inspected, but those temporary files were not retained; [the historical report](tests/rich-artifact-production-report.md) therefore remains bounded and non-reproducible. Current behavioral reruns, live integrations, a faithful mock institutional authorization flow, a retained rich-artifact rerun, and clean bidirectional named-client installation and handoff still require testing before broader production or compatibility claims.
+Exploratory forward tests have covered focused review, accessibility-authority, visual-design, STEM, non-STEM, and rubric-calibration scenarios, but the historical records do not retain all metad[...]
 
 ## License and attribution
 
-Course Development Partner is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Isabel Jimenez and Daniel Mejia. See [NOTICE](NOTICE) for attribution and third-party provenance information.
+Course Development Partner is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Isabel Jimenez and Daniel Mejia. See [NOTICE](NOTICE) for attribution and third-party provenance inf[...]
