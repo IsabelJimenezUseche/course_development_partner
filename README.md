@@ -1,14 +1,14 @@
 # Course Development Partner
 
+Course Development Partner is an interactive, client-neutral Agent Skill for responsible educators, course owners, and instructional designers creating higher-education materials. It helps a teaching team move from course goals and source materials to aligned, authentic, scaffolded, accessible, and boundedly validated teaching artifacts.
+
+The skill is designed for skills-compatible agents and portable Markdown handoffs. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool. Compatibility claims remain conditional until the same scenarios pass in each named client.
+
 ## Quick download and install
 1. Find the `course-development-partner.zip` file in the repository root.
 2. Click the `.zip` file name to open its file page.
 3. On the file page, click the download icon (or the "Download" button) to save the ZIP to your computer.
 4. Add or upload the extracted `course-development-partner` directory (the inner folder containing `SKILL.md`) into the skills/workspace area of your preferred LLM client or skill host.
-
-Course Development Partner is an interactive, client-neutral Agent Skill for responsible educators, course owners, and instructional designers creating higher-education materials. It helps a teachi[...]
-
-The skill is designed for skills-compatible agents and portable Markdown handoffs. Its educational workflow does not depend on a particular model, vendor, MCP server, or file-production tool. Compa[...]
 
 ## What the skill supports
 
